@@ -1,0 +1,68 @@
+[tool.ruff]
+line-length = 300
+
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist"
+]
+
+[tool.ruff.lint]
+# Только правила, которые находят реальные проблемы в коде
+select = [
+    "F",   # Pyflakes - логические ошибки (неиспользуемые переменные, импорты, ошибки в названиях)
+    "B",   # flake8-bugbear - распространённые ошибки и подводные камни
+    "A",   # flake8-builtins - использование имён встроенных функций как переменных
+    "E",   # pycodestyle errors - только синтаксические ошибки (без стиля)
+    "W",   # pycodestyle warnings - только предупреждения о логических проблемах
+    "SIM", # flake8-simplify - упрощение кода (ненужные if, else и т.д.)
+    "RUF", # Специфичные правила ruff для обнаружения проблем
+]
+
+# Игнорируем ВСЕ правила форматирования и стиля
+ignore = [
+    # Все правила форматирования
+    "E101",   # Indentation contains mixed spaces and tabs
+    "E111",   # Indentation is not a multiple of 4
+    "E112",   # Expected an indented block
+    "E113",   # Unexpected indentation
+    "E114",   # Indentation is not a multiple of 4 (comment)
+    "E115",   # Expected an indented block (comment)
+    "E116",   # Unexpected indentation (comment)
+    "E117",   # Over-indented
+    # Все правила форматирования из W
+    "W191",   # Indentation contains tabs
+    "W291",   # Trailing whitespace
+    "W292",   # No newline at end of file
+    "W293",   # Blank line contains whitespace
+    "W391",   # Blank line at end of file
+    # Правила isort (форматирование импортов)
+    "I",      # isort - сортировка импортов
+    
+    # Правила именования (не критичны для логики)
+    "N",      # pep8-naming - соглашения об именах
+    
+    # Правила документации
+    "D",      # pydocstyle - документация
+
+    "B008",
+
+    # Правила Ruff
+    "RUF001",  # символы кирилицы похожие на латиницу
+    "RUF003",
+]
+
+[tool.ruff.lint.flake8-bugbear]
+# Игнорировать магические числа в учебных целях
+extend-immutable-calls = ["print", "len", "range", "int", "str", "list", "dict"]
+
+[tool.ruff.lint.mccabe]
+# Максимальная цикломатическая сложность (можно повысить для студентов)
+max-complexity = 10
+
+[tool.ruff.lint.pycodestyle]
+# Не проверяем длину строк
+max-doc-length = 320

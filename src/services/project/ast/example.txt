@@ -1,0 +1,55 @@
+import logging
+from pathlib import Path
+
+from jinja2 import Environment, FileSystemLoader
+
+from src.infrastructure.llm.base import BaseLLM, Message
+
+
+logger = logging.getLogger(__name__)
+
+
+class Critic(SuperProcessor, byes.Analyzer):
+    """
+    Some critic description
+    implement different features
+    """
+    def __init__(self, llm: BaseLLM) -> None:
+        """base init method"""
+        loader = FileSystemLoader(Path("src") / Path("prompts"))
+        env = Environment(loader=loader)
+        self.system_prompt = env.get_template("critic_project_doc/system.tpl")
+        self.user_prompt = env.get_template("critic_project_doc/user.tpl")
+        self.llm = llm
+
+    @static
+    @observed
+    async def run(self, project_doc: str) -> str:
+        """dsfsdfsdf"""
+        messages = [
+            Message(role="system", content=self.system_prompt.render()),
+            Message(
+                role="user",
+                content=self.user_prompt.render(project_doc=project_doc),
+            ),
+        ]
+        answer = self.llm.answer(messages, temperature=0.3)
+        logger.warning(answer)
+        return answer.content
+
+
+class LazyImplementer:
+    """
+    Implement
+    """
+    pass
+
+
+def simple_sync_func(a: str, b: int) -> None:
+    """Just simple func"""
+    return None
+
+
+async def simple_async_func(a: str, b: int) -> str:
+    """Just simple func"""
+    return a * b

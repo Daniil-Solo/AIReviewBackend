@@ -1,0 +1,151 @@
+[project]
+name = "autoreviewer"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "bandit>=1.9.4",
+    "click>=8.3.1",
+    "jinja2>=3.1.6",
+    "mypy>=1.19.1",
+    "openai>=2.28.0",
+    "rich>=14.3.3",
+    "ruff>=0.15.6",
+    "tiktoken>=0.12.0",
+    "tree-sitter>=0.25.2",
+    "tree-sitter-python>=0.25.0",
+    "treeproject>=2.0.0",
+]
+
+
+[tool.ruff]
+# Версия Python для проверки совместимости
+target-version = "py312"
+# Сортировка импортов
+src = ["src", "tests"]
+# Максимальная длина строки
+line-length = 120
+
+[tool.ruff.lint]
+# Все правила
+select = [
+    # Pycodestyle
+    "E", "W",
+    # Pyflakes
+    "F",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-simplify
+    "SIM",
+    # flake8-return
+    "RET",
+    # flake8-pie
+    "PIE",
+    # flake8-print
+    "T20",
+    # flake8-tidy-imports
+    "TID",
+    # flake8-annotations
+    "ANN",
+    # flake8-unused-arguments
+    "ARG",
+    # flake8-errmsg
+    "EM",
+    # flake8-implicit-str-concat
+    "ISC",
+    # flake8-type-checking
+    "TC",
+    # flake8-pytest-style
+    "PT",
+    # flake8-no-pep420
+    "INP",
+    # pandas-vet
+    "PD",
+]
+# Игнорируемые правила
+ignore = [
+    # Длинные строки - черные проверяет форматирование
+    "E501",
+    # Контроль над commit-ами
+    "ANN101",  # Отключаем self в аннотациях
+    "ANN102",  # Отключаем cls в аннотациях
+    # Может быть слишком строгим
+    "ANN401",  # any type
+    "EM101",   # Exception must not use a string literal
+    "EM102",   # Exception must not use an f-string literal
+    # Кирилица в комментариях
+    "RUF002",
+    #
+    "UP046"
+]
+
+# Правила, которые должны быть исправлены автоматически
+fixable = ["ALL"]
+
+[tool.ruff.lint.mccabe]
+# Максимальная сложность функций
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+# Использовать Google-style докстринги
+convention = "google"
+
+[tool.ruff.lint.isort]
+# Стиль сортировки импортов
+known-first-party = ["src"]
+known-third-party = ["pydantic", "sqlalchemy", "fastapi"]
+lines-after-imports = 2
+force-sort-within-sections = true
+combine-as-imports = true
+
+[tool.mypy]
+# Версия Python
+python_version = "3.12"
+
+# Пути для проверки
+files = ["src", "tests"]
+
+# Строгие настройки
+strict = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_return_any = true
+warn_unreachable = true
+
+# Дополнительные проверки
+disallow_any_unimported = false
+disallow_any_expr = false
+disallow_any_decorated = false
+disallow_any_explicit = false
+disallow_any_generics = true
+disallow_subclassing_any = true
+
+# Проверка не типизированных функций
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+
+# Настройки для типов
+no_implicit_optional = true
+strict_equality = true
+ignore_missing_imports = true
+follow_imports = "silent"
+
+#[tool.mypy.pydantic-mypy]
+#init_forbid_extra = true
+#init_typed = true
+#warn_required_dynamic_aliases = true
+#warn_untyped_fields = true

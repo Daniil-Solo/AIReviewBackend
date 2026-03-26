@@ -1,0 +1,14 @@
+## Гайд для разработчика
+
+### Установка зависимостей
+
+Требуется установленный пакетный менеджер uv
+```bash
+uv sync
+```
+
+### Запуск всех линтеров
+
+```bash
+uv run ruff format src && uv run ruff check --fix src && uv run mypy src
+```
