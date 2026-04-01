@@ -5,10 +5,39 @@ erDiagram
     users {
         integer id PK
         string fullname
-        string login
+        string email
         string hashed_password
+        bool is_verified
         bool is_admin
         datetime created_at
+    }
+    
+    workspaces {
+        integer id PK
+        string name
+        string description
+        datetime created_at
+    }
+
+    workspace_members  {
+        integer id PK
+        integer workspace_id FK
+        integer user_id FK
+        workspace_member_role_enum  role
+    }
+
+    workspace_member_role_enum {
+        string OWNER
+        string TEACHER
+        string STUDENT
+    }
+    
+    workspace_join_rules {
+        integer id PK
+        integer workspace_id FK
+        string slug
+        workspace_member_role_enum role
+        datetime expired_at
     }
 
     tasks {
@@ -33,11 +62,18 @@ erDiagram
         solution_status_enum status
         integer created_by FK
         datetime created_at
+        integer human_grade
+        string human_comment
     }
 
     solution_status_enum {
         string CREATED
-        string CANCELED
+        string FAILED
+        string AI_REVIEW
+        string WAITING_EXAM
+        string EXAMINATION
+        string HUMAN_REVIEW
+        string REVIEWED
     }
 
     solution_format_enum {
@@ -48,58 +84,52 @@ erDiagram
     solution_reports {
         integer solution_id PK, FK
         string project_doc
-        jsonb criteria_checks
         %% code, comment, confidence, value
-        jsonb exam_messages
-        %% role, content
+        jsonb project_doc_criteria_checks
+        jsonb codebase_criteria_checks
+        jsonb agent_criteria_checks
+        %% code, text
+        jsonb questions
     }
-
+    
+    solution_exams {
+        integer solution_id PK, FK
+        datetime expired_at
+        %% code, text
+        jsonb answers
+    }
+    
     transactions {
         integer id PK
         integer user_id FK
-        integer amount
+        float amount
         transaction_type_enum type
+        jsonb metadata
     }
 
     transaction_type_enum {
         string WELCOME_BONUS
         string REVIEW
         string ADMIN_TOP_UP
+        string DEPOSIT
     }
 
-    courses {
-        integer id PK
-        string name
-        string description
-        integer created_by FK
-        datetime created_at
-    }
-
-    course_members {
-        integer course_id PK, FK
-        integer user_id PK, FK
-        course_member_type_enum  type
-    }
-
-    course_member_type_enum {
-        string TEACHER
-        string STUDENT
-    }
-
-    users ||--|{ course_members : "is a part of"
-    users ||--|{ courses : creates
-    courses ||--|{ course_members : contains
-    course_members ||..|| course_member_type_enum : has
+    users ||--|{ workspace_members   : "is a part of"
+    workspaces ||--|{ workspace_join_rules   : uses
+    workspaces ||--|{ workspace_members   : contains
+    workspace_members   ||..|| workspace_member_role_enum : has
+    workspace_join_rules   ||..|| workspace_member_role_enum : has
     
-    courses ||--|{ tasks : contains
+    workspaces ||--|{ tasks : contains
     users ||--|{ tasks : creates
 
-    users ||--|{ solutions : makes
+    users ||--|{ solutions : creates
 
     tasks ||--|{ solutions : "solved in"
     solutions ||..|| solution_format_enum : has
     solutions ||..|| solution_status_enum : has
     solutions ||--|| solution_reports: "described in"
+    solutions ||--|| solution_exams: "extra estimated in"
     
     users ||..|{ transactions : has
     transactions ||..|| transaction_type_enum : has
