@@ -47,11 +47,23 @@ erDiagram
         bool is_active
         integer created_by FK
         datetime created_at
-
-        jsonb config 
-        %% use_linters, use_sast, use_feedback, use_exam
-        jsonb criteria 
-        %% code (fastapi_023), description, weight
+    }
+    
+    criteria {
+        integer id PK
+        string code
+        integer task_id FK
+        string description
+        bool is_public
+        array tags
+        integer created_by
+    }
+    
+    task_criteria {
+        integer id PK
+        integer task_id FK
+        integer criterion_id FK
+        float weight
     }
 
     solutions {
@@ -81,15 +93,21 @@ erDiagram
         string GITHUB
     }
 
-    solution_reports {
+    solution_artifacts {
         integer solution_id PK, FK
+        %% Raw data
+        string project_tree_link
+        string project_content_link
+        %% Project-doc
         string project_doc
-        %% code, comment, confidence, value
+        %% Criteria checks
         jsonb project_doc_criteria_checks
         jsonb codebase_criteria_checks
         jsonb agent_criteria_checks
-        %% code, text
+        %% code, comment, confidence, value
+        %% Exam questions
         jsonb questions
+        %% code, text
     }
     
     solution_exams {
@@ -122,14 +140,18 @@ erDiagram
     
     workspaces ||--|{ tasks : contains
     users ||--|{ tasks : creates
+    users ||--|{ criteria : creates
 
     users ||--|{ solutions : creates
 
     tasks ||--|{ solutions : "solved in"
     solutions ||..|| solution_format_enum : has
     solutions ||..|| solution_status_enum : has
-    solutions ||--|| solution_reports: "described in"
+    solutions ||--|| solution_artifacts: "extra described in"
     solutions ||--|| solution_exams: "extra estimated in"
+    
+    tasks ||--|{ task_criteria : "has"
+    criteria ||--|{ task_criteria : "included in"
     
     users ||..|{ transactions : has
     transactions ||..|| transaction_type_enum : has

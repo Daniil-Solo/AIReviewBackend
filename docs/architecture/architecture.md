@@ -23,7 +23,7 @@ graph LR
     API("Platform Backend <br>[Container: FastAPI]"):::container
     TaskExecutor("Task Executor <br>[Container: Arq Worker]"):::container
     DB[("Core Data <br>[Container: PostgreSQL]")]:::database
-    S3[("Submissions <br>[Container: Minio]")]:::database
+    S3[("Artifacts <br>[Container: Minio]")]:::database
     Tasks[("Tasks Queue <br>[Container: Redis]")]:::database
     StudentBot("Student Bot <br>[Container: Aiogram]"):::container
 
