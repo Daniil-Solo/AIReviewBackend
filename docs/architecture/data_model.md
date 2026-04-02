@@ -47,6 +47,7 @@ erDiagram
         bool is_active
         integer created_by FK
         datetime created_at
+        bool use_exam
     }
     
     criteria {
