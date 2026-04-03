@@ -1,7 +1,7 @@
 from dependency_injector.wiring import Provide, inject
 
-from src.application.exceptions import ConflictError
-from src.dto.users.user import UserCreateDTO, UserResponseDTO
+from src.application.exceptions import ConflictError, ForbiddenError
+from src.dto.users.user import UserCreateDTO, UserResponseDTO, ShortUserDTO
 from src.infrastructure.auth import hash_password
 from src.infrastructure.di.container import Container
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
@@ -40,7 +40,10 @@ async def create_admin(data: UserCreateDTO, uow: UnitOfWork = Provide[Container.
 
 
 @inject
-async def get_all_users(uow: UnitOfWork = Provide[Container.uow]) -> list[UserResponseDTO]:
+async def get_all_users(user: ShortUserDTO, uow: UnitOfWork = Provide[Container.uow]) -> list[UserResponseDTO]:
+    if not user.is_admin:
+        raise ForbiddenError(message="Пользователь должен быть админом")
+
     async with uow:
         return await uow.users.get_all()
 

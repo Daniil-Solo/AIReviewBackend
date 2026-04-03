@@ -23,4 +23,4 @@ class UnitOfWork:
             await self._session.rollback()
         await self._session.close()
         self._session = None
-        self.users_dao = None
+        self.users = None

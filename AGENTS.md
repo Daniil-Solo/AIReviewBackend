@@ -28,23 +28,26 @@
 
 - src - весь исходный код проекта
   - dto - Data Transfer Objects для API и Service слоев
-    - users/ - DTO для пользователей (UserCreateDTO, UserResponseDTO)
-    - auth/ - DTO для аутентификации (UserLoginDTO, TokenDTO)
+    - users/ - DTO для пользователей
+    - auth/ - DTO для аутентификации
   - infrastructure - коннекторы к базе данных и внешним сервисам
     - auth/ - утилиты аутентификации (JWT, хеширование паролей)
     - dao/ - Data Access Object для работы с БД
-    - di/ - контейнер dependency-injector
+      - interfaces/ - интерфейсы для конкретных сущностей
+      - sqlalachemy/ - реализации интерфейсов для конкретных сущностей
+    - di/ - контейнер из dependency-injector
     - sqlalchemy/ - модели и таблицы БД
       - models.py - все таблицы SQLAlchemy Core
-    - config.py - настройки приложения
-    - database.py - подключение к БД
+      - engine.py - подключение к БД
+      - uow.py - агрегация всех DAO для выделения им одной сессии
+    - settings/ - настройки приложения
   - interfaces - различные точки входа в приложение
     - api - содержит эндпоинты API
-      - auth/ - эндпоинты аутентификации
-      - users/ - эндпоинты пользователей
+      - v1/ - эндпоинты версии v1
       - internal/ - внутренние эндпоинты
       - dependencies.py - зависимости для FastAPI
-      - exception_handlers.py - обработчики исключений
+      - error_status_mapping.py - маппинг ошибок из бизнес-слоя на HTTP-коды
+      - app.py - точка входа в приложение с объявлением FastAPI
     - cli - содержит команды для запуска (локальное тестирование)
     - tasks - фоновые задачи
   - application - сервисы бизнес-логики
@@ -56,6 +59,7 @@
     - architecture.md - C4-диаграмма компонентов системы (уровень контейнеров)
     - data_model.md - ER-диаграмма (модель данных)
   - diploma - это тебе не нужно
+  - examples - это тебе не нужно
   - usecases - содержит текстовое описание фичей с предложениями по реализации
   - development.md - основные инструкции для запуска проекта и линтеров
 
@@ -66,9 +70,8 @@
 
 1. **Interfaces** - точка входа (API, CLI)
 2. **Application** - бизнес-логика
-3. **Application** - бизнес-логика
-4. **Infrastructure** - реализация доступа к данным
-5. **DTO** - объекты передачи данных
+3. **Infrastructure** - реализация доступа к данным
+4. **DTO** - объекты передачи данных между слоями
 
 Зависимости: Interfaces → Services → Infrastructure/DAO
             Interfaces → DTO
