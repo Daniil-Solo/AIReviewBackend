@@ -16,11 +16,11 @@ services:
   app:
     build: .
     env_file:
-      - .env
+      - ./.env
     ports:
       - "${APP_PORT}:${APP_PORT}"
     volumes:
-      - ./src:/app/src
+      - .:/app
     depends_on:
       db:
         condition: service_healthy

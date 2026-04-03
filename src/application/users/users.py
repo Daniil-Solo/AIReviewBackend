@@ -1,17 +1,20 @@
 from dependency_injector.wiring import Provide, inject
 
-from src.application.exceptions import ConflictError, ForbiddenError
-from src.dto.users.user import UserCreateDTO, UserResponseDTO, ShortUserDTO
+from src.application.exceptions import ConflictError, EntityNotFoundError, ForbiddenError
+from src.dto.users.user import ShortUserDTO, UserCreateDTO, UserResponseDTO
 from src.infrastructure.auth import hash_password
-from src.infrastructure.di.container import Container
+from src.di.container import Container
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 
 
 @inject
 async def create_user(data: UserCreateDTO, uow: UnitOfWork = Provide[Container.uow]) -> UserResponseDTO:
     async with uow:
-        existing_user = await uow.users.get_by_email(data.email)
-        if existing_user is not None:
+        try:
+            await uow.users.get_by_email(data.email)
+        except EntityNotFoundError:
+            pass
+        else:
             raise ConflictError(message="Пользователь с таким email уже существует", code="user_email_exists")
 
         hashed_password = hash_password(data.password)
@@ -26,8 +29,11 @@ async def create_user(data: UserCreateDTO, uow: UnitOfWork = Provide[Container.u
 @inject
 async def create_admin(data: UserCreateDTO, uow: UnitOfWork = Provide[Container.uow]) -> UserResponseDTO:
     async with uow:
-        existing_user = await uow.users.get_by_email(data.email)
-        if existing_user is not None:
+        try:
+            await uow.users.get_by_email(data.email)
+        except EntityNotFoundError:
+            pass
+        else:
             raise ConflictError(message="Пользователь с таким email уже существует", code="user_email_exists")
 
         hashed_password = hash_password(data.password)

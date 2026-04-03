@@ -29,6 +29,7 @@ class ShortUserDTO(BaseModel):
 class UserResponseDTO(ShortUserDTO):
     is_verified: bool
     created_at: datetime.datetime
+    hashed_password: str
 
     def as_short(self) -> ShortUserDTO:
         return ShortUserDTO(**self.model_dump(by_alias=True))

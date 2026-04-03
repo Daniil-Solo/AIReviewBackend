@@ -22,7 +22,6 @@ class SQLAlchemyUsersDAO(UsersDAO):
                 hashed_password=hashed_password,
                 is_admin=is_admin,
                 is_verified=False,
-                created_at=datetime.datetime.now(datetime.UTC),
             )
             .returning(users_table)
         )

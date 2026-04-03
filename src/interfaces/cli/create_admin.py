@@ -1,9 +1,9 @@
 import asyncclick as click
 from rich.console import Console
 
-from src.application.users import users as users_service
+from src.application.users.users import create_admin
 from src.dto.users.user import UserCreateDTO
-from src.infrastructure.di.container import init_container
+from src.di.container import init_container
 
 
 console = Console()
@@ -17,7 +17,7 @@ async def main(email: str, password: str, fullname: str) -> None:
     try:
         init_container()
         data = UserCreateDTO(email=email, password=password, fullname=fullname)
-        user = await users_service.create_admin(data)
+        user = await create_admin(data)
         console.print(f"[bold green]Администратор {user.email} успешно создан![/bold green]")
     except Exception as e:
         console.print(f"[bold red]Ошибка: {e}[/bold red]")

@@ -3,10 +3,10 @@ from typing import Any
 
 from tree_sitter import Language, Node, Parser, Query, QueryCursor
 import tree_sitter_python as tsp
-
-
-with open("example.txt") as f:
-    source = f.read()
+#
+#
+# with open("example.txt") as f:
+#     source = f.read()
 
 
 def get_node_text(node: Node, source: bytes) -> str:
@@ -115,8 +115,8 @@ def extract_classes(source_code: str) -> list[dict[str, Any]]:
 
     return classes
 
-
-classes = extract_classes(source)
-
-# Pretty print as JSON
-print(json.dumps(classes, indent=2, ensure_ascii=False))
+#
+# classes = extract_classes(source)
+#
+# # Pretty print as JSON
+# print(json.dumps(classes, indent=2, ensure_ascii=False))

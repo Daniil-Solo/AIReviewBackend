@@ -1,5 +1,3 @@
-import datetime
-
 import sqlalchemy as sa
 
 
@@ -12,7 +10,7 @@ users_table = sa.Table(
     sa.Column("fullname", sa.String(255), nullable=False),
     sa.Column("email", sa.String(255), nullable=False, unique=True),
     sa.Column("hashed_password", sa.String, nullable=False),
-    sa.Column("is_verified", sa.Boolean, nullable=False, default=False),
-    sa.Column("is_admin", sa.Boolean, nullable=False, default=False),
-    sa.Column("created_at", sa.DateTime, nullable=False, default=datetime.datetime.utcnow),
+    sa.Column("is_verified", sa.Boolean, nullable=False, server_default=sa.false()),
+    sa.Column("is_admin", sa.Boolean, nullable=False, server_default=sa.false()),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
 )

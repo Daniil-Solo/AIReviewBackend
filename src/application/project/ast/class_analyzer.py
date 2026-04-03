@@ -138,10 +138,10 @@ class ClassASTAnalyzer(BaseASTAnalyzer[list[ClassInfo]]):
             class_info_list.append(class_info)
         return class_info_list
 
-
-with open("example.txt", "rb") as f:
-    source_code = f.read()
-
-analyzer = ClassASTAnalyzer()
-result = analyzer.analyze(source_code)
-pprint(result)  # noqa: T203
+#
+# with open("example.txt", "rb") as f:
+#     source_code = f.read()
+#
+# analyzer = ClassASTAnalyzer()
+# result = analyzer.analyze(source_code)
+# pprint(result)  # noqa: T203
