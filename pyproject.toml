@@ -5,14 +5,19 @@ description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.18.4",
+    "asyncclick>=8.3.0.7",
     "asyncpg>=0.31.0",
     "bandit>=1.9.4",
     "click>=8.3.1",
+    "dependency-injector>=4.49.0",
     "fastapi>=0.135.3",
     "jinja2>=3.1.6",
     "mypy>=1.19.1",
     "openai>=2.28.0",
+    "psycopg2-binary>=2.9.11",
     "pydantic-settings>=2.13.1",
+    "pyjwt>=2.12.1",
+    "python-multipart>=0.0.22",
     "rich>=14.3.3",
     "ruff>=0.15.6",
     "sqlalchemy[asyncio]>=2.0.48",
@@ -80,18 +85,12 @@ select = [
 ]
 # Игнорируемые правила
 ignore = [
-    # Длинные строки - черные проверяет форматирование
     "E501",
-    # Контроль над commit-ами
-    "ANN101",  # Отключаем self в аннотациях
-    "ANN102",  # Отключаем cls в аннотациях
-    # Может быть слишком строгим
     "ANN401",  # any type
     "EM101",   # Exception must not use a string literal
     "EM102",   # Exception must not use an f-string literal
     # Кирилица в комментариях
     "RUF002",
-    #
     "UP046"
 ]
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from src.infrastructure.database import check_database_connection
+from src.infrastructure.sqlalchemy.engine import check_database_connection
 
 
 router = APIRouter()
