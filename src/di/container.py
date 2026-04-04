@@ -1,0 +1,45 @@
+from dependency_injector import containers, providers
+
+from src.infrastructure.dao.users.sqlalchemy import SQLAlchemyUsersDAO
+from src.infrastructure.logs_sender.init_logs_sender import init_logs_sender
+from src.infrastructure.sqlalchemy.engine import create_engine, create_session_factory
+from src.infrastructure.sqlalchemy.uow import UnitOfWork
+from src.settings import settings
+
+
+class Container(containers.DeclarativeContainer):
+    engine = providers.Singleton(create_engine, url=settings.db.url)
+
+    session_factory = providers.Singleton(
+        create_session_factory,
+        engine=engine,
+    )
+
+    users_dao = providers.Factory(lambda: SQLAlchemyUsersDAO)
+
+    uow = providers.Factory(
+        UnitOfWork,
+        session_factory=session_factory,
+        users_dao_factory=users_dao,
+    )
+
+    logs_sender = providers.Resource(init_logs_sender)
+
+
+async def init_container() -> Container:
+    container = Container()
+    container.wire(
+        packages=[
+            "src.application.auth",
+            "src.application.health",
+            "src.application.users",
+        ]
+    )
+    await container.init_resources()
+    return container
+
+
+async def shutdown_container(container: Container) -> None:
+    await container.shutdown_resources()
+    engine = container.engine()
+    await engine.dispose()

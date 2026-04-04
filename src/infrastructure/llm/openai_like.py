@@ -1,12 +1,12 @@
-import logging
 from typing import Any
 
 from openai import OpenAI
 
 from src.infrastructure.llm.base import Answer, BaseLLM, Message
+from src.infrastructure.logging import get_logger
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 
 class OpenAILikeLLM(BaseLLM):
@@ -23,7 +23,12 @@ class OpenAILikeLLM(BaseLLM):
             temperature=0,
             **kwargs,
         )
-        logger.warning(response)
+        logger.info(
+            "llm_response_received",
+            model=self.model,
+            in_tokens=response.usage.prompt_tokens if response.usage else None,
+            out_tokens=response.usage.completion_tokens if response.usage else None,
+        )
         if response.choices is None:
             raise RuntimeError(response)
 
