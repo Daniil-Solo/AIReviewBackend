@@ -12,3 +12,14 @@ uv sync
 ```bash
 uv run ruff format src && uv run ruff check --fix src && uv run mypy src
 ```
+
+### Миграции
+
+```bash
+uv run alembic revision --autogenerate -m "users"
+```
+
+```bash
+uv run alembic upgrade
+```
+

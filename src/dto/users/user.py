@@ -1,0 +1,41 @@
+import datetime
+import re
+
+from pydantic import Field, field_validator
+
+from src.dto.common import BaseDTO
+
+
+class UserCreateDTO(BaseDTO):
+    fullname: str = Field(min_length=1, max_length=255, description="Полное имя пользователя")
+    email: str = Field(description="Электронная почта пользователя")
+    password: str = Field(min_length=8, description="Пароль пользователя")
+
+    @field_validator("password", mode="after")
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        if not re.search(r"\d", v):
+            raise ValueError("Password must contain at least one digit")
+        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", v):
+            raise ValueError("Password must contain at least one special character")
+        return v
+
+
+class ShortUserDTO(BaseDTO):
+    id: int
+    email: str
+    fullname: str
+    is_admin: bool
+
+
+class UserResponseDTO(ShortUserDTO):
+    is_verified: bool
+    created_at: datetime.datetime
+    hashed_password: str
+
+    def as_short(self) -> ShortUserDTO:
+        return ShortUserDTO(**self.model_dump(by_alias=True))
+
+
+class UserWithPasswordDTO(UserResponseDTO):
+    hashed_password: str

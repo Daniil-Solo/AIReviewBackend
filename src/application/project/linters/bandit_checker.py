@@ -1,9 +1,9 @@
-import subprocess
 import json
+import subprocess
+from dataclasses import dataclass
 from pathlib import Path
 from pprint import pprint
 from typing import Any
-from dataclasses import dataclass
 
 IGNORED_DIRECTORIES = ["tests", "migrations", "venv", ".venv", "__pycache__"]
 
