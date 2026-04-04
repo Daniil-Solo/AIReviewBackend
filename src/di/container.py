@@ -1,6 +1,7 @@
 from dependency_injector import containers, providers
 
 from src.infrastructure.dao.users.sqlalchemy import SQLAlchemyUsersDAO
+from src.infrastructure.logs_sender.init_logs_sender import init_logs_sender
 from src.infrastructure.sqlalchemy.engine import create_engine, create_session_factory
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 from src.settings import settings
@@ -22,8 +23,10 @@ class Container(containers.DeclarativeContainer):
         users_dao_factory=users_dao,
     )
 
+    logs_sender = providers.Resource(init_logs_sender)
 
-def init_container() -> Container:
+
+async def init_container() -> Container:
     container = Container()
     container.wire(
         packages=[
@@ -32,4 +35,11 @@ def init_container() -> Container:
             "src.application.users",
         ]
     )
+    await container.init_resources()
     return container
+
+
+async def shutdown_container(container: Container) -> None:
+    await container.shutdown_resources()
+    engine = container.engine()
+    await engine.dispose()

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.dto.users.user import UserResponseDTO
+from src.dto.users.user import UserResponseDTO, UserWithPasswordDTO
 
 
 class UsersDAO(ABC):
