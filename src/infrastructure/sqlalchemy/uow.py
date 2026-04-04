@@ -1,9 +1,10 @@
 from collections.abc import Callable
 import types
+from typing import Self
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.infrastructure.dao.interfaces.users import UsersDAO
+from src.infrastructure.dao.users.interface import UsersDAO
 
 
 class UnitOfWork:
@@ -28,7 +29,7 @@ class UnitOfWork:
     def session(self) -> AsyncSession:
         return self._session
 
-    async def __aenter__(self) -> AsyncSession:
+    async def __aenter__(self) -> Self:
         self._session = self._session_factory()
         return self
 

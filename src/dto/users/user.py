@@ -1,10 +1,12 @@
 import datetime
 import re
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import Field, field_validator
+
+from src.dto.common import BaseDTO
 
 
-class UserCreateDTO(BaseModel):
+class UserCreateDTO(BaseDTO):
     fullname: str = Field(min_length=1, max_length=255, description="Полное имя пользователя")
     email: str = Field(description="Электронная почта пользователя")
     password: str = Field(min_length=8, description="Пароль пользователя")
@@ -19,7 +21,7 @@ class UserCreateDTO(BaseModel):
         return v
 
 
-class ShortUserDTO(BaseModel):
+class ShortUserDTO(BaseDTO):
     id: int
     email: str
     fullname: str
@@ -33,3 +35,7 @@ class UserResponseDTO(ShortUserDTO):
 
     def as_short(self) -> ShortUserDTO:
         return ShortUserDTO(**self.model_dump(by_alias=True))
+
+
+class UserWithPasswordDTO(UserResponseDTO):
+    hashed_password: str

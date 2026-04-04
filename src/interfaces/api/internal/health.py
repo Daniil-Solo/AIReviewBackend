@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter
 
 from src.application.health import health as health_service
 
-router = APIRouter()
 
+router = APIRouter()
 
 
 @router.get("/health")

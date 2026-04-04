@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from src.dto.common import BaseDTO
 
 
-class UserLoginDTO(BaseModel):
+class UserLoginDTO(BaseDTO):
     email: str
     password: str
 
 
-class TokenDTO(BaseModel):
+class TokenDTO(BaseDTO):
     access_token: str

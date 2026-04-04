@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from pprint import pprint
 
 from tree_sitter import Node, Query, QueryCursor
 
@@ -137,6 +136,7 @@ class ClassASTAnalyzer(BaseASTAnalyzer[list[ClassInfo]]):
             )
             class_info_list.append(class_info)
         return class_info_list
+
 
 #
 # with open("example.txt", "rb") as f:

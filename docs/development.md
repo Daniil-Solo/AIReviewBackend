@@ -18,3 +18,8 @@ uv run ruff format src && uv run ruff check --fix src && uv run mypy src
 ```bash
 uv run alembic revision --autogenerate -m "users"
 ```
+
+```bash
+uv run alembic upgrade
+```
+

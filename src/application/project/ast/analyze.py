@@ -1,8 +1,9 @@
-import json
 from typing import Any
 
 from tree_sitter import Language, Node, Parser, Query, QueryCursor
 import tree_sitter_python as tsp
+
+
 #
 #
 # with open("example.txt") as f:
@@ -114,6 +115,7 @@ def extract_classes(source_code: str) -> list[dict[str, Any]]:
         classes.append({"name": class_name, "docstring": docstring, "methods": methods})
 
     return classes
+
 
 #
 # classes = extract_classes(source)

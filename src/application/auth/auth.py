@@ -1,9 +1,9 @@
 from dependency_injector.wiring import Provide, inject
 
 from src.application.exceptions import EntityNotFoundError, InvalidCredentialsError
+from src.di.container import Container
 from src.dto.auth.token import TokenDTO, UserLoginDTO
 from src.infrastructure.auth import create_access_token, verify_password
-from src.di.container import Container
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 
 

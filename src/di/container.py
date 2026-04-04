@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
 
-from src.infrastructure.dao.sqlalchemy.users import SQLAlchemyUsersDAO
+from src.infrastructure.dao.users.sqlalchemy import SQLAlchemyUsersDAO
 from src.infrastructure.sqlalchemy.engine import create_engine, create_session_factory
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 from src.settings import settings
@@ -25,9 +25,11 @@ class Container(containers.DeclarativeContainer):
 
 def init_container() -> Container:
     container = Container()
-    container.wire(packages=[
-        "src.application.auth",
-        "src.application.health",
-        "src.application.users",
-    ])
+    container.wire(
+        packages=[
+            "src.application.auth",
+            "src.application.health",
+            "src.application.users",
+        ]
+    )
     return container

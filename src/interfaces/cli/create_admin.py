@@ -2,8 +2,8 @@ import asyncclick as click
 from rich.console import Console
 
 from src.application.users.users import create_admin
-from src.dto.users.user import UserCreateDTO
 from src.di.container import init_container
+from src.dto.users.user import UserCreateDTO
 
 
 console = Console()

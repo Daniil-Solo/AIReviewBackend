@@ -1,7 +1,7 @@
 import logging
 
-import sqlalchemy as sa
 from dependency_injector.wiring import Provide, inject
+import sqlalchemy as sa
 
 from src.di.container import Container
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
@@ -21,5 +21,3 @@ async def check(uow: UnitOfWork = Provide[Container.uow]) -> dict[str, bool]:
         data["postgres"] = False
     finally:
         return data
-
-

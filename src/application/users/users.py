@@ -1,9 +1,9 @@
 from dependency_injector.wiring import Provide, inject
 
 from src.application.exceptions import ConflictError, EntityNotFoundError, ForbiddenError
+from src.di.container import Container
 from src.dto.users.user import ShortUserDTO, UserCreateDTO, UserResponseDTO
 from src.infrastructure.auth import hash_password
-from src.di.container import Container
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 
 
