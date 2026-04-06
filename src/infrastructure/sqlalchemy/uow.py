@@ -43,7 +43,8 @@ class UnitOfWork:
 
     @asynccontextmanager
     async def connection(self) -> AsyncGenerator[Connection, None]:
-        self._session = self._session_factory()
+        if self._session is None:
+            self._session = self._session_factory()
         try:
             yield Connection(self._session)
             await self._session.commit()

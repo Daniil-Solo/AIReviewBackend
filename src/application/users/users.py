@@ -48,7 +48,7 @@ async def create_admin(data: UserCreateDTO, uow: UnitOfWork = Provide[Container.
 @inject
 async def get_all_users(user: ShortUserDTO, uow: UnitOfWork = Provide[Container.uow]) -> list[UserResponseDTO]:
     if not user.is_admin:
-        raise ForbiddenError(message="Пользователь должен быть админом")
+        raise ForbiddenError(message="Пользователь должен быть админом", code="admin_only")
 
     async with uow.connection():
         return await uow.users.get_all()

@@ -1,0 +1,124 @@
+from typing import Any, AsyncGenerator
+
+import pytest
+from fastapi import FastAPI
+from httpx import AsyncClient, ASGITransport
+from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.pool import NullPool
+
+from src.di.container import Container, init_container, shutdown_container
+from src.infrastructure.dao.users.sqlalchemy import SQLAlchemyUsersDAO
+from src.infrastructure.dao.workspace_join_rules.sqlalchemy import SQLAlchemyWorkspaceJoinRulesDAO
+from src.infrastructure.dao.workspace_members.sqlalchemy import SQLAlchemyWorkspaceMembersDAO
+from src.infrastructure.dao.workspaces.sqlalchemy import SQLAlchemyWorkspacesDAO
+from src.infrastructure.sqlalchemy.engine import create_session_factory
+from src.infrastructure.sqlalchemy.uow import UnitOfWork
+from src.interfaces.api.app import create_app
+from src.settings import settings
+
+import asyncio
+import logging
+import uuid
+from contextlib import asynccontextmanager
+from typing import Any
+
+import pytest_asyncio
+import asyncpg
+import pytest
+from alembic import command
+from alembic.config import Config
+from sqlalchemy import text, True_
+from sqlalchemy.ext.asyncio import AsyncConnection, create_async_engine
+from sqlalchemy.pool import NullPool
+
+from src.infrastructure.sqlalchemy.models import ALL_TABLES
+
+from src.infrastructure.sqlalchemy.engine import create_engine, create_session_factory
+from src.settings import settings
+
+logger = logging.getLogger(__name__)
+
+def log(name: str):
+    with open("t.txt", "a") as f:
+        f.write(f"{name}\n")
+
+
+@pytest_asyncio.fixture(scope="session")
+async def test_database_name():
+    conn = None
+    test_db_name = "test_autoreviewer"
+
+    try:
+        conn = await asyncpg.connect(settings.db.sync_url)
+
+        await conn.execute(f"CREATE DATABASE {test_db_name}")
+
+        logger.info(f"Test database {test_db_name} created successfully")
+
+        log("test_database_name open")
+        yield test_db_name
+
+    finally:
+        log("test_database_name close")
+        if conn:
+            try:
+                await conn.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
+                await conn.close()
+                logger.info(f"Test database {test_db_name} dropped")
+            except Exception as e:
+                logger.error(f"Failed to drop test database: {e}")
+
+
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def run_migrations(test_database_name):
+    test_sync_url = f"postgresql://{settings.db.USER}:{settings.db.PASSWORD}@{settings.db.HOST}:{settings.db.PORT}/{test_database_name}"
+    alembic_cfg = Config("alembic.ini")
+    alembic_cfg.set_main_option("sqlalchemy.url", test_sync_url)
+
+    command.downgrade(alembic_cfg, "base")
+    command.upgrade(alembic_cfg, "head")
+
+    log("run_migrations open")
+    yield
+    log("run_migrations close")
+
+    command.downgrade(alembic_cfg, "base")
+
+
+
+@pytest_asyncio.fixture
+async def container(run_migrations):
+    container = await init_container()
+
+    engine = container.engine()
+    async with engine.begin() as conn:
+        for table in ALL_TABLES:
+            await conn.execute(text(f"TRUNCATE TABLE {table.name} CASCADE"))
+
+    try:
+        log("container open")
+        yield container
+    finally:
+        log("container close")
+        await shutdown_container(container)
+
+@pytest.fixture
+
+def uow(container):
+    uow = container.uow()
+    yield uow
+
+
+@pytest.fixture()
+def init_settings():
+    log("init_settings")
+    settings.logging.LOKI_ENABLED = False
+
+
+@pytest_asyncio.fixture(scope="session")
+async def client() -> AsyncGenerator[AsyncClient, Any]:
+    app = create_app()
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        log("client")
+        yield client

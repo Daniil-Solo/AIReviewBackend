@@ -63,3 +63,5 @@ workspace_join_rules_table = sa.Table(
     sa.Column("expired_at", sa.DateTime(timezone=True), nullable=True),
     sa.CheckConstraint("role IN ('TEACHER', 'STUDENT')", name="chk_join_rule_role_not_owner"),
 )
+
+ALL_TABLES = [users_table, workspaces_table, workspace_members_table, workspace_join_rules_table]
