@@ -5,10 +5,10 @@ from src.application.workspaces.join_rules import (
     update_join_rule,
 )
 from src.application.workspaces.members import (
-    update_member,
     change_workspace_owner,
     join_to_workspace,
     leave_workspace,
+    update_member,
 )
 from src.application.workspaces.workspaces import (
     archive_workspace,

@@ -1,6 +1,7 @@
-import pytest_asyncio
-from httpx import AsyncClient, Response
 from fastapi import status
+from httpx import AsyncClient, Response
+import pytest_asyncio
+
 from src.dto.users import UserCreateDTO, UserResponseDTO
 from tests.factories.users import UserFactory
 from tests.helpers.users import create_users
@@ -9,11 +10,10 @@ from tests.helpers.users import create_users
 @pytest_asyncio.fixture()
 def request_create_user(client: AsyncClient):
     async def inner(data: UserCreateDTO) -> Response:
-        return await client.post(
-            "/api/v1/users",
-            json=data.model_dump(by_alias=True)
-        )
+        return await client.post("/api/v1/users", json=data.model_dump(by_alias=True))
+
     return inner
+
 
 @pytest_asyncio.fixture()
 def create_user(request_create_user):
@@ -21,6 +21,7 @@ def create_user(request_create_user):
         response = await request_create_user(data)
         assert response.status_code == status.HTTP_200_OK
         return UserResponseDTO.model_validate_json(response.text)
+
     return inner
 
 

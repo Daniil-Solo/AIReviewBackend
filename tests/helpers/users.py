@@ -1,6 +1,6 @@
-from src.infrastructure.sqlalchemy.uow import UnitOfWork
 from src.dto.users.user import UserCreateDTO, UserResponseDTO
 from src.infrastructure.auth import hash_password
+from src.infrastructure.sqlalchemy.uow import UnitOfWork
 from tests.factories.users import UserFactory
 
 

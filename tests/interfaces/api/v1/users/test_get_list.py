@@ -1,22 +1,20 @@
-import pytest_asyncio
-from httpx import AsyncClient, Response
 from fastapi import status
+from httpx import AsyncClient, Response
 from pydantic import TypeAdapter
+import pytest_asyncio
 
-from src.dto.users import UserCreateDTO, UserResponseDTO
+from src.dto.users import UserResponseDTO
 from src.infrastructure.auth import create_access_token
-from tests.factories.users import UserFactory
 from tests.helpers.users import create_users
 
 
 @pytest_asyncio.fixture()
 def request_get_users(client: AsyncClient):
     async def inner(token: str) -> Response:
-        return await client.get(
-            "/api/v1/users",
-            headers={"Authorization": f"Bearer {token}"}
-        )
+        return await client.get("/api/v1/users", headers={"Authorization": f"Bearer {token}"})
+
     return inner
+
 
 @pytest_asyncio.fixture()
 def get_users(request_get_users):
@@ -24,6 +22,7 @@ def get_users(request_get_users):
         response = await request_get_users(token)
         assert response.status_code == status.HTTP_200_OK
         return TypeAdapter(list[UserResponseDTO]).validate_json(response.text)
+
     return inner
 
 

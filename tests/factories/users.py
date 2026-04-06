@@ -1,4 +1,5 @@
 import factory
+
 from src.dto.users.user import UserCreateDTO
 
 

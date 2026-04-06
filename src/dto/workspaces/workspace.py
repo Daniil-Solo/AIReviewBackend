@@ -13,6 +13,7 @@ class WorkspaceCreateDTO(BaseDTO):
 class WorkspaceUpdateDTO(WorkspaceCreateDTO):
     pass
 
+
 class WorkspaceResponseDTO(BaseDTO):
     id: int
     name: str = Field(description="Название рабочего пространства")

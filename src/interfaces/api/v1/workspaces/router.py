@@ -3,7 +3,6 @@ from fastapi.params import Query
 
 from src.application.workspaces import (
     archive_workspace,
-    update_member,
     change_workspace_owner,
     check_slug_available,
     create_join_rule,
@@ -15,17 +14,18 @@ from src.application.workspaces import (
     get_workspace_tasks,
     leave_workspace,
     update_join_rule,
+    update_member,
     update_workspace,
 )
 from src.dto.common import SuccessOperationDTO
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces import (
-    WorkspaceMemberUpdateDTO,
     SlugCheckResponseDTO,
     TransferOwnershipDTO,
     WorkspaceCreateDTO,
     WorkspaceJoinRuleResponseDTO,
     WorkspaceMemberResponseDTO,
+    WorkspaceMemberUpdateDTO,
     WorkspaceResponseDTO,
     WorkspaceUpdateDTO,
 )

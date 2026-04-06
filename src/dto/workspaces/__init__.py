@@ -4,7 +4,7 @@ from src.dto.workspaces.join_rule import (
     WorkspaceJoinRuleResponseDTO,
     WorkspaceJoinRuleUpdateDTO,
 )
-from src.dto.workspaces.member import WorkspaceMemberResponseDTO, TransferOwnershipDTO, WorkspaceMemberUpdateDTO
+from src.dto.workspaces.member import TransferOwnershipDTO, WorkspaceMemberResponseDTO, WorkspaceMemberUpdateDTO
 from src.dto.workspaces.workspace import WorkspaceCreateDTO, WorkspaceResponseDTO, WorkspaceUpdateDTO
 
 
