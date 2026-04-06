@@ -43,6 +43,7 @@ jobs:
         uses: falti/dotenv-action@v1
         with:
           path: .example.env
+          keys-case: upper
 
       - name: Run tests with coverage
         run: |
