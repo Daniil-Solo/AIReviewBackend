@@ -110,7 +110,7 @@
 - Всегда реализиуй эндпоинты, дао, сервисные функции по аналогии с уже существующими(src/infrastructure/dao/users, src/interfaces/api/v1/users, )
 
 
-## Флоу реализации эндпоинта и конвенкции по неймингу
+## Флоу реализации эндпоинта, сервисной функции (application), DAO, DTO и SQLAlchemy-модели
 
 ### Создание SQLALchemy-модели
 
@@ -335,3 +335,59 @@ v1_router.include_router(entities_router)
 
 __all__ = ["v1_router"]
 ```
+
+## Флоу тестирования эндпоинта
+
+Для каждого эндпоинта создается отдельный файл с тестами (пример: `tests/interfaces/api/v1/users/test_create.py`)
+
+```python
+from fastapi import status
+from httpx import AsyncClient, Response
+import pytest_asyncio
+
+from src.dto.users import UserCreateDTO, UserResponseDTO
+from tests.factories.users import UserFactory
+from tests.helpers.users import create_users
+
+
+@pytest_asyncio.fixture()
+def request_create_user(client: AsyncClient):
+    async def inner(data: UserCreateDTO) -> Response:
+        return await client.post("/api/v1/users", json=data.model_dump(by_alias=True))
+
+    return inner
+
+
+@pytest_asyncio.fixture()
+def create_user(request_create_user):
+    async def inner(data: UserCreateDTO) -> UserResponseDTO:
+        response = await request_create_user(data)
+        assert response.status_code == status.HTTP_200_OK
+        return UserResponseDTO.model_validate_json(response.text)
+
+    return inner
+
+
+async def test__success(uow, create_user):
+    data: UserCreateDTO = UserFactory.build()
+
+    user = await create_user(data)
+    assert user.email == data.email
+    assert user.fullname == data.fullname
+    assert not user.is_admin
+
+
+async def test__failed__duplicated_email(uow, request_create_user):
+    created_user = (await create_users(uow))[0]
+    data: UserCreateDTO = UserFactory.build(email=created_user.email)
+
+    response = await request_create_user(data)
+    assert response.status_code == status.HTTP_409_CONFLICT
+    assert response.json()["code"] == "user_email_exists"
+```
+
+Важно:
+- Тест в качестве обязательной фикстуры всегда должен использовать uow или container (они инициализируют DI-контейнер для работы сервисных функций)
+- Подготовка данных для создания обектов в БД должна осуществлятсья через Factory-классы (пример: `tests/factories/users.py`)
+- Если в тестах повторяются какие-то операции, их следует вынести во вспомогательные функции (пример: `tests/helpers/users.py`)
+- Конвенкция по наименованию тестов: test__success - успешный, test__failed__not_admin - проваленный тест

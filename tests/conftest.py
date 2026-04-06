@@ -19,11 +19,6 @@ from src.settings import settings
 logger = logging.getLogger(__name__)
 
 
-def log(name: str):
-    with open("t.txt", "a") as f:
-        f.write(f"{name}\n")
-
-
 @pytest_asyncio.fixture(scope="session")
 async def test_database_name():
     conn = None
@@ -36,11 +31,9 @@ async def test_database_name():
 
         logger.info(f"Test database {test_db_name} created successfully")
 
-        log("test_database_name open")
         yield test_db_name
 
     finally:
-        log("test_database_name close")
         if conn:
             try:
                 await conn.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
@@ -59,9 +52,7 @@ async def run_migrations(test_database_name):
     command.downgrade(alembic_cfg, "base")
     command.upgrade(alembic_cfg, "head")
 
-    log("run_migrations open")
     yield
-    log("run_migrations close")
 
     command.downgrade(alembic_cfg, "base")
 
@@ -76,10 +67,8 @@ async def container(run_migrations):
             await conn.execute(text(f"TRUNCATE TABLE {table.name} CASCADE"))
 
     try:
-        log("container open")
         yield container
     finally:
-        log("container close")
         await shutdown_container(container)
 
 
@@ -91,7 +80,6 @@ def uow(container):
 
 @pytest.fixture
 def init_settings():
-    log("init_settings")
     settings.logging.LOKI_ENABLED = False
 
 
@@ -99,5 +87,4 @@ def init_settings():
 async def client() -> AsyncGenerator[AsyncClient, Any]:
     app = create_app()
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        log("client")
         yield client
