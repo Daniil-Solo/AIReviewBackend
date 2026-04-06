@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from src.dto.workspaces.join_rule import (
     WorkspaceJoinRuleCreateDTO,
-    WorkspaceJoinRuleResponseDTO,
+    WorkspaceJoinRuleFullDTO,
     WorkspaceJoinRuleUpdateDTO,
 )
 
@@ -12,19 +12,19 @@ class WorkspaceJoinRulesDAO(ABC):
     async def create(
         self,
         data: WorkspaceJoinRuleCreateDTO,
-    ) -> WorkspaceJoinRuleResponseDTO:
+    ) -> WorkspaceJoinRuleFullDTO:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_one(self, rule_id: int | None = None, slug: str | None = None) -> WorkspaceJoinRuleResponseDTO:
+    async def get_one(self, rule_id: int | None = None, slug: str | None = None) -> WorkspaceJoinRuleFullDTO:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list(self, workspace_id: int) -> list[WorkspaceJoinRuleResponseDTO]:
+    async def get_list(self, workspace_id: int) -> list[WorkspaceJoinRuleFullDTO]:
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, rule_id: int, data: WorkspaceJoinRuleUpdateDTO) -> WorkspaceJoinRuleResponseDTO:
+    async def update(self, rule_id: int, data: WorkspaceJoinRuleUpdateDTO) -> WorkspaceJoinRuleFullDTO:
         raise NotImplementedError
 
     @abstractmethod

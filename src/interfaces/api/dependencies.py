@@ -1,6 +1,6 @@
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jwt.exceptions import ExpiredSignatureError
+from jwt.exceptions import ExpiredSignatureError, PyJWTError
 
 from src.application.exceptions import InvalidCredentialsError
 from src.dto.users.user import ShortUserDTO
@@ -18,6 +18,8 @@ async def get_current_user(
         payload = decode_token(token)
     except ExpiredSignatureError:
         raise InvalidCredentialsError(message="Токен устарел", code="token_expired")
+    except PyJWTError:
+        raise InvalidCredentialsError(message="Токен невалидный", code="token_invalid")
     user_id: str | None = payload.get("sub")
     if user_id is None:
         raise InvalidCredentialsError(message="Токен невалидный", code="token_invalid")

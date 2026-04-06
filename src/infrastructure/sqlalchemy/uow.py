@@ -15,7 +15,7 @@ class Connection:
 
     @asynccontextmanager
     async def transaction(self) -> AsyncGenerator[None, None]:
-        async with self._session.begin():
+        async with self._session.begin_nested():
             yield
 
 

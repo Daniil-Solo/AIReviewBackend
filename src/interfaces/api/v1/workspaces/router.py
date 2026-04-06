@@ -23,13 +23,14 @@ from src.dto.workspaces import (
     SlugCheckResponseDTO,
     TransferOwnershipDTO,
     WorkspaceCreateDTO,
-    WorkspaceJoinRuleResponseDTO,
+    WorkspaceJoinRuleFullDTO,
     WorkspaceMemberResponseDTO,
     WorkspaceMemberUpdateDTO,
     WorkspaceResponseDTO,
     WorkspaceUpdateDTO,
 )
-from src.dto.workspaces.join_rule import WorkspaceJoinRuleRequestCreateDTO, WorkspaceJoinRuleRequestUpdateDTO
+from src.dto.workspaces.join_rule import WorkspaceJoinRuleRequestCreateDTO, WorkspaceJoinRuleRequestUpdateDTO, \
+    WorkspaceJoinRuleResponseDTO
 from src.interfaces.api.dependencies import get_current_user
 
 

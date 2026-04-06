@@ -55,7 +55,7 @@ class SQLAlchemyWorkspaceMembersDAO(WorkspaceMembersDAO):
         result = await self.session.execute(query)
         row = result.fetchone()
         if row is None:
-            raise EntityNotFoundError(message="Участник не найден в workspace")
+            raise EntityNotFoundError(message="Участник не найден в пространстве")
         return WorkspaceMemberResponseDTO.model_validate(row)
 
     async def get_by_id(self, member_id: int) -> WorkspaceMemberResponseDTO:

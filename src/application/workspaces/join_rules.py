@@ -10,8 +10,8 @@ from src.dto.workspaces.join_rule import (
     WorkspaceJoinRuleCreateDTO,
     WorkspaceJoinRuleRequestCreateDTO,
     WorkspaceJoinRuleRequestUpdateDTO,
-    WorkspaceJoinRuleResponseDTO,
-    WorkspaceJoinRuleUpdateDTO,
+    WorkspaceJoinRuleFullDTO,
+    WorkspaceJoinRuleUpdateDTO, WorkspaceJoinRuleResponseDTO,
 )
 from src.infrastructure.auth.password import hash_password
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
@@ -45,8 +45,9 @@ async def create_join_rule(
             )
 
         hashed_password = hash_password(data.password) if data.password else None
-        data = WorkspaceJoinRuleCreateDTO(**data.model_dump(), hashed_password=hashed_password)
-        return await uow.workspace_join_rules.create(data)
+        data = WorkspaceJoinRuleCreateDTO(**data.model_dump(), hashed_password=hashed_password, workspace_id=workspace_id)
+        join_rule = await uow.workspace_join_rules.create(data)
+        return join_rule.to_response()
 
 
 @inject
@@ -58,6 +59,7 @@ async def update_join_rule(
     uow: UnitOfWork = Provide[Container.uow],
 ) -> WorkspaceJoinRuleResponseDTO:
     async with uow.connection():
+        await uow.workspace_join_rules.get_one(rule_id=rule_id)
         await check_member_role(
             uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )
@@ -69,7 +71,8 @@ async def update_join_rule(
 
         hashed_password = hash_password(data.password) if data.password else None
         data = WorkspaceJoinRuleUpdateDTO(**data.model_dump(), hashed_password=hashed_password)
-        return await uow.workspace_join_rules.update(rule_id, data)
+        join_rule =  await uow.workspace_join_rules.update(rule_id, data)
+        return join_rule.to_response()
 
 
 @inject
@@ -80,6 +83,7 @@ async def delete_join_rule(
     uow: UnitOfWork = Provide[Container.uow],
 ) -> None:
     async with uow.connection():
+        await uow.workspace_join_rules.get_one(rule_id=rule_id)
         await check_member_role(
             uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )

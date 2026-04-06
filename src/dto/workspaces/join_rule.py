@@ -9,8 +9,8 @@ from src.dto.common import BaseDTO
 class WorkspaceJoinRuleBaseCreateDTO(BaseDTO):
     slug: str = Field(min_length=1, max_length=255, description="Уникальный slug для приглашения")
     role: WorkspaceMemberRoleEnum = Field(description="Роль, назначаемая при вступлении")
+    is_active: bool = Field(default=True, description="Активно ли приглашение")
     expired_at: datetime.datetime | None = Field(default=None, description="Дата истечения срока действия")
-    is_active: bool | None = Field(default=None, description="Активно ли приглашение")
 
 
 class WorkspaceJoinRuleRequestCreateDTO(WorkspaceJoinRuleBaseCreateDTO):
@@ -21,13 +21,25 @@ class WorkspaceJoinRuleRequestUpdateDTO(WorkspaceJoinRuleRequestCreateDTO):
     pass
 
 
-class WorkspaceJoinRuleCreateDTO(WorkspaceJoinRuleBaseCreateDTO):
+class WorkspaceJoinRuleUpdateDTO(WorkspaceJoinRuleBaseCreateDTO):
     hashed_password: str | None = Field(default=None, max_length=255, description="Пароль для вступления")
 
 
-class WorkspaceJoinRuleUpdateDTO(WorkspaceJoinRuleCreateDTO):
-    pass
+class WorkspaceJoinRuleCreateDTO(WorkspaceJoinRuleUpdateDTO):
+    workspace_id: int = Field(description="ID рабочего пространства")
 
+
+class WorkspaceJoinRuleFullDTO(BaseDTO):
+    id: int = Field(description="ID приглашения")
+    workspace_id: int = Field(description="ID рабочего пространства")
+    slug: str = Field(description="Уникальный slug для приглашения")
+    role: WorkspaceMemberRoleEnum = Field(description="Роль, назначаемая при вступлении")
+    expired_at: datetime.datetime | None = Field(description="Дата истечения срока действия")
+    is_active: bool = Field(description="Активно ли приглашение")
+    hashed_password: str | None = Field(exclude=True, description="Хеш пароля (исключён из API ответа)")
+
+    def to_response(self):
+        return WorkspaceJoinRuleResponseDTO(**self.model_dump(), has_password=self.hashed_password is not None)
 
 class WorkspaceJoinRuleResponseDTO(BaseDTO):
     id: int = Field(description="ID приглашения")
@@ -36,4 +48,4 @@ class WorkspaceJoinRuleResponseDTO(BaseDTO):
     role: WorkspaceMemberRoleEnum = Field(description="Роль, назначаемая при вступлении")
     expired_at: datetime.datetime | None = Field(description="Дата истечения срока действия")
     is_active: bool = Field(description="Активно ли приглашение")
-    hashed_password: str | None = Field(exclude=True, description="Хеш пароля (исключён из API ответа)")
+    has_password: bool = Field(description="Есть ли пароль у приглашения")
