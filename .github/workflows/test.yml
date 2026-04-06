@@ -43,7 +43,9 @@ jobs:
         uses: falti/dotenv-action@v1
         with:
           path: .example.env
+          export-variables: true
           keys-case: upper
+          log-variables: true
 
       - name: Run tests with coverage
         run: |
