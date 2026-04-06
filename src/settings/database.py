@@ -10,6 +10,7 @@ class DatabaseSettings(BaseSettings):
     USER: str = Field(description="Логин пользователя базы данных")
     PASSWORD: str = Field(description="Пароль пользователя базы данных")
     DB: str = Field(description="Название базы данных")
+    SQL_ECHO: bool = Field(default=False, description="Отображать SQL-запросы для дебага")
 
     @property
     def url(self) -> str:

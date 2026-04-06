@@ -20,6 +20,7 @@ class ConflictError(ApplicationError):
 
 
 class ForbiddenError(ApplicationError):
-    def __init__(self, message: str) -> None:
+    def __init__(self, message: str, code: str = "forbidden") -> None:
         self.message = message
-        super().__init__(self.message, "forbidden")
+        self.code = code
+        super().__init__(self.message, self.code)

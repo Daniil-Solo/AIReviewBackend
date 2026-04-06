@@ -16,6 +16,7 @@ erDiagram
         integer id PK
         string name
         string description
+        bool is_archived
         datetime created_at
     }
 
@@ -36,6 +37,9 @@ erDiagram
         integer id PK
         integer workspace_id FK
         string slug
+        string password
+        integer used_count
+        bool is_active
         workspace_member_role_enum role
         datetime expired_at
     }
@@ -56,6 +60,7 @@ erDiagram
         integer task_id FK
         string description
         bool is_public
+        bool is_manually_only
         array tags
         integer created_by
     }

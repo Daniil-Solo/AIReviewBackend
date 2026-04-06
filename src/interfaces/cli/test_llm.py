@@ -13,7 +13,7 @@ console = Console()
 def main(text: str) -> None:
     model = "qwen/qwen3-235b-a22b-2507"
 
-    llm = OpenAILikeLLM(base_url, api_key, model)
+    llm = OpenAILikeLLM("base_url", "api_key", model)
 
     messages = [Message(role="user", content=text)]
 
@@ -29,7 +29,7 @@ def main(text: str) -> None:
 def structured_main(text: str) -> None:
     model = "mistralai/mistral-small-24b-instruct-2501"
 
-    llm = OpenAILikeLLM(base_url, api_key, model)
+    llm = OpenAILikeLLM("base_url", "api_key", model)
 
     messages = [Message(role="user", content=text)]
 
@@ -60,4 +60,4 @@ def structured_main(text: str) -> None:
 
 
 if __name__ == "__main__":
-    structured_main()
+    main()

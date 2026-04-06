@@ -9,7 +9,7 @@ from src.infrastructure.sqlalchemy.uow import UnitOfWork
 
 @inject
 async def login(data: UserLoginDTO, uow: UnitOfWork = Provide[Container.uow]) -> TokenDTO:
-    async with uow:
+    async with uow.connection():
         try:
             user = await uow.users.get_by_email(data.email)
         except EntityNotFoundError as ex:
