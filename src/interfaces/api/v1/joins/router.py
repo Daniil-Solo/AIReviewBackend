@@ -14,7 +14,7 @@ from src.interfaces.api.dependencies import get_current_user
 router = APIRouter(prefix="/joins", tags=["joins"])
 
 
-@router.post("/", response_model=JoinResponseDTO)
+@router.post("", response_model=JoinResponseDTO)
 async def join_by_slug_endpoint(
     data: JoinBySlugDTO,
     user: ShortUserDTO = Depends(get_current_user),

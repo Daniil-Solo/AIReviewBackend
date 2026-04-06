@@ -36,7 +36,7 @@ from src.interfaces.api.dependencies import get_current_user
 router = APIRouter(prefix="/workspaces", tags=["workspaces"])
 
 
-@router.post("/", response_model=WorkspaceResponseDTO)
+@router.post("", response_model=WorkspaceResponseDTO)
 async def create_workspace_endpoint(
     data: WorkspaceCreateDTO,
     user: ShortUserDTO = Depends(get_current_user),
