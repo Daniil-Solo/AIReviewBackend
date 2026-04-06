@@ -39,6 +39,12 @@ jobs:
           pip install uv
           uv sync
 
+      - name: Export variables from .example.env
+        uses: falti/dotenv-action@v1
+        with:
+          path: .example.env
+          export: true
+
       - name: Run tests with coverage
         run: |
           uv run pytest tests/ \
