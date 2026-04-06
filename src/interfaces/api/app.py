@@ -22,12 +22,12 @@ async def lifespan(_application: FastAPI) -> AsyncGenerator[None, None]:
 
 
 def create_app() -> FastAPI:
-    application = FastAPI(title="AI Review API", lifespan=lifespan)
+    application = FastAPI(title="AI Review API", lifespan=lifespan, swagger_ui_parameters=dict(docExpansion="none"))
 
     application.add_middleware(RequestLoggingMiddleware)
 
-    application.include_router(internal_router, prefix="/api")
     application.include_router(v1_router, prefix="/api")
+    application.include_router(internal_router, prefix="/api")
 
     @application.exception_handler(ApplicationError)
     async def application_error_handler(_request: Request, exc: ApplicationError) -> JSONResponse:

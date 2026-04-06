@@ -118,6 +118,7 @@ combine-as-imports = true
 [tool.mypy]
 # Версия Python
 python_version = "3.12"
+plugins = ["contextlib.mypy_plugin"]
 
 # Пути для проверки
 files = ["src", "tests"]

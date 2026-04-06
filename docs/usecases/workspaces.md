@@ -29,6 +29,14 @@
 - `PUT /workspaces/:id`: Request: {name, description}, Response {id, name, description, created_at}
 
 
+### Архивация рабочего пространства
+
+Эндпоинты:
+- `DELETE /workspaces/:id`:  Response {message}
+
+Пространство не удаляется физически
+
+
 ### Просмотр рабочего пространства
 
 Рабочее пространство представляет собой страницу с информацией:
@@ -61,8 +69,30 @@
 
 Эндпоинты:
 - `POST /workspaces/:id/join_rules`: Request {slug, role, expired_at}, Response {id, workspace_id, slug, role, expired_at}
-- `PUT /workspaces/:id/join_rules/:id`: Request {slug, role, expired_at}, Response {id, workspace_id, slug, role, expired_at}
+- `PUT /workspaces/:id/join_rules/:id`: Request {slug, role, is_active, expired_at}, Response {id, workspace_id, slug, role, expired_at}
 - `DELETE /workspaces/:id/join_rules/:id`: Response {message}
 - `POST /joins` Request {slug}, Response {workspace_id} - отправляется из фронтенда при переходе по ссылке
 
 
+### Изменить роль участника
+
+Эндпоинты:
+- `PATCH /workspaces/:id/members/:id`:  Request {role} Response {id, fullname, email, role}
+
+Нужно быть владельцем
+
+
+### Выход из пространства
+
+Эндпоинты:
+- `POST /workspaces/:id/leave`:  Response {id, fullname, email, role}
+
+Не доступен владельцу
+
+
+### Передача владения
+
+Эндпоинты:
+- `PATCH /workspaces/:id/owner`:  Request {member_id} Response {id, name, description, created_at}
+
+Доступна только владельцу

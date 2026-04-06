@@ -13,7 +13,7 @@ logger = get_logger()
 async def check(uow: UnitOfWork = Provide[Container.uow]) -> dict[str, bool]:
     data = {"postgres": True}
     try:
-        async with uow:
+        async with uow.connection():
             await uow.session.execute(sa.text("SELECT 1"))
     except Exception:
         logger.exception("Healthcheck failed", component="postgres")
