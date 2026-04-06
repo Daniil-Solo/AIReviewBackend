@@ -60,6 +60,7 @@ erDiagram
         integer task_id FK
         string description
         bool is_public
+        bool is_manually_only
         array tags
         integer created_by
     }

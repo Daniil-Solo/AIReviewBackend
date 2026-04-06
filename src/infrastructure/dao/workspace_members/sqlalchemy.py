@@ -1,3 +1,5 @@
+from typing import Any
+
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,11 +23,13 @@ class SQLAlchemyWorkspaceMembersDAO(WorkspaceMembersDAO):
         await self.session.execute(query)
         return await self._get_by_user_and_workspace(data.user_id, data.workspace_id)
 
-    async def get_list(self, filters: WorkspaceMemberFiltersDTO) -> list[WorkspaceMemberResponseDTO]:
-        query = (
+    @staticmethod
+    def _get_query() -> sa.Select[Any]:
+        return (
             sa.select(
                 workspace_members_table.c.id,
                 workspace_members_table.c.workspace_id,
+                workspace_members_table.c.user_id,
                 users_table.c.fullname,
                 users_table.c.email,
                 workspace_members_table.c.role,
@@ -33,6 +37,11 @@ class SQLAlchemyWorkspaceMembersDAO(WorkspaceMembersDAO):
             .select_from(
                 workspace_members_table.join(users_table, workspace_members_table.c.user_id == users_table.c.id)
             )
+        )
+
+    async def get_list(self, filters: WorkspaceMemberFiltersDTO) -> list[WorkspaceMemberResponseDTO]:
+        query = (
+            self._get_query()
             .where(workspace_members_table.c.workspace_id == filters.workspace_id)
         )
 
@@ -46,18 +55,10 @@ class SQLAlchemyWorkspaceMembersDAO(WorkspaceMembersDAO):
     async def get_by_user_and_workspace(self, user_id: int, workspace_id: int) -> WorkspaceMemberResponseDTO:
         return await self._get_by_user_and_workspace(user_id, workspace_id)
 
+
     async def _get_by_user_and_workspace(self, user_id: int, workspace_id: int) -> WorkspaceMemberResponseDTO:
         query = (
-            sa.select(
-                workspace_members_table.c.id,
-                workspace_members_table.c.workspace_id,
-                users_table.c.fullname,
-                users_table.c.email,
-                workspace_members_table.c.role,
-            )
-            .select_from(
-                workspace_members_table.join(users_table, workspace_members_table.c.user_id == users_table.c.id)
-            )
+            self._get_query()
             .where(
                 workspace_members_table.c.user_id == user_id,
                 workspace_members_table.c.workspace_id == workspace_id,
@@ -71,16 +72,7 @@ class SQLAlchemyWorkspaceMembersDAO(WorkspaceMembersDAO):
 
     async def get_by_id(self, member_id: int) -> WorkspaceMemberResponseDTO:
         query = (
-            sa.select(
-                workspace_members_table.c.id,
-                workspace_members_table.c.workspace_id,
-                users_table.c.fullname,
-                users_table.c.email,
-                workspace_members_table.c.role,
-            )
-            .select_from(
-                workspace_members_table.join(users_table, workspace_members_table.c.user_id == users_table.c.id)
-            )
+            self._get_query()
             .where(workspace_members_table.c.id == member_id)
         )
         result = await self.session.execute(query)

@@ -3,7 +3,7 @@ from fastapi.params import Query
 
 from src.application.workspaces import (
     archive_workspace,
-    change_member,
+    update_member,
     change_workspace_owner,
     check_slug_available,
     create_join_rule,
@@ -20,7 +20,7 @@ from src.application.workspaces import (
 from src.dto.common import SuccessOperationDTO
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces import (
-    ChangeMemberRoleDTO,
+    WorkspaceMemberUpdateDTO,
     SlugCheckResponseDTO,
     TransferOwnershipDTO,
     WorkspaceCreateDTO,
@@ -124,13 +124,13 @@ async def delete_join_rule_endpoint(
 
 
 @router.patch("/{workspace_id}/members/{member_id}", response_model=WorkspaceMemberResponseDTO)
-async def change_member_endpoint(
+async def update_member_endpoint(
     workspace_id: int,
     member_id: int,
-    data: ChangeMemberRoleDTO,
+    data: WorkspaceMemberUpdateDTO,
     user: ShortUserDTO = Depends(get_current_user),
 ) -> WorkspaceMemberResponseDTO:
-    return await change_member(workspace_id, member_id, data, user)
+    return await update_member(workspace_id, member_id, data, user)
 
 
 @router.post("/{workspace_id}/leave", response_model=SuccessOperationDTO)

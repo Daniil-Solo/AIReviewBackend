@@ -60,7 +60,7 @@ async def join_to_workspace(
 
 
 @inject
-async def change_member(
+async def update_member(
     workspace_id: int,
     member_id: int,
     data: WorkspaceMemberUpdateDTO,

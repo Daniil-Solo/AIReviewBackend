@@ -10,10 +10,8 @@ class WorkspaceCreateDTO(BaseDTO):
     description: str = Field(default="", max_length=5000, description="Описание рабочего пространства")
 
 
-class WorkspaceUpdateDTO(BaseDTO):
-    name: str = Field(min_length=1, max_length=255, description="Название рабочего пространства")
-    description: str = Field(max_length=5000, description="Описание рабочего пространства")
-
+class WorkspaceUpdateDTO(WorkspaceCreateDTO):
+    pass
 
 class WorkspaceResponseDTO(BaseDTO):
     id: int
