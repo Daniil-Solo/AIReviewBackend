@@ -56,7 +56,6 @@ erDiagram
     
     criteria {
         integer id PK
-        string code
         integer task_id FK
         string description
         bool is_public

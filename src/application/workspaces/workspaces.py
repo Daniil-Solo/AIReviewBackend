@@ -5,7 +5,7 @@ from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.di.container import Container
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces.join_rule import (
-    WorkspaceJoinRuleResponseDTO,
+    WorkspaceJoinRuleFullDTO, WorkspaceJoinRuleResponseDTO,
 )
 from src.dto.workspaces.member import WorkspaceMemberCreateDTO, WorkspaceMemberFiltersDTO, WorkspaceMemberResponseDTO
 from src.dto.workspaces.workspace import WorkspaceCreateDTO, WorkspaceResponseDTO, WorkspaceUpdateDTO
@@ -38,6 +38,7 @@ async def update_workspace(
     uow: UnitOfWork = Provide[Container.uow],
 ) -> WorkspaceResponseDTO:
     async with uow.connection():
+        await uow.workspaces.get_by_id(workspace_id)
         await check_member_role(
             uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )
@@ -51,8 +52,9 @@ async def archive_workspace(
     uow: UnitOfWork = Provide[Container.uow],
 ) -> None:
     async with uow.connection():
-        await check_member_role(uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER})
-        await uow.workspaces.archive(workspace_id)
+        workspace = await uow.workspaces.get_by_id(workspace_id)
+        await check_member_role(uow, user.id, workspace.id, allowed_roles={WorkspaceMemberRoleEnum.OWNER})
+        await uow.workspaces.archive(workspace.id)
 
 
 @inject
@@ -62,8 +64,9 @@ async def get_workspace(
     uow: UnitOfWork = Provide[Container.uow],
 ) -> WorkspaceResponseDTO:
     async with uow.connection():
+        workspace = await uow.workspaces.get_by_id(workspace_id)
         await check_member_role(uow, user.id, workspace_id)
-        return await uow.workspaces.get_by_id(workspace_id)
+        return workspace
 
 
 @inject
@@ -98,4 +101,5 @@ async def get_workspace_join_rules(
         await check_member_role(
             uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )
-        return await uow.workspace_join_rules.get_list(workspace_id)
+        join_rules =  await uow.workspace_join_rules.get_list(workspace_id)
+        return [jr.to_response() for jr in join_rules]

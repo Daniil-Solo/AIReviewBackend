@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.application.exceptions import ConflictError, EntityNotFoundError
 from src.dto.workspaces.join_rule import (
     WorkspaceJoinRuleCreateDTO,
-    WorkspaceJoinRuleResponseDTO,
+    WorkspaceJoinRuleFullDTO,
     WorkspaceJoinRuleUpdateDTO,
 )
 from src.infrastructure.dao.workspace_join_rules.interface import WorkspaceJoinRulesDAO
@@ -18,7 +18,7 @@ class SQLAlchemyWorkspaceJoinRulesDAO(WorkspaceJoinRulesDAO):
     async def create(
         self,
         data: WorkspaceJoinRuleCreateDTO,
-    ) -> WorkspaceJoinRuleResponseDTO:
+    ) -> WorkspaceJoinRuleFullDTO:
         query = sa.insert(workspace_join_rules_table).values(**data.model_dump()).returning(workspace_join_rules_table)
         try:
             result = await self.session.execute(query)
@@ -29,9 +29,9 @@ class SQLAlchemyWorkspaceJoinRulesDAO(WorkspaceJoinRulesDAO):
         row = result.fetchone()
         if row is None:
             raise EntityNotFoundError(message="Приглашение не создано")
-        return WorkspaceJoinRuleResponseDTO.model_validate(row)
+        return WorkspaceJoinRuleFullDTO.model_validate(row)
 
-    async def get_one(self, rule_id: int | None = None, slug: str | None = None) -> WorkspaceJoinRuleResponseDTO:
+    async def get_one(self, rule_id: int | None = None, slug: str | None = None) -> WorkspaceJoinRuleFullDTO:
         query = sa.select(workspace_join_rules_table)
         if rule_id is not None:
             query = query.where(workspace_join_rules_table.c.id == rule_id)
@@ -44,15 +44,15 @@ class SQLAlchemyWorkspaceJoinRulesDAO(WorkspaceJoinRulesDAO):
         row = result.fetchone()
         if row is None:
             raise EntityNotFoundError(message="Приглашение не найдено")
-        return WorkspaceJoinRuleResponseDTO.model_validate(row)
+        return WorkspaceJoinRuleFullDTO.model_validate(row)
 
-    async def get_list(self, workspace_id: int) -> list[WorkspaceJoinRuleResponseDTO]:
+    async def get_list(self, workspace_id: int) -> list[WorkspaceJoinRuleFullDTO]:
         query = sa.select(workspace_join_rules_table).where(workspace_join_rules_table.c.workspace_id == workspace_id)
         result = await self.session.execute(query)
         rows = result.fetchall()
-        return [WorkspaceJoinRuleResponseDTO.model_validate(row) for row in rows]
+        return [WorkspaceJoinRuleFullDTO.model_validate(row) for row in rows]
 
-    async def update(self, rule_id: int, data: WorkspaceJoinRuleUpdateDTO) -> WorkspaceJoinRuleResponseDTO:
+    async def update(self, rule_id: int, data: WorkspaceJoinRuleUpdateDTO) -> WorkspaceJoinRuleFullDTO:
         query = (
             sa.update(workspace_join_rules_table)
             .where(workspace_join_rules_table.c.id == rule_id)
@@ -68,7 +68,7 @@ class SQLAlchemyWorkspaceJoinRulesDAO(WorkspaceJoinRulesDAO):
         row = result.fetchone()
         if row is None:
             raise EntityNotFoundError(message="Правило приглашения не найдено")
-        return WorkspaceJoinRuleResponseDTO.model_validate(row)
+        return WorkspaceJoinRuleFullDTO.model_validate(row)
 
     async def delete(self, rule_id: int) -> None:
         query = sa.delete(workspace_join_rules_table).where(workspace_join_rules_table.c.id == rule_id)
@@ -85,4 +85,4 @@ class SQLAlchemyWorkspaceJoinRulesDAO(WorkspaceJoinRulesDAO):
     async def exists_by_slug(self, slug: str) -> bool:
         query = sa.select(sa.exists(workspace_join_rules_table).where(workspace_join_rules_table.c.slug == slug))
         result = await self.session.execute(query)
-        return bool(result.fetchone())
+        return bool(result.fetchone()[0])

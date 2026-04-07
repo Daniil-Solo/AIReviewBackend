@@ -1,7 +1,7 @@
 from src.dto.workspaces.join import JoinBySlugDTO, JoinResponseDTO, SlugCheckResponseDTO
 from src.dto.workspaces.join_rule import (
     WorkspaceJoinRuleCreateDTO,
-    WorkspaceJoinRuleResponseDTO,
+    WorkspaceJoinRuleFullDTO,
     WorkspaceJoinRuleUpdateDTO,
 )
 from src.dto.workspaces.member import TransferOwnershipDTO, WorkspaceMemberResponseDTO, WorkspaceMemberUpdateDTO
@@ -14,7 +14,7 @@ __all__ = [
     "SlugCheckResponseDTO",
     "WorkspaceCreateDTO",
     "WorkspaceJoinRuleCreateDTO",
-    "WorkspaceJoinRuleResponseDTO",
+    "WorkspaceJoinRuleFullDTO",
     "WorkspaceJoinRuleUpdateDTO",
     "WorkspaceMemberResponseDTO",
     "WorkspaceResponseDTO",
