@@ -3,7 +3,7 @@ from pathlib import Path
 import click
 from rich.console import Console
 
-from src.infrastructure.llm.openai_like import OpenAILikeLLM
+from src.infrastructure.ai.llm import OpenAILikeLLM
 from src.services.project.document_generation.creating import DocumentGenerator
 from src.services.project.preprocessing.preprocessing import ProjectPreprocessor
 

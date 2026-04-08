@@ -58,10 +58,18 @@ erDiagram
         integer id PK
         integer task_id FK
         string description
+        criterion_stage_enum stage
         bool is_public
         bool is_manually_only
         array tags
         integer created_by
+    }
+    
+    criterion_stage_enum {
+        string PROJECTDOC
+        string CODEBASE
+        string AUTO
+        string MANUAL
     }
     
     task_criteria {
@@ -157,6 +165,7 @@ erDiagram
     
     tasks ||--|{ task_criteria : "has"
     criteria ||--|{ task_criteria : "included in"
+    criteria  ||..|| criterion_stage_enum : has
     
     users ||..|{ transactions : has
     transactions ||..|| transaction_type_enum : has

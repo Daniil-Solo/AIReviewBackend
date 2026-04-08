@@ -3,7 +3,7 @@ from pathlib import Path
 import click
 from rich.console import Console
 
-from src.infrastructure.llm.openai_like import OpenAILikeLLM
+from src.infrastructure.ai.llm import OpenAILikeLLM
 from src.services.project.document_generation.cricitc import Critic
 
 
