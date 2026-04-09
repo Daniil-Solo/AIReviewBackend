@@ -3,8 +3,7 @@ from pathlib import Path
 import click
 from rich.console import Console
 
-from src.services.project.preprocessing.preprocessing import ProjectPreprocessor
-
+from src.application.project.preprocessing.preprocessing import ProjectPreprocessor
 
 console = Console()
 
