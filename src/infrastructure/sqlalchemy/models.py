@@ -1,5 +1,11 @@
 import sqlalchemy as sa
 
+from src.constants.ai_review import (
+    CriterionCheckStatusEnum,
+    CriterionStageEnum,
+    SolutionFormatEnum,
+    SolutionStatusEnum,
+)
 from src.constants.workspaces import (
     WorkspaceMemberRoleEnum,
 )
@@ -64,4 +70,128 @@ workspace_join_rules_table = sa.Table(
     sa.CheckConstraint("role IN ('TEACHER', 'STUDENT')", name="chk_join_rule_role_not_owner"),
 )
 
-ALL_TABLES = [users_table, workspaces_table, workspace_members_table, workspace_join_rules_table]
+criteria_table = sa.Table(
+    "criteria",
+    metadata,
+    sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
+    sa.Column("description", sa.Text, nullable=False),
+    sa.Column("tags", sa.ARRAY(sa.String), nullable=False, server_default="{}"),
+    sa.Column("stage", sa.Enum(CriterionStageEnum, name="criterion_stage"), nullable=True),
+    sa.Column("is_public", sa.Boolean, nullable=False, server_default=sa.true()),
+    sa.Column(
+        "created_by", sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"), nullable=False
+    ),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+)
+
+tasks_table = sa.Table(
+    "tasks",
+    metadata,
+    sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
+    sa.Column("name", sa.String(255), nullable=False),
+    sa.Column("description", sa.Text, nullable=False, server_default=""),
+    sa.Column("is_active", sa.Boolean, nullable=False, server_default=sa.true()),
+    sa.Column(
+        "created_by", sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"), nullable=False
+    ),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+    sa.Column("use_exam", sa.Boolean, nullable=False, server_default=sa.false()),
+)
+
+task_criteria_table = sa.Table(
+    "task_criteria",
+    metadata,
+    sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
+    sa.Column(
+        "task_id",
+        sa.Integer,
+        sa.ForeignKey("tasks.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+    ),
+    sa.Column(
+        "criterion_id",
+        sa.Integer,
+        sa.ForeignKey("criteria.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+    ),
+    sa.Column("weight", sa.Float, nullable=False),
+    sa.UniqueConstraint("task_id", "criterion_id", name="uq_task_criteria_task_criterion"),
+)
+
+solutions_table = sa.Table(
+    "solutions",
+    metadata,
+    sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
+    sa.Column(
+        "task_id",
+        sa.Integer,
+        sa.ForeignKey("tasks.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+    ),
+    sa.Column("format", sa.Enum(SolutionFormatEnum, name="solution_format"), nullable=False),
+    sa.Column("link", sa.String, nullable=False),
+    sa.Column("status", sa.Enum(SolutionStatusEnum, name="solution_status"), nullable=False, server_default="created"),
+    sa.Column("human_grade", sa.Integer, nullable=True),
+    sa.Column("human_feedback", sa.String, nullable=True),
+    sa.Column("ai_feedback", sa.Text, nullable=True),
+    sa.Column(
+        "created_by", sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"), nullable=False
+    ),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+)
+
+solution_criteria_checks_table = sa.Table(
+    "solution_criteria_checks",
+    metadata,
+    sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
+    sa.Column(
+        "task_criterion_id",
+        sa.Integer,
+        sa.ForeignKey("task_criteria.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+    ),
+    sa.Column(
+        "solution_id",
+        sa.Integer,
+        sa.ForeignKey("solutions.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+    ),
+    sa.Column("comment", sa.Text, nullable=False, server_default=""),
+    sa.Column("stage", sa.Enum(CriterionStageEnum, name="solution_criterion_stage"), nullable=False),
+    sa.Column(
+        "status",
+        sa.Enum(CriterionCheckStatusEnum, name="solution_criterion_check_status"),
+        nullable=False,
+        server_default="sufficient",
+    ),
+    sa.Column("is_passed", sa.Boolean, nullable=True),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+)
+
+solution_artifacts_table = sa.Table(
+    "solution_artifacts",
+    metadata,
+    sa.Column(
+        "solution_id",
+        sa.Integer,
+        sa.ForeignKey("solutions.id", ondelete="CASCADE", onupdate="CASCADE"),
+        primary_key=True,
+    ),
+    sa.Column("project_tree", sa.Text, nullable=True),
+    sa.Column("project_content", sa.Text, nullable=True),
+    sa.Column("project_doc", sa.Text, nullable=True),
+    sa.Column("questions", sa.JSON, nullable=True),
+)
+
+ALL_TABLES = [
+    users_table,
+    workspaces_table,
+    workspace_members_table,
+    workspace_join_rules_table,
+    criteria_table,
+    tasks_table,
+    task_criteria_table,
+    solutions_table,
+    solution_criteria_checks_table,
+    solution_artifacts_table,
+]

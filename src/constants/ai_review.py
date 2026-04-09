@@ -1,17 +1,31 @@
-from enum import Enum
+from enum import StrEnum
 
 
+class CriterionStageEnum(StrEnum):
+    PROJECT_DOC = "project_doc"
+    CODEBASE = "codebase"
+    AUTO = "auto"
+    MANUAL = "manual"
 
-class CriterionStageEnum(str, Enum):
-    PROJECT_DOC = "projectdoc"   # проверяется только по документации
-    CODEBASE = "codebase"       # проверяется только по кодовой базе
-    AUTO = "auto"               # проверяется по всем: документация, кодовая база
-    MANUAL = "manual"           # проверяется только в ходе ручной проверки
+
+class CriterionCheckStatusEnum(StrEnum):
+    SUFFICIENT = "sufficient"
+    NEEDS_CODE = "needs_code"
+    NEEDS_STUDENT = "needs_student"
+    NEEDS_MANUAL = "needs_manual"
+    NOT_APPLICABLE = "not_applicable"
 
 
-class CriterionStatusEnum(str, Enum):
-    SUFFICIENT = "sufficient"  # полученных сведений достаточно для оценки удовлетворенности критерием
-    NEEDS_CODE = "needs_code"  # нужно проверить код
-    NEEDS_STUDENT = "needs_student"  # нужно запросить информацию у студента
-    NEEDS_MANUAL = "needs_manual"  # нужна ручная проверка преподавателем
-    NOT_APPLICABLE = "not_applicable"  # критерий не применим к проекту
+class SolutionFormatEnum(StrEnum):
+    ZIP = "zip"
+    GITHUB = "github"
+
+
+class SolutionStatusEnum(StrEnum):
+    CREATED = "created"
+    ERROR = "error"
+    AI_REVIEW = "ai_review"
+    WAITING_EXAM = "waiting_exam"
+    EXAMINATION = "examination"
+    HUMAN_REVIEW = "human_review"
+    REVIEWED = "reviewed"
