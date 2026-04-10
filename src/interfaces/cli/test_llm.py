@@ -1,8 +1,8 @@
 import click
 from rich.console import Console
 
-from src.infrastructure.llm.base import Message
-from src.infrastructure.llm.openai_like import OpenAILikeLLM
+from src.dto.ai_review.message import InputMessageDTO
+from src.infrastructure.ai.llm import OpenAILikeLLM
 
 
 console = Console()
@@ -15,7 +15,7 @@ def main(text: str) -> None:
 
     llm = OpenAILikeLLM("base_url", "api_key", model)
 
-    messages = [Message(role="user", content=text)]
+    messages = [InputMessageDTO(role="user", content=text)]
 
     answer = llm.answer(messages)
 
@@ -31,7 +31,7 @@ def structured_main(text: str) -> None:
 
     llm = OpenAILikeLLM("base_url", "api_key", model)
 
-    messages = [Message(role="user", content=text)]
+    messages = [InputMessageDTO(role="user", content=text)]
 
     answer = llm.answer(
         messages,

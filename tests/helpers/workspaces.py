@@ -1,9 +1,12 @@
 from src.constants.workspaces import WorkspaceMemberRoleEnum
+from src.dto.tasks import TaskResponseDTO
 from src.dto.workspaces.join_rule import WorkspaceJoinRuleCreateDTO
 from src.dto.workspaces.member import WorkspaceMemberCreateDTO
 from src.dto.workspaces.workspace import WorkspaceCreateDTO, WorkspaceResponseDTO
 from src.infrastructure.auth.password import hash_password
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
+from tests.factories.tasks import TaskFactory
+from tests.factories.workspaces import WorkspaceFactory
 
 
 async def create_workspace(
@@ -57,3 +60,21 @@ async def create_join_rule(
     )
     async with uow.connection():
         await uow.workspace_join_rules.create(data)
+
+
+async def create_workspace_with_task(uow: UnitOfWork, user_id: int) -> tuple[WorkspaceResponseDTO, TaskResponseDTO]:
+    async with uow.connection():
+        workspace_data = WorkspaceFactory.build()
+        workspace = await uow.workspaces.create(workspace_data)
+
+        member_data = WorkspaceMemberCreateDTO(
+            workspace_id=workspace.id,
+            user_id=user_id,
+            role=WorkspaceMemberRoleEnum.OWNER,
+        )
+        await uow.workspace_members.create(member_data)
+
+        task_data = TaskFactory.build(workspace_id=workspace.id)
+        task = await uow.tasks.create(task_data, user_id)
+
+    return workspace, task

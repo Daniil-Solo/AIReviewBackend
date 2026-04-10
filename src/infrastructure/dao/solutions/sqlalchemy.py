@@ -1,0 +1,69 @@
+import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.application.exceptions import EntityNotFoundError
+from src.constants.ai_review import SolutionStatusEnum
+from src.dto.solutions.solutions import (
+    SolutionCreateDTO,
+    SolutionResponseDTO,
+    SolutionShortResponseDTO,
+    SolutionUpdateDTO,
+)
+from src.infrastructure.dao.solutions.interface import SolutionsDAO
+from src.infrastructure.sqlalchemy.models import solutions_table
+
+
+class SQLAlchemySolutionsDAO(SolutionsDAO):
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+
+    async def create(self, data: SolutionCreateDTO, created_by: int) -> SolutionResponseDTO:
+        query = (
+            sa.insert(solutions_table)
+            .values(
+                **data.model_dump(),
+                created_by=created_by,
+                status=SolutionStatusEnum.CREATED,
+            )
+            .returning(solutions_table)
+        )
+        result = await self.session.execute(query)
+        row = result.fetchone()
+        if row is None:
+            raise EntityNotFoundError(message="Решение не создано")
+        return SolutionResponseDTO.model_validate(row)
+
+    async def get_by_id(self, solution_id: int) -> SolutionResponseDTO:
+        query = sa.select(solutions_table).where(solutions_table.c.id == solution_id)
+        result = await self.session.execute(query)
+        row = result.fetchone()
+        if row is None:
+            raise EntityNotFoundError(message="Решение не найдено")
+        return SolutionResponseDTO.model_validate(row)
+
+    async def update(self, solution_id: int, data: SolutionUpdateDTO) -> SolutionResponseDTO:
+        update_values = {k: v for k, v in data.model_dump(by_alias=True).items() if v is not None}
+        if not update_values:
+            return await self.get_by_id(solution_id)
+
+        query = (
+            sa.update(solutions_table)
+            .where(solutions_table.c.id == solution_id)
+            .values(**update_values)
+            .returning(solutions_table)
+        )
+        result = await self.session.execute(query)
+        row = result.fetchone()
+        if row is None:
+            raise EntityNotFoundError(message="Решение не найдено")
+        return SolutionResponseDTO.model_validate(row)
+
+    async def get_list_by_task(self, task_id: int) -> list[SolutionShortResponseDTO]:
+        query = sa.select(solutions_table).where(solutions_table.c.task_id == task_id)
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+        return [SolutionShortResponseDTO.model_validate(row) for row in rows]
+
+    async def delete(self, solution_id: int) -> None:
+        query = sa.delete(solutions_table).where(solutions_table.c.id == solution_id)
+        await self.session.execute(query)

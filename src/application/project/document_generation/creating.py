@@ -3,7 +3,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from src.infrastructure.llm.base import BaseLLM, Message
+from src.infrastructure.ai.llm import LLMInterface, Message
 from src.services.project.preprocessing.preprocessing import ProjectPreprocessor
 
 
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class DocumentCreator:
-    def __init__(self, llm: BaseLLM, processor: ProjectPreprocessor) -> None:
+    def __init__(self, llm: LLMInterface, processor: ProjectPreprocessor) -> None:
         loader = FileSystemLoader(Path("src") / Path("prompts") / Path("project_doc"))
         env = Environment(loader=loader)
         self.system_prompt = env.get_template("creating/system.tpl")

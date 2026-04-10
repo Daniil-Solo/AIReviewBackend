@@ -46,6 +46,7 @@ erDiagram
 
     tasks {
         integer id PK
+        integer workspace_id FK
         string name
         string description
         bool is_active
@@ -56,12 +57,17 @@ erDiagram
     
     criteria {
         integer id PK
-        integer task_id FK
         string description
-        bool is_public
-        bool is_manually_only
         array tags
+        nullable_criterion_stage_enum stage
+        bool is_public
         integer created_by
+    }
+    
+    criterion_stage_enum {
+        string PROJECTDOC
+        string CODEBASE
+        string MANUAL
     }
     
     task_criteria {
@@ -77,15 +83,17 @@ erDiagram
         solution_format_enum format
         string link
         solution_status_enum status
+        jsonb steps
+        nullable_integer human_grade
+        nullable_string human_comment
+        nullable_string ai_feedback
         integer created_by FK
         datetime created_at
-        integer human_grade
-        string human_comment
     }
-
+    
     solution_status_enum {
         string CREATED
-        string FAILED
+        string ERROR
         string AI_REVIEW
         string WAITING_EXAM
         string EXAMINATION
@@ -97,26 +105,42 @@ erDiagram
         string ZIP
         string GITHUB
     }
+    
+    solution_criteria_checks {
+        integer id PK
+        integer task_criterion_id FK
+        integer solution_id FK
+        string comment
+        criterion_stage_enum stage
+        criterion_check_status_enum status
+        nullable_bool is_passed
+        datetime created_at
+    }
+    
+    criterion_check_status_enum {
+        string SUFFICIENT
+        string NEEDS_CODE
+        string NEEDS_STUDENT
+        string NEEDS_MANUAL
+        string NOT_APPLICABLE
+    }
 
     solution_artifacts {
         integer solution_id PK, FK
         %% Raw data
-        string project_tree_link
-        string project_content_link
+        string project_tree
+        string project_content
         %% Project-doc
         string project_doc
-        %% Criteria checks
-        jsonb project_doc_criteria_checks
-        jsonb codebase_criteria_checks
-        jsonb agent_criteria_checks
-        %% code, comment, confidence, value
         %% Exam questions
         jsonb questions
         %% code, text
     }
     
-    solution_exams {
+    exams {
         integer solution_id PK, FK
+        datetime started_at
+        datetime ended_at
         datetime expired_at
         %% code, text
         jsonb answers
@@ -146,17 +170,23 @@ erDiagram
     workspaces ||--|{ tasks : contains
     users ||--|{ tasks : creates
     users ||--|{ criteria : creates
-
+    
+    tasks ||--|{ task_criteria : "has"
+    criteria ||--|{ task_criteria : "included in"
+    criteria  ||..|| criterion_stage_enum : has
+    
+    solution_criteria_checks ||..|| criterion_check_status_enum : has
+    solution_criteria_checks  ||..|| criterion_stage_enum : has
+    solutions ||..|{ solution_criteria_checks : has
+    task_criteria ||..|{ solution_criteria_checks : has
+    
     users ||--|{ solutions : creates
 
     tasks ||--|{ solutions : "solved in"
     solutions ||..|| solution_format_enum : has
     solutions ||..|| solution_status_enum : has
     solutions ||--|| solution_artifacts: "extra described in"
-    solutions ||--|| solution_exams: "extra estimated in"
-    
-    tasks ||--|{ task_criteria : "has"
-    criteria ||--|{ task_criteria : "included in"
+    solutions ||--|| exams: "extra estimated in"
     
     users ||..|{ transactions : has
     transactions ||..|| transaction_type_enum : has

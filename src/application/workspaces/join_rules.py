@@ -10,8 +10,8 @@ from src.dto.workspaces.join_rule import (
     WorkspaceJoinRuleCreateDTO,
     WorkspaceJoinRuleRequestCreateDTO,
     WorkspaceJoinRuleRequestUpdateDTO,
-    WorkspaceJoinRuleFullDTO,
-    WorkspaceJoinRuleUpdateDTO, WorkspaceJoinRuleResponseDTO,
+    WorkspaceJoinRuleResponseDTO,
+    WorkspaceJoinRuleUpdateDTO,
 )
 from src.infrastructure.auth.password import hash_password
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
@@ -45,7 +45,9 @@ async def create_join_rule(
             )
 
         hashed_password = hash_password(data.password) if data.password else None
-        data = WorkspaceJoinRuleCreateDTO(**data.model_dump(), hashed_password=hashed_password, workspace_id=workspace_id)
+        data = WorkspaceJoinRuleCreateDTO(
+            **data.model_dump(), hashed_password=hashed_password, workspace_id=workspace_id
+        )
         join_rule = await uow.workspace_join_rules.create(data)
         return join_rule.to_response()
 
@@ -71,7 +73,7 @@ async def update_join_rule(
 
         hashed_password = hash_password(data.password) if data.password else None
         data = WorkspaceJoinRuleUpdateDTO(**data.model_dump(), hashed_password=hashed_password)
-        join_rule =  await uow.workspace_join_rules.update(rule_id, data)
+        join_rule = await uow.workspace_join_rules.update(rule_id, data)
         return join_rule.to_response()
 
 

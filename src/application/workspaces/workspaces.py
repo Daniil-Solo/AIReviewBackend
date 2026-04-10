@@ -3,9 +3,10 @@ from dependency_injector.wiring import Provide, inject
 from src.application.workspaces.common import check_member_role
 from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.di.container import Container
+from src.dto.tasks import TaskFiltersDTO, TaskResponseDTO
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces.join_rule import (
-    WorkspaceJoinRuleFullDTO, WorkspaceJoinRuleResponseDTO,
+    WorkspaceJoinRuleResponseDTO,
 )
 from src.dto.workspaces.member import WorkspaceMemberCreateDTO, WorkspaceMemberFiltersDTO, WorkspaceMemberResponseDTO
 from src.dto.workspaces.workspace import WorkspaceCreateDTO, WorkspaceResponseDTO, WorkspaceUpdateDTO
@@ -70,17 +71,6 @@ async def get_workspace(
 
 
 @inject
-async def get_workspace_tasks(
-    workspace_id: int,
-    user: ShortUserDTO,
-    uow: UnitOfWork = Provide[Container.uow],
-) -> list[dict]:
-    async with uow.connection():
-        await check_member_role(uow, user.id, workspace_id)
-        return []
-
-
-@inject
 async def get_workspace_members(
     workspace_id: int,
     user: ShortUserDTO,
@@ -101,5 +91,18 @@ async def get_workspace_join_rules(
         await check_member_role(
             uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )
-        join_rules =  await uow.workspace_join_rules.get_list(workspace_id)
+        join_rules = await uow.workspace_join_rules.get_list(workspace_id)
         return [jr.to_response() for jr in join_rules]
+
+
+@inject
+async def get_workspace_tasks(
+    workspace_id: int,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> list[TaskResponseDTO]:
+    async with uow.connection():
+        await check_member_role(
+            uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
+        )
+        return await uow.tasks.get_list(TaskFiltersDTO(workspace_id=workspace_id))

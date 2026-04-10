@@ -3,14 +3,14 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from src.infrastructure.llm.base import BaseLLM, Message
+from src.infrastructure.ai.llm import LLMInterface, Message
 
 
 logger = logging.getLogger(__name__)
 
 
 class Critic:
-    def __init__(self, llm: BaseLLM) -> None:
+    def __init__(self, llm: LLMInterface) -> None:
         loader = FileSystemLoader(Path("src") / Path("prompts") / Path("project_doc"))
         env = Environment(loader=loader)
         self.system_prompt = env.get_template("criticism/system.tpl")

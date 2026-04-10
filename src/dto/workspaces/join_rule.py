@@ -41,6 +41,7 @@ class WorkspaceJoinRuleFullDTO(BaseDTO):
     def to_response(self):
         return WorkspaceJoinRuleResponseDTO(**self.model_dump(), has_password=self.hashed_password is not None)
 
+
 class WorkspaceJoinRuleResponseDTO(BaseDTO):
     id: int = Field(description="ID приглашения")
     workspace_id: int = Field(description="ID рабочего пространства")
