@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from pydantic import Field
 
 import src.application.tasks as task_service
-from src.dto.common import BaseDTO
+from src.dto.common import BaseDTO, SuccessOperationDTO
 from src.dto.tasks.tasks import TaskCreateDTO, TaskResponseDTO, TaskUpdateDTO
 from src.dto.users.user import ShortUserDTO
 from src.interfaces.api.dependencies import get_current_user
@@ -42,3 +42,12 @@ async def get_public_endpoint(
     user: ShortUserDTO = Depends(get_current_user),
 ) -> TaskResponseDTO:
     return await task_service.get_public(task_id, user)
+
+
+@router.delete("/{task_id}", response_model=SuccessOperationDTO)
+async def delete_endpoint(
+    task_id: int,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> SuccessOperationDTO:
+    await task_service.delete(task_id, user)
+    return SuccessOperationDTO(message="Задача удалена")

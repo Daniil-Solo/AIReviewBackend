@@ -59,12 +59,13 @@ class SQLAlchemyTasksDAO(TasksDAO):
         return [TaskResponseDTO.model_validate(row) for row in rows]
 
     async def get_public_by_id(self, task_id: int) -> TaskResponseDTO:
-        query = (
-            sa.select(tasks_table)
-            .where(tasks_table.c.id == task_id, tasks_table.c.is_active == sa.true())
-        )
+        query = sa.select(tasks_table).where(tasks_table.c.id == task_id, tasks_table.c.is_active == sa.true())
         result = await self.session.execute(query)
         row = result.fetchone()
         if row is None:
             raise EntityNotFoundError(message="Задача не найдена")
         return TaskResponseDTO.model_validate(row)
+
+    async def delete(self, task_id: int) -> None:
+        query = sa.delete(tasks_table).where(tasks_table.c.id == task_id)
+        await self.session.execute(query)

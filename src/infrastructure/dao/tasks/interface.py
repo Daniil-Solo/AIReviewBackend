@@ -28,3 +28,7 @@ class TasksDAO(ABC):
     @abstractmethod
     async def get_public_by_id(self, task_id: int) -> TaskResponseDTO:
         raise NotImplementedError
+
+    @abstractmethod
+    async def delete(self, task_id: int) -> None:
+        raise NotImplementedError

@@ -69,3 +69,20 @@ async def get_public(
         task = await uow.tasks.get_by_id(task_id)
         await check_member_role(uow, user.id, task.workspace_id)
         return await uow.tasks.get_public_by_id(task_id)
+
+
+@inject
+async def delete(
+    task_id: int,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> None:
+    async with uow.connection():
+        task = await uow.tasks.get_by_id(task_id)
+        await check_member_role(
+            uow,
+            user.id,
+            task.workspace_id,
+            allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER},
+        )
+        await uow.tasks.delete(task_id)
