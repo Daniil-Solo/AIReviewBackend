@@ -11,12 +11,13 @@ from src.application.workspaces import (
     get_workspace,
     get_workspace_join_rules,
     get_workspace_members,
-    get_workspace_tasks,
     leave_workspace,
     update_join_rule,
     update_member,
-    update_workspace,
+    update_workspace, get_workspace_tasks,
 )
+import src.application.tasks as task_service
+from src.dto.tasks.tasks import TaskResponseDTO
 from src.dto.common import SuccessOperationDTO
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces import (
@@ -73,11 +74,11 @@ async def get_workspace_endpoint(
     return await get_workspace(workspace_id, user)
 
 
-@router.get("/{workspace_id}/tasks")
+@router.get("/{workspace_id}/tasks", response_model=list[TaskResponseDTO])
 async def get_workspace_tasks_endpoint(
     workspace_id: int,
     user: ShortUserDTO = Depends(get_current_user),
-) -> list[dict]:
+) -> list[TaskResponseDTO]:
     return await get_workspace_tasks(workspace_id, user)
 
 

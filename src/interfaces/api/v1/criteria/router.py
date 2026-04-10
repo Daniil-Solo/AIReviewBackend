@@ -37,7 +37,7 @@ async def list_criteria_endpoint(
 
 
 @router.get("/available_tags", response_model=list[str])
-async def get_available_tags(
+async def get_available_tags_endpoint(
     user: ShortUserDTO = Depends(get_current_user),
 ) -> list[str]:
     return await criteria_service.get_available_tags(user)

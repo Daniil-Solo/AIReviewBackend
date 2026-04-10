@@ -34,6 +34,7 @@ def upgrade() -> None:
     )
     op.create_table('tasks',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('workspace_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('description', sa.Text(), server_default='', nullable=False),
     sa.Column('is_active', sa.Boolean(), server_default=sa.text('true'), nullable=False),
@@ -41,6 +42,7 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('use_exam', sa.Boolean(), server_default=sa.text('false'), nullable=False),
     sa.ForeignKeyConstraint(['created_by'], ['users.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['workspace_id'], ['workspaces.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('solutions',

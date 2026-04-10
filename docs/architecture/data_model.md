@@ -46,6 +46,7 @@ erDiagram
 
     tasks {
         integer id PK
+        integer workspace_id FK
         string name
         string description
         bool is_active

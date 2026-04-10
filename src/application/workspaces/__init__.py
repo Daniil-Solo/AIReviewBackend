@@ -16,8 +16,8 @@ from src.application.workspaces.workspaces import (
     get_workspace,
     get_workspace_join_rules,
     get_workspace_members,
-    get_workspace_tasks,
     update_workspace,
+    get_workspace_tasks,
 )
 
 
@@ -26,7 +26,6 @@ __all__ = (
     "update_workspace",
     "archive_workspace",
     "get_workspace",
-    "get_workspace_tasks",
     "get_workspace_members",
     "get_workspace_join_rules",
     "check_slug_available",
@@ -37,4 +36,5 @@ __all__ = (
     "update_member",
     "leave_workspace",
     "change_workspace_owner",
+    "get_workspace_tasks",
 )

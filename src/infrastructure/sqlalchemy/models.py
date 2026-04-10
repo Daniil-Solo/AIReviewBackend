@@ -88,6 +88,12 @@ tasks_table = sa.Table(
     "tasks",
     metadata,
     sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
+    sa.Column(
+        "workspace_id",
+        sa.Integer,
+        sa.ForeignKey("workspaces.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+    ),
     sa.Column("name", sa.String(255), nullable=False),
     sa.Column("description", sa.Text, nullable=False, server_default=""),
     sa.Column("is_active", sa.Boolean, nullable=False, server_default=sa.true()),
