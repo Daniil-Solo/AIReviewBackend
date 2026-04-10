@@ -22,6 +22,7 @@ class SolutionFormatEnum(StrEnum):
 
 class SolutionStatusEnum(StrEnum):
     CREATED = "CREATED"
+    CANCELLED = "CANCELLED"
     ERROR = "ERROR"
     AI_REVIEW = "AI_REVIEW"
     WAITING_EXAM = "WAITING_EXAM"

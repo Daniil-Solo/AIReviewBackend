@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends
 
 import src.application.tasks as task_service
 import src.application.tasks.task_criteria as task_criteria_service
+import src.application.solutions.solutions as solution_service
 from src.dto.common import SuccessOperationDTO
+from src.dto.solutions.solutions import SolutionShortResponseDTO
 from src.dto.tasks.task_criteria import (
     TaskCriteriaCreateDTO,
     TaskCriteriaResponseDTO,
@@ -94,3 +96,11 @@ async def delete_criterion_endpoint(
 ) -> SuccessOperationDTO:
     await task_criteria_service.delete(task_criterion_id, user)
     return SuccessOperationDTO(message="Критерий задачи удален")
+
+
+@router.get("/{task_id}/solutions", response_model=list[SolutionShortResponseDTO])
+async def get_list_by_task_endpoint(
+    task_id: int,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> list[SolutionShortResponseDTO]:
+    return await solution_service.get_list_by_task(task_id, user)

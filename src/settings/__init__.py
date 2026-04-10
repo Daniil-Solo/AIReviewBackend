@@ -8,6 +8,7 @@ from src.settings.ai import AISettings
 from src.settings.database import DatabaseSettings
 from src.settings.jwt import JWTSettings
 from src.settings.logging import LoggingSettings
+from src.settings.storage import StorageSettings
 
 
 class Settings(BaseSettings):
@@ -20,6 +21,7 @@ class Settings(BaseSettings):
     jwt: JWTSettings = JWTSettings()
     ai: AISettings = AISettings()
     logging: LoggingSettings = LoggingSettings()
+    storage: StorageSettings = StorageSettings()
 
 
 settings = Settings()

@@ -50,7 +50,7 @@ def upgrade() -> None:
     sa.Column('task_id', sa.Integer(), nullable=False),
     sa.Column('format', sa.Enum('ZIP', 'GITHUB', name='solution_format'), nullable=False),
     sa.Column('link', sa.String(), nullable=False),
-    sa.Column('status', sa.Enum('CREATED', 'ERROR', 'AI_REVIEW', 'WAITING_EXAM', 'EXAMINATION', 'HUMAN_REVIEW', 'REVIEWED', name='solution_status'), nullable=False),
+    sa.Column('status', sa.Enum('CREATED', 'CANCELLED', 'ERROR', 'AI_REVIEW', 'WAITING_EXAM', 'EXAMINATION', 'HUMAN_REVIEW', 'REVIEWED', name='solution_status'), nullable=False),
     sa.Column('steps', sa.JSON(), server_default=sa.text("'{}'"), nullable=False),
     sa.Column('human_grade', sa.Integer(), nullable=True),
     sa.Column('human_feedback', sa.String(), nullable=True),

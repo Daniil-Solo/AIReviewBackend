@@ -8,6 +8,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      s3:
+        condition: service_healthy
     volumes:
       - .:/app
     restart: unless-stopped
@@ -66,10 +68,29 @@ services:
     networks:
       - autoreviewer
 
+  s3:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    command: server --console-address ":9001" /data/
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - .env
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    networks:
+      - autoreviewer
+
 volumes:
   postgres_data:
   loki_data:
   grafana_data:
+  minio_data:
 
 networks:
   autoreviewer:
