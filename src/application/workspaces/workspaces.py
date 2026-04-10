@@ -5,7 +5,7 @@ from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.di.container import Container
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces.join_rule import (
-    WorkspaceJoinRuleFullDTO, WorkspaceJoinRuleResponseDTO,
+    WorkspaceJoinRuleResponseDTO,
 )
 from src.dto.workspaces.member import WorkspaceMemberCreateDTO, WorkspaceMemberFiltersDTO, WorkspaceMemberResponseDTO
 from src.dto.workspaces.workspace import WorkspaceCreateDTO, WorkspaceResponseDTO, WorkspaceUpdateDTO
@@ -101,5 +101,5 @@ async def get_workspace_join_rules(
         await check_member_role(
             uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )
-        join_rules =  await uow.workspace_join_rules.get_list(workspace_id)
+        join_rules = await uow.workspace_join_rules.get_list(workspace_id)
         return [jr.to_response() for jr in join_rules]

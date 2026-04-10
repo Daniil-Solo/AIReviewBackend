@@ -8,10 +8,7 @@ from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterfac
 
 class Jinja2PromptBuilder(PromptBuilderInterface):
     def __init__(self, prompts_dir_path: Path):
-        self.env = Environment(
-            loader=FileSystemLoader(prompts_dir_path),
-            undefined=StrictUndefined
-        )
+        self.env = Environment(loader=FileSystemLoader(prompts_dir_path), undefined=StrictUndefined)
 
     def build(self, prompt_path: str, **payload: Any) -> str:
         """

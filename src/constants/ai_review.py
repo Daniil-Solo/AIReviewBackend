@@ -2,30 +2,29 @@ from enum import StrEnum
 
 
 class CriterionStageEnum(StrEnum):
-    PROJECT_DOC = "project_doc"
-    CODEBASE = "codebase"
-    AUTO = "auto"
-    MANUAL = "manual"
+    PROJECT_DOC = "PROJECT_DOC"
+    CODEBASE = "CODEBASE"
+    MANUAL = "MANUAL"
 
 
 class CriterionCheckStatusEnum(StrEnum):
-    SUFFICIENT = "sufficient"
-    NEEDS_CODE = "needs_code"
-    NEEDS_STUDENT = "needs_student"
-    NEEDS_MANUAL = "needs_manual"
-    NOT_APPLICABLE = "not_applicable"
+    SUFFICIENT = "SUFFICIENT"
+    NEEDS_CODE = "NEEDS_CODE"
+    NEEDS_STUDENT = "NEEDS_STUDENT"
+    NEEDS_MANUAL = "NEEDS_MANUAL"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
 
 
 class SolutionFormatEnum(StrEnum):
-    ZIP = "zip"
-    GITHUB = "github"
+    ZIP = "ZIP"
+    GITHUB = "GITHUB"
 
 
 class SolutionStatusEnum(StrEnum):
-    CREATED = "created"
-    ERROR = "error"
-    AI_REVIEW = "ai_review"
-    WAITING_EXAM = "waiting_exam"
-    EXAMINATION = "examination"
-    HUMAN_REVIEW = "human_review"
-    REVIEWED = "reviewed"
+    CREATED = "CREATED"
+    ERROR = "ERROR"
+    AI_REVIEW = "AI_REVIEW"
+    WAITING_EXAM = "WAITING_EXAM"
+    EXAMINATION = "EXAMINATION"
+    HUMAN_REVIEW = "HUMAN_REVIEW"
+    REVIEWED = "REVIEWED"

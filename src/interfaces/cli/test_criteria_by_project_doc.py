@@ -16,7 +16,7 @@ async def main() -> None:
     start = time.perf_counter()
     try:
         await grade_by_project_doc()
-        console.print(f"[bold green]Выполнено [/bold green]")
+        console.print("[bold green]Выполнено [/bold green]")
     except Exception as e:
         console.print(f"[bold red]Ошибка: {e}[/bold red]")
     finally:

@@ -2,9 +2,10 @@ from typing import Any
 
 from openai import OpenAI
 
-from src.dto.ai_review.message import InputMessageDTO, AIAnswerDTO
+from src.dto.ai_review.message import AIAnswerDTO, InputMessageDTO
 from src.infrastructure.ai.llm.interface import LLMInterface
 from src.infrastructure.logging import get_logger
+
 
 logger = get_logger()
 
@@ -17,10 +18,7 @@ class OpenAILikeLLM(LLMInterface):
 
     def answer(self, messages: list[InputMessageDTO], **kwargs: Any) -> AIAnswerDTO:
         response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[msg.model_dump() for msg in messages],
-            **self.common_parameters,
-            **kwargs
+            model=self.model, messages=[msg.model_dump() for msg in messages], **self.common_parameters, **kwargs
         )
         answer = AIAnswerDTO(
             content=response.choices[0].message.content or "",

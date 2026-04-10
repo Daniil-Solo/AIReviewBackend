@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any, Literal
+from typing import Any
 
-from src.dto.ai_review.message import InputMessageDTO, AIAnswerDTO
+from src.dto.ai_review.message import AIAnswerDTO, InputMessageDTO
 
 
 class LLMInterface(ABC):

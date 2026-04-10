@@ -5,6 +5,7 @@ from rich.console import Console
 
 from src.application.project.preprocessing.preprocessing import ProjectPreprocessor
 
+
 console = Console()
 
 

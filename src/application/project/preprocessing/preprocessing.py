@@ -6,7 +6,8 @@ from typing import cast
 import tiktoken
 from treeproject import path_content, path_tree
 
-from src.application.project.preprocessing.constants import IGNORED_DIRECTORIES, ALLOWED_EXTENSIONS
+from src.application.project.preprocessing.constants import ALLOWED_EXTENSIONS, IGNORED_DIRECTORIES
+
 
 logger = logging.getLogger(__name__)
 

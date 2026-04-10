@@ -82,6 +82,7 @@ erDiagram
         solution_format_enum format
         string link
         solution_status_enum status
+        jsonb steps
         nullable_integer human_grade
         nullable_string human_comment
         nullable_string ai_feedback
