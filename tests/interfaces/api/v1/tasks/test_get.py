@@ -35,10 +35,11 @@ async def test__success(uow, get_task):
     user = (await create_users(uow))[0]
     token = create_access_token(user.as_short())
     workspace = await create_workspace(uow, user.id)
-    task = await create_task(uow, user.id, workspace.id, name="Test Task")
+    task = await create_task(uow, workspace.id, user.id)
 
     result = await get_task(task.id, token)
-    assert result.name == "Test Task"
+    assert result.name == task.name
+    assert result.description == task.description
     assert result.workspace_id == workspace.id
 
 

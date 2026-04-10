@@ -45,7 +45,7 @@ async def test__success__by_owner(uow, create_task):
 
 
 async def test__failed__unauthorized(request_create_task):
-    data: TaskCreateDTO = TaskFactory.build()
+    data: TaskCreateDTO = TaskFactory.build(workspace_id=99999)
 
     response = await request_create_task(data, token="invalid")
     assert response.status_code == status.HTTP_401_UNAUTHORIZED

@@ -23,7 +23,7 @@ async def test__success(uow, request_delete_task):
     user = (await create_users(uow))[0]
     token = create_access_token(user.as_short())
     workspace = await create_workspace(uow, user.id)
-    task = await create_task(uow, user.id, workspace.id, name="Task to Delete")
+    task = await create_task(uow, workspace.id, user.id)
 
     response = await request_delete_task(task.id, token)
     assert response.status_code == status.HTTP_200_OK

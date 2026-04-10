@@ -34,10 +34,11 @@ async def test__success__active_task(uow, get_public_task):
     user = (await create_users(uow))[0]
     token = create_access_token(user.as_short())
     workspace = await create_workspace(uow, user.id)
-    task = await create_task(uow, user.id, workspace.id, name="Public Task", is_active=True)
+    task = await create_task(uow, workspace.id, user.id, is_active=True)
 
     result = await get_public_task(task.id, token)
-    assert result.name == "Public Task"
+    assert result.name == task.name
+    assert result.description == task.description
     assert result.is_active
 
 
@@ -45,7 +46,7 @@ async def test__failed__not_active(uow, request_get_public_task):
     user = (await create_users(uow))[0]
     token = create_access_token(user.as_short())
     workspace = await create_workspace(uow, user.id)
-    task = await create_task(uow, user.id, workspace.id, name="Inactive Task", is_active=False)
+    task = await create_task(uow, workspace.id, user.id, is_active=False)
 
     response = await request_get_public_task(task.id, token)
     assert response.status_code == status.HTTP_404_NOT_FOUND

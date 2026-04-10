@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.dao.criteria.interface import CriteriaDAO
+from src.infrastructure.dao.task_criteria.interface import TaskCriteriaDAO
 from src.infrastructure.dao.tasks.interface import TasksDAO
 from src.infrastructure.dao.users.interface import UsersDAO
 from src.infrastructure.dao.workspace_join_rules.interface import WorkspaceJoinRulesDAO
@@ -31,6 +32,7 @@ class UnitOfWork:
         workspace_join_rules_dao_factory: Callable[[AsyncSession], WorkspaceJoinRulesDAO],
         criteria_dao_factory: Callable[[AsyncSession], CriteriaDAO],
         tasks_dao_factory: Callable[[AsyncSession], TasksDAO],
+        task_criteria_dao_factory: Callable[[AsyncSession], TaskCriteriaDAO],
     ) -> None:
         self._session_factory = session_factory
         self._session: AsyncSession | None = None
@@ -41,6 +43,7 @@ class UnitOfWork:
         self._workspace_join_rules_dao_factory = workspace_join_rules_dao_factory
         self._criteria_dao_factory = criteria_dao_factory
         self._tasks_dao_factory = tasks_dao_factory
+        self._task_criteria_dao_factory = task_criteria_dao_factory
         # dao
         self._users: UsersDAO | None = None
         self._workspaces: WorkspacesDAO | None = None
@@ -48,6 +51,7 @@ class UnitOfWork:
         self._workspace_join_rules: WorkspaceJoinRulesDAO | None = None
         self._criteria: CriteriaDAO | None = None
         self._tasks: TasksDAO | None = None
+        self._task_criteria: TaskCriteriaDAO | None = None
 
     @asynccontextmanager
     async def connection(self) -> AsyncGenerator[Connection, None]:
@@ -70,6 +74,7 @@ class UnitOfWork:
                 self._workspace_join_rules = None
                 self._criteria = None
                 self._tasks = None
+                self._task_criteria = None
 
     @property
     def session(self) -> AsyncSession:
@@ -110,3 +115,9 @@ class UnitOfWork:
         if self._tasks is None:
             self._tasks = self._tasks_dao_factory(self._session)  # type: ignore[assignment]
         return self._tasks
+
+    @property
+    def task_criteria(self) -> TaskCriteriaDAO:
+        if self._task_criteria is None:
+            self._task_criteria = self._task_criteria_dao_factory(self._session)  # type: ignore[assignment]
+        return self._task_criteria

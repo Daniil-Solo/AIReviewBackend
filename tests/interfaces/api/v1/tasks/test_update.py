@@ -36,7 +36,7 @@ async def test__success(uow, update_task):
     user = (await create_users(uow))[0]
     token = create_access_token(user.as_short())
     workspace = await create_workspace(uow, user.id)
-    task = await create_task(uow, user.id, workspace.id, name="Original Name")
+    task = await create_task(uow, workspace.id, user.id)
 
     data: TaskUpdateDTO = TaskUpdateFactory.build(name="Updated Name")
 

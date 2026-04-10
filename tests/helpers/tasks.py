@@ -1,30 +1,17 @@
 from src.dto.tasks.tasks import TaskCreateDTO, TaskResponseDTO
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
+from tests.factories.tasks import TaskFactory, TaskUpdateFactory
 
 
 async def create_task(
     uow: UnitOfWork,
-    user_id: int,
     workspace_id: int,
-    name: str | None = None,
-    description: str | None = None,
-    is_active: bool = True,
-    use_exam: bool = False,
+    user_id: int,
+    is_active: bool | None = None
 ) -> TaskResponseDTO:
-    data = TaskCreateDTO(
-        workspace_id=workspace_id,
-        name=name or "Test Task",
-        description=description or "",
-    )
+    data: TaskCreateDTO = TaskFactory.build(workspace_id=workspace_id)
     async with uow.connection():
         task = await uow.tasks.create(data, created_by=user_id)
-        if not is_active or use_exam:
-            from src.dto.tasks.tasks import TaskUpdateDTO
-
-            update_data = TaskUpdateDTO(
-                name=task.name,
-                description=task.description,
-                is_active=is_active,
-            )
-            task = await uow.tasks.update(task.id, update_data)
+        if is_active is not  None:
+            await uow.tasks.update(task.id, TaskUpdateFactory.build(name=task.name, description=task.description, is_active=is_active))
         return task

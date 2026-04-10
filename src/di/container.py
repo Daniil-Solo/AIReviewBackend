@@ -5,6 +5,7 @@ from src.infrastructure.ai.llm.openai_like import OpenAILikeLLM
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface
 from src.infrastructure.ai.prompt_builder.jinja2 import Jinja2PromptBuilder
 from src.infrastructure.dao.criteria.sqlalchemy import SQLAlchemyCriteriaDAO
+from src.infrastructure.dao.task_criteria.sqlalchemy import SQLAlchemyTaskCriteriaDAO
 from src.infrastructure.dao.tasks.sqlalchemy import SQLAlchemyTasksDAO
 from src.infrastructure.dao.users.sqlalchemy import SQLAlchemyUsersDAO
 from src.infrastructure.dao.workspace_join_rules.sqlalchemy import SQLAlchemyWorkspaceJoinRulesDAO
@@ -30,6 +31,7 @@ class Container(containers.DeclarativeContainer):
     workspace_join_rules_dao = providers.Factory(lambda: SQLAlchemyWorkspaceJoinRulesDAO)
     criteria_dao = providers.Factory(lambda: SQLAlchemyCriteriaDAO)
     tasks_dao = providers.Factory(lambda: SQLAlchemyTasksDAO)
+    task_criteria_dao = providers.Factory(lambda: SQLAlchemyTaskCriteriaDAO)
 
     uow = providers.Factory(
         UnitOfWork,
@@ -40,6 +42,7 @@ class Container(containers.DeclarativeContainer):
         workspace_join_rules_dao_factory=workspace_join_rules_dao,
         criteria_dao_factory=criteria_dao,
         tasks_dao_factory=tasks_dao,
+        task_criteria_dao_factory=task_criteria_dao,
     )
 
     logs_sender = providers.Resource(init_logs_sender)
