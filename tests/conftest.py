@@ -81,7 +81,7 @@ def uow(container):
 @pytest.fixture
 def init_settings():
     settings.logging.LOKI_ENABLED = False
-
+    settings.redis.ENABLED = False
 
 @pytest_asyncio.fixture(scope="session")
 async def client() -> AsyncGenerator[AsyncClient, Any]:

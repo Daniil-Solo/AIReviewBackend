@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 
+import src.application.solutions.solutions as solution_service
 import src.application.tasks as task_service
 import src.application.tasks.task_criteria as task_criteria_service
-import src.application.solutions.solutions as solution_service
 from src.dto.common import SuccessOperationDTO
 from src.dto.solutions.solutions import SolutionShortResponseDTO
 from src.dto.tasks.task_criteria import (

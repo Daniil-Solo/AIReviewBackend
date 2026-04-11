@@ -6,6 +6,7 @@ from src.application.exceptions import (
     EntityNotFoundError,
     ForbiddenError,
     InvalidCredentialsError,
+    RateLimitError,
 )
 
 
@@ -15,4 +16,5 @@ APP_ERROR_TO_HTTP_CODE = {
     InvalidCredentialsError.__name__: status.HTTP_401_UNAUTHORIZED,
     ConflictError.__name__: status.HTTP_409_CONFLICT,
     ForbiddenError.__name__: status.HTTP_403_FORBIDDEN,
+    RateLimitError.__name__: status.HTTP_429_TOO_MANY_REQUESTS,
 }

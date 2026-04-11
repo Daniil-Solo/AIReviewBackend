@@ -1,18 +1,19 @@
 import re
 
-import httpx
 from dependency_injector.wiring import Provide, inject
 from fastapi import UploadFile
+import httpx
 
-from src.application.exceptions import ForbiddenError, ApplicationError
+from src.application.exceptions import ApplicationError, ForbiddenError
 from src.application.workspaces.common import check_member_role
 from src.constants.ai_review import SolutionFormatEnum, SolutionStatusEnum
 from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.di.container import Container
 from src.dto.solutions.solutions import (
     SolutionCreateDTO,
+    SolutionCreateRequestDTO,
     SolutionShortResponseDTO,
-    SolutionUpdateDTO, SolutionCreateRequestDTO,
+    SolutionUpdateDTO,
 )
 from src.dto.users.user import ShortUserDTO
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
@@ -20,9 +21,9 @@ from src.infrastructure.storage.interface import SolutionStorage
 
 
 async def validate_github_link(link: str) -> None:
-    url = link.strip().rstrip('/')
+    url = link.strip().rstrip("/")
 
-    match = re.search(r'github\.com/([^/]+)/([^/]+)/?$', url, re.IGNORECASE)
+    match = re.search(r"github\.com/([^/]+)/([^/]+)/?$", url, re.IGNORECASE)
     if match:
         owner, repo = match.group(1), match.group(2)
     else:
@@ -35,10 +36,12 @@ async def validate_github_link(link: str) -> None:
 
         if response.status_code == 200:
             return
-        elif response.status_code == 404:
+        if response.status_code == 404:
             raise ApplicationError(message="Репозиторий не найден", code="github_repo_not_found")
-        else:
-            raise ApplicationError(message="Возникла непредвиденная ошибка обращения к GitHub", code="github_unexpected_error")
+        raise ApplicationError(
+            message="Возникла непредвиденная ошибка обращения к GitHub", code="github_unexpected_error"
+        )
+
 
 @inject
 async def create(
@@ -81,7 +84,10 @@ async def get(
         solution = await uow.solutions.get_by_id(solution_id)
         task = await uow.tasks.get_by_id(solution.task_id)
         member = await check_member_role(uow, user.id, task.workspace_id)
-        if solution.created_by != user.id and member.role not in {WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}:
+        if solution.created_by != user.id and member.role not in {
+            WorkspaceMemberRoleEnum.OWNER,
+            WorkspaceMemberRoleEnum.TEACHER,
+        }:
             raise ForbiddenError(message="Пользователь не имеет доступ к этому решению")
         return SolutionShortResponseDTO.model_validate(solution)
 
@@ -108,5 +114,7 @@ async def get_list_by_task(
     async with uow.connection():
         task = await uow.tasks.get_by_id(task_id)
         workspace = await uow.workspaces.get_by_id(task.workspace_id)
-        await check_member_role(uow, user.id, workspace.id, {WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER})
+        await check_member_role(
+            uow, user.id, workspace.id, {WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
+        )
         return await uow.solutions.get_list_by_task(task_id)

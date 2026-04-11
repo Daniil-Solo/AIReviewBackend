@@ -11,7 +11,9 @@ class SQLAlchemyUsersDAO(UsersDAO):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def create(self, email: str, fullname: str, hashed_password: str, is_admin: bool = False) -> UserResponseDTO:
+    async def create(
+        self, email: str, fullname: str, hashed_password: str, is_admin: bool = False, is_verified: bool = False
+    ) -> UserResponseDTO:
         query = (
             sa.insert(users_table)
             .values(
@@ -19,7 +21,7 @@ class SQLAlchemyUsersDAO(UsersDAO):
                 fullname=fullname,
                 hashed_password=hashed_password,
                 is_admin=is_admin,
-                is_verified=False,
+                is_verified=is_verified,
             )
             .returning(users_table)
         )

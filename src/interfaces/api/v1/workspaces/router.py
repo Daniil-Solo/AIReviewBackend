@@ -11,14 +11,14 @@ from src.application.workspaces import (
     get_workspace,
     get_workspace_join_rules,
     get_workspace_members,
+    get_workspace_tasks,
     leave_workspace,
     update_join_rule,
     update_member,
-    update_workspace, get_workspace_tasks,
+    update_workspace,
 )
-import src.application.tasks as task_service
-from src.dto.tasks.tasks import TaskResponseDTO
 from src.dto.common import SuccessOperationDTO
+from src.dto.tasks.tasks import TaskResponseDTO
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces import (
     SlugCheckResponseDTO,

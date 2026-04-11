@@ -5,7 +5,9 @@ from src.dto.users.user import UserResponseDTO, UserWithPasswordDTO
 
 class UsersDAO(ABC):
     @abstractmethod
-    async def create(self, email: str, fullname: str, hashed_password: str, is_admin: bool = False) -> UserResponseDTO:
+    async def create(
+        self, email: str, fullname: str, hashed_password: str, is_admin: bool = False, is_verified: bool = False
+    ) -> UserResponseDTO:
         raise NotImplementedError
 
     @abstractmethod
