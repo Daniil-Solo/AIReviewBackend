@@ -24,3 +24,9 @@ class ForbiddenError(ApplicationError):
         self.message = message
         self.code = code
         super().__init__(self.message, self.code)
+
+
+class RateLimitError(ApplicationError):
+    def __init__(self, message: str) -> None:
+        self.message = message
+        super().__init__(self.message, "rate_limit_exceeded")

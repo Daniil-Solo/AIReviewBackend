@@ -16,8 +16,8 @@ from src.application.workspaces.workspaces import (
     get_workspace,
     get_workspace_join_rules,
     get_workspace_members,
-    update_workspace,
     get_workspace_tasks,
+    update_workspace,
 )
 
 

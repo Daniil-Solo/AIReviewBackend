@@ -4,8 +4,8 @@ import src.application.solutions.solutions as solution_service
 from src.constants.ai_review import SolutionFormatEnum
 from src.dto.common import SuccessOperationDTO
 from src.dto.solutions.solutions import (
-    SolutionCreateDTO,
-    SolutionShortResponseDTO, SolutionCreateRequestDTO,
+    SolutionCreateRequestDTO,
+    SolutionShortResponseDTO,
 )
 from src.dto.users.user import ShortUserDTO
 from src.interfaces.api.dependencies import get_current_user
@@ -41,4 +41,3 @@ async def cancel_endpoint(
 ) -> SuccessOperationDTO:
     await solution_service.cancel(solution_id, user)
     return SuccessOperationDTO(message="Проверка решения отменена")
-

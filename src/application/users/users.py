@@ -23,6 +23,7 @@ async def create_user(data: UserCreateDTO, uow: UnitOfWork = Provide[Container.u
             fullname=data.fullname,
             hashed_password=hashed_password,
             is_admin=False,
+            is_verified=False,
         )
 
 
@@ -42,6 +43,7 @@ async def create_admin(data: UserCreateDTO, uow: UnitOfWork = Provide[Container.
             fullname=data.fullname,
             hashed_password=hashed_password,
             is_admin=True,
+            is_verified=True,
         )
 
 

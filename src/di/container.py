@@ -1,10 +1,13 @@
 from dependency_injector import containers, providers
+from redis.asyncio import Redis
 
 from src.infrastructure.ai.llm.interface import LLMInterface
 from src.infrastructure.ai.llm.openai_like import OpenAILikeLLM
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface
 from src.infrastructure.ai.prompt_builder.jinja2 import Jinja2PromptBuilder
 from src.infrastructure.dao.criteria.sqlalchemy import SQLAlchemyCriteriaDAO
+from src.infrastructure.dao.registrations.interface import RegistrationsFlow
+from src.infrastructure.dao.registrations.redis import RedisRegistrationsFlow
 from src.infrastructure.dao.solutions.sqlalchemy import SQLAlchemySolutionsDAO
 from src.infrastructure.dao.task_criteria.sqlalchemy import SQLAlchemyTaskCriteriaDAO
 from src.infrastructure.dao.tasks.sqlalchemy import SQLAlchemyTasksDAO
@@ -12,7 +15,13 @@ from src.infrastructure.dao.users.sqlalchemy import SQLAlchemyUsersDAO
 from src.infrastructure.dao.workspace_join_rules.sqlalchemy import SQLAlchemyWorkspaceJoinRulesDAO
 from src.infrastructure.dao.workspace_members.sqlalchemy import SQLAlchemyWorkspaceMembersDAO
 from src.infrastructure.dao.workspaces.sqlalchemy import SQLAlchemyWorkspacesDAO
+from src.infrastructure.email_sender.interface import EmailSenderInterface
+from src.infrastructure.email_sender.maileroo import MailerooEmailSender
+from src.infrastructure.email_templater.interface import EmailTemplaterInterface
+from src.infrastructure.email_templater.jinja2 import Jinja2EmailTemplater
 from src.infrastructure.logs_sender.init_logs_sender import init_logs_sender
+from src.infrastructure.rate_limiter.rate_limiter import RateLimiter
+from src.infrastructure.redis.client import init_redis_client
 from src.infrastructure.sqlalchemy.engine import create_engine, create_session_factory
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 from src.infrastructure.storage.interface import SolutionStorage
@@ -37,6 +46,22 @@ class Container(containers.DeclarativeContainer):
     task_criteria_dao = providers.Factory(lambda: SQLAlchemyTaskCriteriaDAO)
     solutions_dao = providers.Factory(lambda: SQLAlchemySolutionsDAO)
 
+    redis_client = providers.Resource[Redis](init_redis_client)
+    registrations_flow = providers.Factory[RegistrationsFlow](
+        RedisRegistrationsFlow,
+        redis=redis_client,
+        prefix=settings.auth.CODE_CONFIRM_PREFIX,
+        ttl=settings.auth.CONFIRM_TTL,
+        max_count=settings.auth.MAX_CONFIRM_COUNT,
+    )
+    resend_code_rate_limiter = providers.Factory(
+        RateLimiter,
+        redis=redis_client,
+        prefix=settings.auth.CODE_RESEND_PREFIX,
+        ttl=settings.auth.RESEND_TTL,
+        max_count=settings.auth.MAX_RESEND_COUNT,
+    )
+
     uow = providers.Factory(
         UnitOfWork,
         session_factory=session_factory,
@@ -55,11 +80,20 @@ class Container(containers.DeclarativeContainer):
         endpoint=settings.storage.ENDPOINT,
         access_key=settings.storage.ACCESS_KEY,
         secret_key=settings.storage.SECRET_KEY,
+        bucket=settings.storage.BUCKET,
         use_ssl=settings.storage.USE_SSL,
-        bucket=settings.storage.BUCKET
     )
 
     logs_sender = providers.Resource(init_logs_sender)
+
+    email_sender = providers.Factory[EmailSenderInterface](
+        MailerooEmailSender,
+        token=settings.email.MAILEROO_API_KEY,
+    )
+    email_templater = providers.Factory[EmailTemplaterInterface](
+        Jinja2EmailTemplater, templates_dir_path=ROOT_DIR / "src" / "email_templates"
+    )
+
     prompt_builder = providers.Singleton[PromptBuilderInterface](
         Jinja2PromptBuilder, prompts_dir_path=ROOT_DIR / "ai_review" / "prompts"
     )

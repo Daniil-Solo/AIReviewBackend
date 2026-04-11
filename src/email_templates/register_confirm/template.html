@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <title>Код подтверждения</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f7f9fc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <center style="width: 100%; table-layout: fixed;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #f7f9fc;">
+            <tr>
+                <td align="center" style="padding: 40px 20px 30px;">
+                    <!-- Логотип или название сервиса -->
+                    <div style="font-size: 24px; font-weight: 700; color: #1a1e24; letter-spacing: -0.5px; margin-bottom: 8px;">
+                        {{ platform_name }}
+                    </div>
+                    <div style="font-size: 14px; color: #6b7280; font-weight: 400;">
+                        подтверждение регистрации
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" style="padding: 0 20px;">
+                    <!-- Основной белый блок -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 24px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);">
+                        <tr>
+                            <td align="center" style="padding: 40px 32px;">
+                                <!-- Иконка или приветствие -->
+                                <div style="margin-bottom: 24px;">
+                                    <!-- Простая графическая деталь — точка/акцент -->
+                                    <div style="width: 48px; height: 48px; background-color: #eef2ff; border-radius: 50%; display: inline-block; line-height: 48px; text-align: center;">
+                                        <span style="font-size: 24px;">✉️</span>
+                                    </div>
+                                </div>
+
+                                <h2 style="margin: 0 0 8px; font-size: 22px; font-weight: 600; color: #111827;">Код подтверждения</h2>
+                                <p style="margin: 0 0 28px; font-size: 15px; line-height: 1.5; color: #4b5563;">
+                                    Пожалуйста, введите его на платформе.
+                                </p>
+
+                                <!-- Блок с кодом -->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 32px;">
+                                    <tr>
+                                        <td align="center" style="background-color: #f3f4f6; padding: 16px 36px; border-radius: 60px; font-size: 42px; font-weight: 700; letter-spacing: 8px; color: #111827; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', 'Consolas', 'Courier New', monospace;">
+                                            {{ code }}
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Разделитель -->
+                                <div style="width: 40px; height: 2px; background-color: #e5e7eb; margin: 0 auto 24px;"></div>
+
+                                <!-- Предупреждение -->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 8px;">
+                                    <tr>
+                                        <td style="padding: 0 16px;">
+                                            <p style="margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: #6b7280; font-style: normal;">
+                                                ⚡ Внимание: ни в коем случае не передавайте этот код посторонним.
+                                            </p>
+                                            <p style="margin: 0 0 16px; font-size: 13px; line-height: 1.5; color: #6b7280;">
+                                                Мы никогда не попросим вас назвать его в переписке или по телефону.
+                                            </p>
+                                            <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #6b7280;">
+                                                Если вы не создавали аккаунт, просто игнорируйте это письмо.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" style="padding: 32px 20px 20px;">
+                    <!-- Подвал -->
+                    <p style="margin: 0 0 4px; font-size: 15px; font-weight: 500; color: #1f2937;">
+                        До скорой встречи,
+                    </p>
+                    <p style="margin: 0; font-size: 14px; color: #4b5563;">
+                        Команда платформы <span style="font-weight: 500; color: #1f2937;">{{ platform_name }}</span>
+                    </p>
+
+                    <!-- Дополнительная техническая информация (опционально) -->
+                    <p style="margin: 24px 0 0; font-size: 12px; color: #9ca3af;">
+                        Это автоматическое сообщение, на него не нужно отвечать.
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>
