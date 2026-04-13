@@ -109,6 +109,7 @@
 - SQLAlchemy используется в режиме Core (императивные таблицы), не ORM; запросы в DAO также составляются с помощью Core
 - Всегда реализиуй эндпоинты, дао, сервисные функции по аналогии с уже существующими(src/infrastructure/dao/users, src/interfaces/api/v1/users, )
 - Название сервисных функций в application слое формируется без указания сущности, поскольку из файла application/{entities}/{entity}.py итак понятно к какой сущности относится функция (например, в файле application/tasks/tasks.py функции называются create, update, get, а не create_task, update_task, get_task)
+- Никогда не пытайся запустить сам тесты, а также любой Docker-контейнер
 
 
 ## Флоу реализации эндпоинта, сервисной функции (application), DAO, DTO и SQLAlchemy-модели
