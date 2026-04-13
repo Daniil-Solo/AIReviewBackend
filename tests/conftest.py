@@ -30,6 +30,7 @@ async def test_database_name():
         await conn.execute(f"CREATE DATABASE {test_db_name}")
 
         logger.info(f"Test database {test_db_name} created successfully")
+        settings.db.DB = test_db_name
 
         yield test_db_name
 

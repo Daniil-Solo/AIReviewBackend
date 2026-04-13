@@ -6,8 +6,8 @@ ALLOWED_EXTENSIONS = [
     ".tpl"  # ".ipynb",
     ".html",
     ".css",
-    ".js",
-    ".ts",
+    ".js", ".jsx",
+    ".ts", ".tsx",
     # execs
     ".sh",
     ".bat",

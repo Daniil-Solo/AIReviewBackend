@@ -9,7 +9,12 @@ from src.dto.workspaces.join_rule import (
     WorkspaceJoinRuleResponseDTO,
 )
 from src.dto.workspaces.member import WorkspaceMemberCreateDTO, WorkspaceMemberFiltersDTO, WorkspaceMemberResponseDTO
-from src.dto.workspaces.workspace import WorkspaceCreateDTO, WorkspaceResponseDTO, WorkspaceUpdateDTO
+from src.dto.workspaces.workspace import (
+    UserWorkspaceResponseDTO,
+    WorkspaceCreateDTO,
+    WorkspaceResponseDTO,
+    WorkspaceUpdateDTO,
+)
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 
 
@@ -106,3 +111,19 @@ async def get_workspace_tasks(
             uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )
         return await uow.tasks.get_list(TaskFiltersDTO(workspace_id=workspace_id))
+
+
+@inject
+async def get_user_workspaces(
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> list[UserWorkspaceResponseDTO]:
+    async with uow.connection():
+        members = await uow.workspace_members.get_by_user(user.id)
+        result = []
+        for member in members:
+            workspace = await uow.workspaces.get_by_id(member.workspace_id)
+            if workspace.is_archived and member.role != WorkspaceMemberRoleEnum.OWNER:
+                continue
+            result.append(UserWorkspaceResponseDTO(workspace=workspace, role=member.role))
+        return result

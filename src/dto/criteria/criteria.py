@@ -1,6 +1,6 @@
 import datetime
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from src.constants.ai_review import CriterionStageEnum
 from src.dto.common import BaseDTO
@@ -11,6 +11,13 @@ class CriterionCreateDTO(BaseDTO):
     tags: list[str] = Field(default_factory=list, description="Теги критерия")
     stage: CriterionStageEnum | None = Field(default=None, description="Стадия проверки критерия")
     is_public: bool = Field(default=True, description="Флаг публичности критерия")
+
+    @field_validator("tags", mode="before")
+    @classmethod
+    def normalize_tags(cls, v):
+        if isinstance(v, list):
+            return [tag.lower() for tag in v]
+        return v
 
 
 class CriterionUpdateDTO(CriterionCreateDTO):
@@ -30,3 +37,10 @@ class CriterionResponseDTO(BaseDTO):
 class CriterionFiltersDTO(BaseDTO):
     search: str | None = Field(default=None, description="Поисковой запрос")
     tags: list[str] | None = Field(default=None, description="Теги")
+
+    @field_validator("tags", mode="before")
+    @classmethod
+    def normalize_tags(cls, v):
+        if isinstance(v, list):
+            return [tag.lower() for tag in v]
+        return v

@@ -13,6 +13,7 @@ from src.application.workspaces.members import (
 from src.application.workspaces.workspaces import (
     archive_workspace,
     create_workspace,
+    get_user_workspaces,
     get_workspace,
     get_workspace_join_rules,
     get_workspace_members,
@@ -37,4 +38,5 @@ __all__ = (
     "leave_workspace",
     "change_workspace_owner",
     "get_workspace_tasks",
+    "get_user_workspaces",
 )

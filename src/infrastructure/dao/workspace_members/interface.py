@@ -30,5 +30,9 @@ class WorkspaceMembersDAO(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_by_user(self, user_id: int) -> list[WorkspaceMemberResponseDTO]:
+        raise NotImplementedError
+
+    @abstractmethod
     async def delete(self, member_id: int) -> None:
         raise NotImplementedError
