@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi.responses import StreamingResponse
 
-import src.application.solutions.solutions as solution_service
 import src.application.ai_review.pipeline as pipeline_service
+import src.application.solutions.solutions as solution_service
+from src.constants.ai_pipeline import PipelineStepEnum
 from src.constants.ai_review import SolutionFormatEnum
 from src.dto.ai_review.pipeline import PipelineInfoDTO
 from src.dto.common import SuccessOperationDTO
@@ -60,3 +62,16 @@ async def get_pipeline_info(
     user: ShortUserDTO = Depends(get_current_user),
 ) -> PipelineInfoDTO:
     return await pipeline_service.get_info(solution_id, user)
+
+
+@router.get("/{solution_id}/artefacts/{step}")
+async def get_artefact_endpoint(
+    solution_id: int,
+    step: PipelineStepEnum,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> StreamingResponse:
+    content = await solution_service.get_artefact(solution_id, step, user)
+    return StreamingResponse(
+        content=iter([content]),
+        media_type="text/plain; charset=utf-8",
+    )

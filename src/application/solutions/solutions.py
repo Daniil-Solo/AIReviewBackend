@@ -1,13 +1,14 @@
 import re
 
+from botocore.exceptions import ClientError
 from dependency_injector.wiring import Provide, inject
 from fastapi import UploadFile
 import httpx
 
-from src.application.exceptions import ApplicationError, ForbiddenError
+from src.application.exceptions import ApplicationError, EntityNotFoundError, ForbiddenError
 from src.application.solutions.common import check_solution_permissions
 from src.application.workspaces.common import check_member_role
-from src.constants.ai_pipeline import ALL_STEPS
+from src.constants.ai_pipeline import ALL_STEPS, PipelineStepEnum
 from src.constants.ai_review import SolutionFormatEnum, SolutionStatusEnum
 from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.di.container import Container
@@ -19,6 +20,7 @@ from src.dto.solutions.solutions import (
 )
 from src.dto.users.user import ShortUserDTO
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
+from src.infrastructure.storage.artifact import SolutionArtifactStorage
 from src.infrastructure.storage.interface import SolutionStorage
 
 
@@ -118,3 +120,24 @@ async def get_list_by_task(
             uow, user.id, workspace.id, {WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )
         return await uow.solutions.get_list_by_task(task_id)
+
+
+@inject
+async def get_artefact(
+    solution_id: int,
+    step: PipelineStepEnum,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+    artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
+) -> str:
+    async with uow.connection():
+        await check_solution_permissions(uow, user.id, solution_id)
+        try:
+            return await artifact_storage.get_artifact(solution_id, step.value)
+        except ClientError as e:
+            error_code = e.response.get("Error", {}).get("Code", "")
+            if error_code == "NoSuchKey":
+                raise EntityNotFoundError(
+                    message=f"Артефакт этапа {step.value} не найден для решения {solution_id}"
+                ) from e
+            raise
