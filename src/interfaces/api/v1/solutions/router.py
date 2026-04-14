@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 import src.application.solutions.solutions as solution_service
+import src.application.ai_review.pipeline as pipeline_service
 from src.constants.ai_review import SolutionFormatEnum
+from src.dto.ai_review.pipeline import PipelineInfoDTO
 from src.dto.common import SuccessOperationDTO
 from src.dto.solutions.solutions import (
     SolutionCreateRequestDTO,
@@ -11,10 +13,10 @@ from src.dto.users.user import ShortUserDTO
 from src.interfaces.api.dependencies import get_current_user
 
 
-solutions_router = APIRouter(prefix="/solutions", tags=["solutions"])
+router = APIRouter(prefix="/solutions", tags=["solutions"])
 
 
-@solutions_router.post("", response_model=SolutionShortResponseDTO)
+@router.post("", response_model=SolutionShortResponseDTO)
 async def create_endpoint(
     task_id: int = Form(),
     format: SolutionFormatEnum = Form(),
@@ -26,7 +28,7 @@ async def create_endpoint(
     return await solution_service.create(data, file, link, user)
 
 
-@solutions_router.get("/{solution_id}", response_model=SolutionShortResponseDTO)
+@router.get("/{solution_id}", response_model=SolutionShortResponseDTO)
 async def get_endpoint(
     solution_id: int,
     user: ShortUserDTO = Depends(get_current_user),
@@ -34,10 +36,36 @@ async def get_endpoint(
     return await solution_service.get(solution_id, user)
 
 
-@solutions_router.post("/{solution_id}/cancel", response_model=SuccessOperationDTO)
+@router.post("/{solution_id}/cancel", response_model=SuccessOperationDTO)
 async def cancel_endpoint(
     solution_id: int,
     user: ShortUserDTO = Depends(get_current_user),
 ) -> SuccessOperationDTO:
     await solution_service.cancel(solution_id, user)
     return SuccessOperationDTO(message="Проверка решения отменена")
+
+
+@router.post("/{solution_id}/start", response_model=SuccessOperationDTO)
+async def start_pipeline(
+    solution_id: int,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> SuccessOperationDTO:
+    await pipeline_service.start(solution_id, user)
+    return SuccessOperationDTO(message="Пайплайн запущен")
+
+
+@router.post("/{solution_id}/restart", response_model=SuccessOperationDTO)
+async def restart_pipeline(
+    solution_id: int,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> SuccessOperationDTO:
+    await pipeline_service.restart(solution_id, user)
+    return SuccessOperationDTO(message="Пайплайн перезапущен")
+
+
+@router.get("/{solution_id}/info", response_model=PipelineInfoDTO)
+async def get_pipeline_info(
+    solution_id: int,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> PipelineInfoDTO:
+    return await pipeline_service.get_info(solution_id, user)

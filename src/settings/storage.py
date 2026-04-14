@@ -8,5 +8,6 @@ class StorageSettings(BaseSettings):
     ENDPOINT: str = Field(description="S3 endpoint URL")
     ACCESS_KEY: str = Field(description="S3 access key")
     SECRET_KEY: str = Field(description="S3 secret key")
-    BUCKET: str = Field(description="S3 bucket for solutions")
+    SOLUTIONS_BUCKET: str = Field(description="S3 bucket for solutions")
+    SOLUTION_ARTIFACTS_BUCKET: str = Field(description="S3 bucket for solutions")
     USE_SSL: bool = Field(description="Use SSL for S3 connection")

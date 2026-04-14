@@ -6,6 +6,7 @@ from src.infrastructure.ai.llm.openai_like import OpenAILikeLLM
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface
 from src.infrastructure.ai.prompt_builder.jinja2 import Jinja2PromptBuilder
 from src.infrastructure.dao.criteria.sqlalchemy import SQLAlchemyCriteriaDAO
+from src.infrastructure.dao.pipeline_tasks.sqlalchemy import SQLAlchemyPipelineTasksDAO
 from src.infrastructure.dao.registrations.interface import RegistrationsFlow
 from src.infrastructure.dao.registrations.redis import RedisRegistrationsFlow
 from src.infrastructure.dao.solutions.sqlalchemy import SQLAlchemySolutionsDAO
@@ -24,8 +25,10 @@ from src.infrastructure.rate_limiter.rate_limiter import RateLimiter
 from src.infrastructure.redis.client import init_redis_client
 from src.infrastructure.sqlalchemy.engine import create_engine, create_session_factory
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
+from src.infrastructure.storage.artifact import SolutionArtifactStorage
 from src.infrastructure.storage.interface import SolutionStorage
 from src.infrastructure.storage.s3 import S3SolutionStorage
+from src.infrastructure.storage.s3_artifact import S3SolutionArtifactStorage
 from src.settings import ROOT_DIR, settings
 
 
@@ -45,6 +48,7 @@ class Container(containers.DeclarativeContainer):
     tasks_dao = providers.Factory(lambda: SQLAlchemyTasksDAO)
     task_criteria_dao = providers.Factory(lambda: SQLAlchemyTaskCriteriaDAO)
     solutions_dao = providers.Factory(lambda: SQLAlchemySolutionsDAO)
+    pipeline_tasks_dao = providers.Factory(lambda: SQLAlchemyPipelineTasksDAO)
 
     redis_client = providers.Resource[Redis](init_redis_client)
     registrations_flow = providers.Factory[RegistrationsFlow](
@@ -73,6 +77,7 @@ class Container(containers.DeclarativeContainer):
         tasks_dao_factory=tasks_dao,
         task_criteria_dao_factory=task_criteria_dao,
         solutions_dao_factory=solutions_dao,
+        pipeline_tasks_dao_factory=pipeline_tasks_dao,
     )
 
     solution_storage = providers.Factory[SolutionStorage](
@@ -80,7 +85,16 @@ class Container(containers.DeclarativeContainer):
         endpoint=settings.storage.ENDPOINT,
         access_key=settings.storage.ACCESS_KEY,
         secret_key=settings.storage.SECRET_KEY,
-        bucket=settings.storage.BUCKET,
+        bucket=settings.storage.SOLUTIONS_BUCKET,
+        use_ssl=settings.storage.USE_SSL,
+    )
+
+    solution_artifact_storage = providers.Factory[SolutionArtifactStorage](
+        S3SolutionArtifactStorage,
+        endpoint=settings.storage.ENDPOINT,
+        access_key=settings.storage.ACCESS_KEY,
+        secret_key=settings.storage.SECRET_KEY,
+        bucket=settings.storage.SOLUTION_ARTIFACTS_BUCKET,
         use_ssl=settings.storage.USE_SSL,
     )
 

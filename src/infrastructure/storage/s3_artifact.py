@@ -1,14 +1,10 @@
-from collections.abc import Awaitable
-from typing import IO, Any, cast
-import uuid
-
 from aiobotocore.config import AioConfig
 import aiobotocore.session
 
-from src.infrastructure.storage.interface import SolutionStorage
+from src.infrastructure.storage.artifact import SolutionArtifactStorage
 
 
-class S3SolutionStorage(SolutionStorage):
+class S3SolutionArtifactStorage(SolutionArtifactStorage):
     def __init__(
         self,
         endpoint: str,
@@ -25,10 +21,12 @@ class S3SolutionStorage(SolutionStorage):
         self._bucket = bucket
         self._use_ssl = use_ssl
 
-    async def upload_solution(self, file: IO[Any], filename: str, task_id: int, user_id: int) -> str:
-        unique_id = uuid.uuid4().hex
-        key = f"tasks/{task_id}/users/{user_id}/{unique_id}_{filename}"
+    @staticmethod
+    def _make_key(solution_id: int, key: str) -> str:
+        return f"{solution_id}/{key}.md"
 
+    async def save_artifact(self, solution_id: int, key: str, content: str) -> None:
+        full_key = self._make_key(solution_id, key)
         async with self._session.create_client(
             "s3",
             endpoint_url=self._endpoint,
@@ -37,21 +35,15 @@ class S3SolutionStorage(SolutionStorage):
             config=self._config,
             use_ssl=self._use_ssl,
         ) as client:
-            file_body = cast("bytes | Awaitable[bytes]", file.read())
-            if isinstance(file_body, Awaitable):
-                body_content = await file_body
-            else:
-                body_content = file_body
             await client.put_object(
                 Bucket=self._bucket,
-                Key=key,
-                Body=body_content,
-                ContentType="application/zip",
+                Key=full_key,
+                Body=content.encode("utf-8"),
+                ContentType="text/plain; charset=utf-8",
             )
 
-        return key
-
-    async def get_content(self, key: str) -> bytes:
+    async def get_artifact(self, solution_id: int, key: str) -> str:
+        full_key = self._make_key(solution_id, key)
         async with self._session.create_client(
             "s3",
             endpoint_url=self._endpoint,
@@ -60,7 +52,19 @@ class S3SolutionStorage(SolutionStorage):
             config=self._config,
             use_ssl=self._use_ssl,
         ) as client:
-            response = await client.get_object(Bucket=self._bucket, Key=key)
+            response = await client.get_object(Bucket=self._bucket, Key=full_key)
             async with response["Body"] as stream:
                 data = await stream.read()
-            return data
+                return data.decode("utf-8")
+
+    async def delete_artifact(self, solution_id: int, key: str) -> None:
+        full_key = self._make_key(solution_id, key)
+        async with self._session.create_client(
+            "s3",
+            endpoint_url=self._endpoint,
+            aws_access_key_id=self._access_key,
+            aws_secret_access_key=self._secret_key,
+            config=self._config,
+            use_ssl=self._use_ssl,
+        ) as client:
+            await client.delete_object(Bucket=self._bucket, Key=full_key)

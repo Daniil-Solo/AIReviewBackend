@@ -4,7 +4,7 @@ from src.interfaces.api.v1.auth.router import router as auth_router
 from src.interfaces.api.v1.criteria.router import router as criteria_router
 from src.interfaces.api.v1.joins.router import router as joins_router
 from src.interfaces.api.v1.profile.router import router as profile_router
-from src.interfaces.api.v1.solutions.router import solutions_router as solutions_router
+from src.interfaces.api.v1.solutions.router import router as solutions_router
 from src.interfaces.api.v1.tasks.router import router as tasks_main_router
 from src.interfaces.api.v1.users.router import router as users_router
 from src.interfaces.api.v1.workspaces.router import router as workspaces_router

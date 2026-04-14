@@ -15,14 +15,45 @@ services:
     volumes:
       - .:/app
     restart: unless-stopped
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
     networks:
       - autoreviewer
     command: uv run uvicorn src.interfaces.api.app:app --host 0.0.0.0 --port 8000 --reload
+
+  review_worker-1:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    networks:
+      - autoreviewer
+    command: uv run python -m src.interfaces.cli.worker
+
+  review_worker-2:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    networks:
+      - autoreviewer
+    command: uv run python -m src.interfaces.cli.worker
 
   db:
     image: postgres:16

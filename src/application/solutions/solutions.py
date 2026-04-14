@@ -6,6 +6,7 @@ import httpx
 
 from src.application.exceptions import ApplicationError, ForbiddenError
 from src.application.workspaces.common import check_member_role
+from src.constants.ai_pipeline import ALL_STEPS
 from src.constants.ai_review import SolutionFormatEnum, SolutionStatusEnum
 from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.di.container import Container
@@ -67,10 +68,15 @@ async def create(
 
         await validate_github_link(link)
 
-    async with uow.connection():
+    async with uow.connection() as conn, conn.transaction():
         task = await uow.tasks.get_by_id(data.task_id)
         await check_member_role(uow, user.id, task.workspace_id)
         solution = await uow.solutions.create(SolutionCreateDTO(**data.model_dump(), link=link), user.id)
+        solution = await uow.solutions.update(
+            solution.id,
+            SolutionUpdateDTO(status=SolutionStatusEnum.AI_REVIEW, steps=[]),
+        )
+        await uow.pipeline_tasks.create_tasks(solution.id, ALL_STEPS)
     return SolutionShortResponseDTO.model_validate(solution)
 
 

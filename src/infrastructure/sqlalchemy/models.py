@@ -174,19 +174,22 @@ solution_criteria_checks_table = sa.Table(
     sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
 )
 
-solution_artifacts_table = sa.Table(
-    "solution_artifacts",
+pipeline_tasks_table = sa.Table(
+    "pipeline_tasks",
     metadata,
+    sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
     sa.Column(
         "solution_id",
         sa.Integer,
         sa.ForeignKey("solutions.id", ondelete="CASCADE", onupdate="CASCADE"),
-        primary_key=True,
+        nullable=False,
     ),
-    sa.Column("project_tree", sa.Text, nullable=True),
-    sa.Column("project_content", sa.Text, nullable=True),
-    sa.Column("project_doc", sa.Text, nullable=True),
-    sa.Column("questions", sa.JSON, nullable=True),
+    sa.Column("step", sa.String(100), nullable=False),
+    sa.Column("status", sa.String(20), nullable=False, server_default="pending"),
+    sa.Column("error_text", sa.Text, nullable=True),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+    sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+    sa.UniqueConstraint("solution_id", "step", name="uq_pipeline_tasks_solution_step"),
 )
 
 ALL_TABLES = [
@@ -199,5 +202,5 @@ ALL_TABLES = [
     task_criteria_table,
     solutions_table,
     solution_criteria_checks_table,
-    solution_artifacts_table,
+    pipeline_tasks_table,
 ]

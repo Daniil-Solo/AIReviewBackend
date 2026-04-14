@@ -3,7 +3,6 @@ from pydantic import TypeAdapter
 
 from src.di.container import Container
 from src.dto.ai_review.criteria import CriterionCheckDTO, CriterionWithCommentsDTO
-from src.dto.ai_review.message import InputMessageDTO
 from src.infrastructure.ai.llm.interface import LLMInterface
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface
 from src.infrastructure.logging import get_logger
@@ -55,12 +54,7 @@ async def grade_by_project_doc(
         prompt_path="criteria_checks/projectdoc_grading/user.tpl", project_doc=project_doc
     )
 
-    messages = [
-        InputMessageDTO(role="system", content=system_content),
-        InputMessageDTO(role="user", content=user_content),
-    ]
-
-    answer = default_model.answer(messages)
+    answer = await default_model.run(system_content, user_content)
     with open("grade_by_project_doc.txt", "w") as f:
         f.write(answer.content)
 
@@ -96,12 +90,7 @@ async def grade_by_codebase(
         project_content=project_content_doc,
     )
 
-    messages = [
-        InputMessageDTO(role="system", content=system_content),
-        InputMessageDTO(role="user", content=user_content),
-    ]
-
-    answer = default_model.answer(messages)
+    answer = await default_model.run(system_content, user_content)
     with open("grade_by_codebase.txt", "w") as f:
         f.write(answer.content)
 
