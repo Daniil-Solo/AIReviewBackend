@@ -23,7 +23,7 @@ class S3SolutionArtifactStorage(SolutionArtifactStorage):
 
     @staticmethod
     def _make_key(solution_id: int, key: str) -> str:
-        return f"{solution_id}/{key}.md"
+        return f"{solution_id}/{key}.txt"
 
     async def save_artifact(self, solution_id: int, key: str, content: str) -> None:
         full_key = self._make_key(solution_id, key)

@@ -5,6 +5,7 @@ from fastapi import UploadFile
 import httpx
 
 from src.application.exceptions import ApplicationError, ForbiddenError
+from src.application.solutions.common import check_solution_permissions
 from src.application.workspaces.common import check_member_role
 from src.constants.ai_pipeline import ALL_STEPS
 from src.constants.ai_review import SolutionFormatEnum, SolutionStatusEnum
@@ -76,7 +77,7 @@ async def create(
             solution.id,
             SolutionUpdateDTO(status=SolutionStatusEnum.AI_REVIEW, steps=[]),
         )
-        await uow.pipeline_tasks.create_tasks(solution.id, ALL_STEPS)
+        await uow.pipeline_tasks.create_many(solution.id, ALL_STEPS)
     return SolutionShortResponseDTO.model_validate(solution)
 
 
@@ -87,14 +88,7 @@ async def get(
     uow: UnitOfWork = Provide[Container.uow],
 ) -> SolutionShortResponseDTO:
     async with uow.connection():
-        solution = await uow.solutions.get_by_id(solution_id)
-        task = await uow.tasks.get_by_id(solution.task_id)
-        member = await check_member_role(uow, user.id, task.workspace_id)
-        if solution.created_by != user.id and member.role not in {
-            WorkspaceMemberRoleEnum.OWNER,
-            WorkspaceMemberRoleEnum.TEACHER,
-        }:
-            raise ForbiddenError(message="Пользователь не имеет доступ к этому решению")
+        solution = await check_solution_permissions(uow, user.id, solution_id)
         return SolutionShortResponseDTO.model_validate(solution)
 
 
@@ -107,7 +101,7 @@ async def cancel(
     async with uow.connection():
         solution = await uow.solutions.get_by_id(solution_id)
         if solution.created_by != user.id:
-            raise ForbiddenError(message="Нет доступа к этому решению")
+            raise ForbiddenError(message="Только автор решения может отменить его")
         await uow.solutions.update(solution_id, SolutionUpdateDTO(status=SolutionStatusEnum.CANCELLED))
 
 

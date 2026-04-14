@@ -1,11 +1,15 @@
+from typing import Any
+
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.infrastructure.dao.pipeline_tasks.interface import (
+from src.constants.ai_pipeline import PipelineStepEnum, PipelineTaskStatusEnum
+from src.dto.ai_review.pipeline import (
     PipelineTaskDTO,
-    PipelineTasksDAO,
-    PipelineTaskStatusEnum,
+    PipelineTaskFiltersDTO,
+    PipelineTaskUpdateDTO,
 )
+from src.infrastructure.dao.pipeline_tasks.interface import PipelineTasksDAO
 from src.infrastructure.sqlalchemy.models import pipeline_tasks_table
 
 
@@ -13,17 +17,17 @@ class SQLAlchemyPipelineTasksDAO(PipelineTasksDAO):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def create_tasks(self, solution_id: int, steps: list[str]) -> list[PipelineTaskDTO]:
-        values = [{"solution_id": solution_id, "step": step} for step in steps]
+    async def create_many(self, solution_id: int, steps: list[PipelineStepEnum]) -> list[PipelineTaskDTO]:
+        values = [{"solution_id": solution_id, "step": str(step)} for step in steps]
         query = sa.insert(pipeline_tasks_table).values(values).returning(pipeline_tasks_table)
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [PipelineTaskDTO.model_validate(row) for row in rows]
 
-    async def get_pending_task(self) -> PipelineTaskDTO | None:
+    async def get_pending(self) -> PipelineTaskDTO | None:
         query = (
             sa.select(pipeline_tasks_table)
-            .where(pipeline_tasks_table.c.status == PipelineTaskStatusEnum.PENDING)
+            .where(pipeline_tasks_table.c.status == str(PipelineTaskStatusEnum.PENDING))
             .order_by(pipeline_tasks_table.c.created_at)
             .limit(1)
             .with_for_update(skip_locked=True)
@@ -34,75 +38,29 @@ class SQLAlchemyPipelineTasksDAO(PipelineTasksDAO):
             return None
         return PipelineTaskDTO.model_validate(row)
 
-    async def mark_running(self, task_id: int) -> PipelineTaskDTO | None:
-        query = (
+    async def update(self, task_id: int, data: PipelineTaskUpdateDTO) -> PipelineTaskDTO | None:
+        update_query = (
             sa.update(pipeline_tasks_table)
             .where(pipeline_tasks_table.c.id == task_id)
-            .where(pipeline_tasks_table.c.status == PipelineTaskStatusEnum.PENDING)
-            .values(status=PipelineTaskStatusEnum.RUNNING)
+            .values(**data.model_dump(exclude_unset=True))
             .returning(pipeline_tasks_table)
         )
-        result = await self.session.execute(query)
+        result = await self.session.execute(update_query)
         row = result.fetchone()
         if row is None:
             return None
         return PipelineTaskDTO.model_validate(row)
 
-    async def mark_completed(self, task_id: int) -> PipelineTaskDTO:
-        query = (
-            sa.update(pipeline_tasks_table)
-            .where(pipeline_tasks_table.c.id == task_id)
-            .values(status=PipelineTaskStatusEnum.COMPLETED)
-            .returning(pipeline_tasks_table)
-        )
-        result = await self.session.execute(query)
-        row = result.fetchone()
-        return PipelineTaskDTO.model_validate(row)
+    async def get_many(self, filters: PipelineTaskFiltersDTO) -> list[PipelineTaskDTO]:
+        query = sa.select(pipeline_tasks_table).order_by(pipeline_tasks_table.c.created_at)
 
-    async def mark_completed_task(self, solution_id: int, step: str) -> None:
-        query = (
-            sa.update(pipeline_tasks_table)
-            .where(pipeline_tasks_table.c.solution_id == solution_id)
-            .where(pipeline_tasks_table.c.step == step)
-            .values(status=PipelineTaskStatusEnum.COMPLETED)
-        )
-        await self.session.execute(query)
+        if filters.solution_id is not None:
+            query = query.where(pipeline_tasks_table.c.solution_id == filters.solution_id)
 
-    async def mark_failed(self, task_id: int, error_text: str) -> PipelineTaskDTO:
-        query = (
-            sa.update(pipeline_tasks_table)
-            .where(pipeline_tasks_table.c.id == task_id)
-            .values(status=PipelineTaskStatusEnum.FAILED, error_text=error_text)
-            .returning(pipeline_tasks_table)
-        )
-        result = await self.session.execute(query)
-        row = result.fetchone()
-        return PipelineTaskDTO.model_validate(row)
-
-    async def get_completed_steps(self, solution_id: int) -> list[str]:
-        query = (
-            sa.select(pipeline_tasks_table.c.step)
-            .where(pipeline_tasks_table.c.solution_id == solution_id)
-            .where(pipeline_tasks_table.c.status == PipelineTaskStatusEnum.COMPLETED)
-        )
-        result = await self.session.execute(query)
-        rows = result.fetchall()
-        return [row[0] for row in rows]
-
-    async def get_solution_tasks(self, solution_id: int) -> list[PipelineTaskDTO]:
-        query = (
-            sa.select(pipeline_tasks_table)
-            .where(pipeline_tasks_table.c.solution_id == solution_id)
-            .order_by(pipeline_tasks_table.c.created_at)
-        )
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [PipelineTaskDTO.model_validate(row) for row in rows]
 
-    async def delete_solution_tasks(self, solution_id: int) -> None:
+    async def delete_many(self, solution_id: int) -> None:
         query = sa.delete(pipeline_tasks_table).where(pipeline_tasks_table.c.solution_id == solution_id)
-        await self.session.execute(query)
-
-    async def update_task_status(self, task_id: int, status: PipelineTaskStatusEnum) -> None:
-        query = sa.update(pipeline_tasks_table).where(pipeline_tasks_table.c.id == task_id).values(status=status)
         await self.session.execute(query)

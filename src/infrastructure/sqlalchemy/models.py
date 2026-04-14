@@ -187,8 +187,8 @@ pipeline_tasks_table = sa.Table(
     sa.Column("step", sa.String(100), nullable=False),
     sa.Column("status", sa.String(20), nullable=False, server_default="pending"),
     sa.Column("error_text", sa.Text, nullable=True),
+    sa.Column("duration", sa.Float, nullable=True),
     sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
-    sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
     sa.UniqueConstraint("solution_id", "step", name="uq_pipeline_tasks_solution_step"),
 )
 

@@ -27,8 +27,8 @@ def upgrade() -> None:
     sa.Column('step', sa.String(length=100), nullable=False),
     sa.Column('status', sa.String(length=20), server_default='pending', nullable=False),
     sa.Column('error_text', sa.Text(), nullable=True),
+    sa.Column('duration', sa.Float, nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['solution_id'], ['solutions.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('solution_id', 'step', name='uq_pipeline_tasks_solution_step')
