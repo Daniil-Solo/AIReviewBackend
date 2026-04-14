@@ -13,6 +13,7 @@ class PipelineTaskDTO(BaseDTO):
     error_text: str | None
     duration: float | None
     last_checked_at: datetime.datetime | None
+    ran_at: datetime.datetime | None
     created_at: datetime.datetime
 
 
@@ -20,6 +21,7 @@ class PipelineTaskUpdateDTO(BaseDTO):
     status: PipelineTaskStatusEnum | None = None
     error_text: str | None = None
     duration: float | None = None
+    ran_at: datetime.datetime | None = None
 
 
 class PipelineTaskFiltersDTO(BaseDTO):

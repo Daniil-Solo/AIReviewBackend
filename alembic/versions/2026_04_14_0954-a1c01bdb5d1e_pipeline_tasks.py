@@ -29,6 +29,7 @@ def upgrade() -> None:
     sa.Column('error_text', sa.Text(), nullable=True),
     sa.Column('duration', sa.Float, nullable=True),
     sa.Column("last_checked_at", sa.DateTime(timezone=True), nullable=True),
+    sa.Column("ran_at", sa.DateTime(timezone=True), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['solution_id'], ['solutions.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),

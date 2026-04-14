@@ -189,6 +189,7 @@ pipeline_tasks_table = sa.Table(
     sa.Column("error_text", sa.Text, nullable=True),
     sa.Column("duration", sa.Float, nullable=True),
     sa.Column("last_checked_at", sa.DateTime(timezone=True), nullable=True),
+    sa.Column("ran_at", sa.DateTime(timezone=True), nullable=True),
     sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
     sa.UniqueConstraint("solution_id", "step", name="uq_pipeline_tasks_solution_step"),
     sa.Index("ix_pipeline_tasks_last_checked_at", "last_checked_at"),

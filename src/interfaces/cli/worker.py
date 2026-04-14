@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Awaitable, Callable
+import datetime
 import logging
 import time
 import traceback
@@ -58,7 +59,10 @@ async def run_worker() -> None:
                 logger.info(f"Processing task {task.id}: solution_id={task.solution_id}, step={task.step}")
 
                 marked = await uow.pipeline_tasks.update(
-                    task.id, PipelineTaskUpdateDTO(status=PipelineTaskStatusEnum.RUNNING)
+                    task.id,
+                    PipelineTaskUpdateDTO(
+                        status=PipelineTaskStatusEnum.RUNNING, ran_at=datetime.datetime.now(datetime.UTC)
+                    ),
                 )
                 if marked is None:
                     continue
