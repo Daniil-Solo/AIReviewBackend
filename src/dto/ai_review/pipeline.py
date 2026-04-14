@@ -1,7 +1,5 @@
 import datetime
 
-from pydantic import Field
-
 from src.constants.ai_pipeline import PipelineStepEnum, PipelineTaskStatusEnum
 from src.constants.ai_review import SolutionStatusEnum
 from src.dto.common import BaseDTO
@@ -14,6 +12,7 @@ class PipelineTaskDTO(BaseDTO):
     status: PipelineTaskStatusEnum
     error_text: str | None
     duration: float | None
+    last_checked_at: datetime.datetime | None
     created_at: datetime.datetime
 
 

@@ -45,15 +45,6 @@ async def cancel_endpoint(
     return SuccessOperationDTO(message="Проверка решения отменена")
 
 
-@router.post("/{solution_id}/start", response_model=SuccessOperationDTO)
-async def start_pipeline(
-    solution_id: int,
-    user: ShortUserDTO = Depends(get_current_user),
-) -> SuccessOperationDTO:
-    await pipeline_service.start(solution_id, user)
-    return SuccessOperationDTO(message="Пайплайн запущен")
-
-
 @router.post("/{solution_id}/restart", response_model=SuccessOperationDTO)
 async def restart_pipeline(
     solution_id: int,

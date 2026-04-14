@@ -15,21 +15,6 @@ logger = get_logger()
 
 
 @inject
-async def start(
-    solution_id: int,
-    user: ShortUserDTO,
-    uow: UnitOfWork = Provide[Container.uow],
-) -> None:
-    async with uow.connection() as conn, conn.transaction():
-        solution = await check_solution_permissions(uow, user.id, solution_id)
-        await uow.solutions.update(
-            solution.id,
-            SolutionUpdateDTO(status=SolutionStatusEnum.AI_REVIEW, steps=[]),
-        )
-        await uow.pipeline_tasks.create_many(solution.id, ALL_STEPS)
-
-
-@inject
 async def restart(
     solution_id: int,
     user: ShortUserDTO,

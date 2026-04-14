@@ -1,8 +1,8 @@
 import asyncio
-import time
-import traceback
 from collections.abc import Awaitable, Callable
 import logging
+import time
+import traceback
 
 from src.application.ai_review.preprocessing import (
     prepare_project_content,
@@ -14,6 +14,7 @@ from src.application.ai_review.project_doc import (
     improve_doc,
     resolve_gaps,
 )
+from src.application.ai_review.task_graph import is_step_ready
 from src.constants.ai_pipeline import PipelineStepEnum, PipelineTaskStatusEnum
 from src.constants.ai_review import SolutionStatusEnum
 from src.di.container import init_container, shutdown_container
@@ -41,11 +42,17 @@ async def run_worker() -> None:
     logger.info("Worker started")
     try:
         while True:
+            await asyncio.sleep(2)
             async with uow.connection():
-                task = await uow.pipeline_tasks.get_pending()
-
+                task = await uow.pipeline_tasks.get_ready_pending()
                 if task is None:
-                    await asyncio.sleep(2)
+                    logger.debug(f"No tasks in queue")
+                    continue
+
+                solution = await uow.solutions.get_by_id(task.solution_id)
+                if not is_step_ready(task.step, solution.steps):
+                    await uow.pipeline_tasks.update_last_checked_at(task.id)
+                    logger.debug(f"Task {task.id} not ready, skipping")
                     continue
 
                 logger.info(f"Processing task {task.id}: solution_id={task.solution_id}, step={task.step}")
@@ -70,10 +77,10 @@ async def run_worker() -> None:
                     if task.step not in solution.steps:
                         await uow.solutions.update(solution.id, SolutionUpdateDTO(steps=[*solution.steps, task.step]))
                     await uow.pipeline_tasks.update(
-                        task.id, PipelineTaskUpdateDTO(
-                            status=PipelineTaskStatusEnum.COMPLETED,
-                            duration=success_time - start_time
-                        )
+                        task.id,
+                        PipelineTaskUpdateDTO(
+                            status=PipelineTaskStatusEnum.COMPLETED, duration=success_time - start_time
+                        ),
                     )
                 logger.info("Задача успешно выполнена", task_id=task.id, step=task.step)
             except Exception as e:
@@ -87,11 +94,12 @@ async def run_worker() -> None:
                         ),
                     )
                     await uow.pipeline_tasks.update(
-                        task.id, PipelineTaskUpdateDTO(
+                        task.id,
+                        PipelineTaskUpdateDTO(
                             status=PipelineTaskStatusEnum.FAILED,
                             error_text=f"{str(e)}\n{traceback.format_exc()}",
-                            duration=error_time - start_time
-                        )
+                            duration=error_time - start_time,
+                        ),
                     )
 
     except KeyboardInterrupt:

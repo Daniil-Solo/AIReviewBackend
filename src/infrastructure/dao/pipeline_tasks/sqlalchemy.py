@@ -1,4 +1,3 @@
-from typing import Any
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,11 +23,11 @@ class SQLAlchemyPipelineTasksDAO(PipelineTasksDAO):
         rows = result.fetchall()
         return [PipelineTaskDTO.model_validate(row) for row in rows]
 
-    async def get_pending(self) -> PipelineTaskDTO | None:
+    async def get_ready_pending(self) -> PipelineTaskDTO | None:
         query = (
             sa.select(pipeline_tasks_table)
             .where(pipeline_tasks_table.c.status == str(PipelineTaskStatusEnum.PENDING))
-            .order_by(pipeline_tasks_table.c.created_at)
+            .order_by(pipeline_tasks_table.c.last_checked_at.nullsfirst(), pipeline_tasks_table.c.created_at)
             .limit(1)
             .with_for_update(skip_locked=True)
         )
@@ -37,6 +36,14 @@ class SQLAlchemyPipelineTasksDAO(PipelineTasksDAO):
         if row is None:
             return None
         return PipelineTaskDTO.model_validate(row)
+
+    async def update_last_checked_at(self, task_id: int) -> None:
+        query = (
+            sa.update(pipeline_tasks_table)
+            .where(pipeline_tasks_table.c.id == task_id)
+            .values(last_checked_at=sa.func.now())
+        )
+        await self.session.execute(query)
 
     async def update(self, task_id: int, data: PipelineTaskUpdateDTO) -> PipelineTaskDTO | None:
         update_query = (

@@ -10,7 +10,11 @@ class PipelineTasksDAO(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_pending(self) -> PipelineTaskDTO | None:
+    async def get_ready_pending(self) -> PipelineTaskDTO | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update_last_checked_at(self, task_id: int) -> None:
         raise NotImplementedError
 
     @abstractmethod
