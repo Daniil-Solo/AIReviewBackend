@@ -3,6 +3,7 @@ from src.application.solutions.solutions import (
     create,
     get,
     get_list_by_task,
+    get_my_solutions,
 )
 
 
@@ -11,4 +12,5 @@ __all__ = [
     "get",
     "cancel",
     "get_list_by_task",
+    "get_my_solutions",
 ]

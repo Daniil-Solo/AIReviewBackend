@@ -5,6 +5,7 @@ from pydantic import Field, field_validator
 from src.constants.ai_pipeline import PipelineStepEnum
 from src.constants.ai_review import SolutionFormatEnum, SolutionStatusEnum
 from src.dto.common import BaseDTO
+from src.dto.users.user import ShortUserDTO
 
 
 class SolutionCreateRequestDTO(BaseDTO):
@@ -37,12 +38,13 @@ class SolutionResponseDTO(BaseDTO):
     created_by: int = Field(description="ID создателя")
     created_at: datetime.datetime = Field(description="Дата создания")
 
-    @field_validator('steps', mode='before')
+    @field_validator("steps", mode="before")
     @classmethod
     def convert_empty_dict_to_list(cls, v):
         if v == {}:
             return []
         return v
+
 
 class SolutionShortResponseDTO(BaseDTO):
     id: int = Field(description="ID решения")
@@ -56,7 +58,13 @@ class SolutionShortResponseDTO(BaseDTO):
     ai_feedback: str | None = Field(description="Отзыв от AI")
     created_at: datetime.datetime = Field(description="Дата создания")
     created_by: int = Field(description="ID создателя")
+    author: ShortUserDTO | None = Field(default=None, description="Информация об авторе решения")
+
+
+class SolutionFiltersRequestDTO(BaseDTO):
+    task_id: int | None = Field(default=None, description="ID задачи для фильтрации")
 
 
 class SolutionFiltersDTO(BaseDTO):
+    created_by: int | None = Field(default=None, description="ID создателя для фильтрации")
     task_id: int | None = Field(default=None, description="ID задачи для фильтрации")

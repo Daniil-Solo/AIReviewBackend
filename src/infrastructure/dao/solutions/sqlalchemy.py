@@ -5,6 +5,7 @@ from src.application.exceptions import EntityNotFoundError
 from src.constants.ai_review import SolutionStatusEnum
 from src.dto.solutions.solutions import (
     SolutionCreateDTO,
+    SolutionFiltersDTO,
     SolutionResponseDTO,
     SolutionShortResponseDTO,
     SolutionUpdateDTO,
@@ -58,8 +59,13 @@ class SQLAlchemySolutionsDAO(SolutionsDAO):
             raise EntityNotFoundError(message="Решение не найдено")
         return SolutionResponseDTO.model_validate(row)
 
-    async def get_list_by_task(self, task_id: int) -> list[SolutionShortResponseDTO]:
-        query = sa.select(solutions_table).where(solutions_table.c.task_id == task_id)
+    async def get_list(self, filters: SolutionFiltersDTO | None) -> list[SolutionShortResponseDTO]:
+        query = sa.select(solutions_table)
+        if filters is not None:
+            if filters.created_by is not None:
+                query = query.where(solutions_table.c.created_by == filters.created_by)
+            if filters.task_id is not None:
+                query = query.where(solutions_table.c.task_id == filters.task_id)
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [SolutionShortResponseDTO.model_validate(row) for row in rows]

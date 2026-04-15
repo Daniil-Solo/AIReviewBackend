@@ -15,6 +15,8 @@ from src.di.container import Container
 from src.dto.solutions.solutions import (
     SolutionCreateDTO,
     SolutionCreateRequestDTO,
+    SolutionFiltersDTO,
+    SolutionFiltersRequestDTO,
     SolutionShortResponseDTO,
     SolutionUpdateDTO,
 )
@@ -91,7 +93,10 @@ async def get(
 ) -> SolutionShortResponseDTO:
     async with uow.connection():
         solution = await check_solution_permissions(uow, user.id, solution_id)
-        return SolutionShortResponseDTO.model_validate(solution)
+        author = await uow.users.get_by_id(solution.created_by)
+        sol_dict = solution.model_dump()
+        sol_dict["author"] = author.as_short()
+        return SolutionShortResponseDTO(**sol_dict)
 
 
 @inject
@@ -119,7 +124,30 @@ async def get_list_by_task(
         await check_member_role(
             uow, user.id, workspace.id, {WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )
-        return await uow.solutions.get_list_by_task(task_id)
+        filters = SolutionFiltersDTO(task_id=task_id)
+        solutions = await uow.solutions.get_list(filters)
+
+        user_ids = list({s.created_by for s in solutions})
+        users = {u.id: u.as_short() for u in await uow.users.get_by_ids(user_ids)}
+
+        result = []
+        for solution in solutions:
+            sol_dict = solution.model_dump()
+            sol_dict["author"] = users.get(solution.created_by)
+            result.append(SolutionShortResponseDTO(**sol_dict))
+
+        return result
+
+
+@inject
+async def get_my_solutions(
+    filters: SolutionFiltersRequestDTO,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> list[SolutionShortResponseDTO]:
+    async with uow.connection():
+        dao_filters = SolutionFiltersDTO(created_by=user.id, task_id=filters.task_id)
+        return await uow.solutions.get_list(dao_filters)
 
 
 @inject

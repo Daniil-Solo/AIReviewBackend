@@ -52,3 +52,11 @@ class SQLAlchemyUsersDAO(UsersDAO):
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [UserResponseDTO.model_validate(row) for row in rows]
+
+    async def get_by_ids(self, user_ids: list[int]) -> list[UserResponseDTO]:
+        if not user_ids:
+            return []
+        query = sa.select(users_table).where(users_table.c.id.in_(user_ids))
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+        return [UserResponseDTO.model_validate(row) for row in rows]

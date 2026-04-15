@@ -9,6 +9,7 @@ from src.dto.ai_review.pipeline import PipelineInfoDTO
 from src.dto.common import SuccessOperationDTO
 from src.dto.solutions.solutions import (
     SolutionCreateRequestDTO,
+    SolutionFiltersRequestDTO,
     SolutionShortResponseDTO,
 )
 from src.dto.users.user import ShortUserDTO
@@ -28,6 +29,14 @@ async def create_endpoint(
 ) -> SolutionShortResponseDTO:
     data = SolutionCreateRequestDTO(task_id=task_id, format=format)
     return await solution_service.create(data, file, link, user)
+
+
+@router.get("/my", response_model=list[SolutionShortResponseDTO])
+async def get_my_solutions_endpoint(
+    filters: SolutionFiltersRequestDTO = Depends(),
+    user: ShortUserDTO = Depends(get_current_user),
+) -> list[SolutionShortResponseDTO]:
+    return await solution_service.get_my_solutions(filters, user)
 
 
 @router.get("/{solution_id}", response_model=SolutionShortResponseDTO)
