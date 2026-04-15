@@ -60,6 +60,13 @@ class SolutionShortResponseDTO(BaseDTO):
     created_by: int = Field(description="ID создателя")
     author: ShortUserDTO | None = Field(default=None, description="Информация об авторе решения")
 
+    @field_validator("steps", mode="before")
+    @classmethod
+    def convert_empty_dict_to_list(cls, v):
+        if v == {}:
+            return []
+        return v
+
 
 class SolutionFiltersRequestDTO(BaseDTO):
     task_id: int | None = Field(default=None, description="ID задачи для фильтрации")

@@ -161,11 +161,9 @@ async def get_artefact(
     async with uow.connection():
         await check_solution_permissions(uow, user.id, solution_id)
         try:
-            return await artifact_storage.get_artifact(solution_id, step.value)
+            return await artifact_storage.get_artifact(solution_id, str(step))
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code", "")
             if error_code == "NoSuchKey":
-                raise EntityNotFoundError(
-                    message=f"Артефакт этапа {step.value} не найден для решения {solution_id}"
-                ) from e
+                raise EntityNotFoundError(message=f"Артефакт не найден") from e
             raise

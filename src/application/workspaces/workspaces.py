@@ -107,6 +107,7 @@ async def get_workspace_tasks(
     uow: UnitOfWork = Provide[Container.uow],
 ) -> list[TaskResponseDTO]:
     async with uow.connection():
+        await check_member_role(uow, user.id, workspace_id)
         return await uow.tasks.get_list(TaskFiltersDTO(workspace_id=workspace_id))
 
 

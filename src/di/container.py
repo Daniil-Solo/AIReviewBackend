@@ -34,7 +34,11 @@ from src.settings import ROOT_DIR, settings
 
 
 class Container(containers.DeclarativeContainer):
-    engine = providers.Singleton(create_engine, url=settings.db.url, echo=settings.db.SQL_ECHO)
+    engine = providers.Singleton(
+        create_engine,
+        url=providers.Callable(lambda: settings.db.url),
+        echo=settings.db.SQL_ECHO
+    )
 
     session_factory = providers.Singleton(
         create_session_factory,
