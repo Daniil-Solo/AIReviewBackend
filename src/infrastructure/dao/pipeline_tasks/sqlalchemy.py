@@ -59,7 +59,7 @@ class SQLAlchemyPipelineTasksDAO(PipelineTasksDAO):
         return PipelineTaskDTO.model_validate(row)
 
     async def get_many(self, filters: PipelineTaskFiltersDTO) -> list[PipelineTaskDTO]:
-        query = sa.select(pipeline_tasks_table).order_by(pipeline_tasks_table.c.created_at)
+        query = sa.select(pipeline_tasks_table).order_by(pipeline_tasks_table.c.ran_at)
 
         if filters.solution_id is not None:
             query = query.where(pipeline_tasks_table.c.solution_id == filters.solution_id)

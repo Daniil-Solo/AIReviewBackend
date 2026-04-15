@@ -1,6 +1,7 @@
 from dependency_injector.wiring import Provide, inject
 
 from src.application.exceptions import ApplicationError, ConflictError, EntityNotFoundError, InvalidCredentialsError
+from src.constants.transactions import TransactionTypeEnum
 from src.di.container import Container
 from src.dto.auth import TokenDTO
 from src.dto.auth.register import (
@@ -10,6 +11,7 @@ from src.dto.auth.register import (
 )
 from src.dto.common import SuccessOperationDTO
 from src.dto.emails.emails import EmailMessageDTO
+from src.dto.transactions.transactions import TransactionCreateDTO
 from src.infrastructure.auth import create_access_token, hash_password
 from src.infrastructure.auth.code import generate_code
 from src.infrastructure.dao.registrations.interface import RegistrationsFlow
@@ -97,6 +99,14 @@ async def confirm_registration(
             is_admin=False,
             is_verified=True,
         )
+
+        welcome_bonus = TransactionCreateDTO(
+            user_id=user.id,
+            amount=100.0,
+            type=TransactionTypeEnum.WELCOME_BONUS.value,
+            metadata={"source": "registration"},
+        )
+        await uow.transactions.create(welcome_bonus)
     await registration_flow.delete(data.email)
     await resend_code_rate_limiter.reset(data.email)
     access_token = create_access_token(user.as_short())

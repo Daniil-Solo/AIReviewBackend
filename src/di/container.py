@@ -12,6 +12,7 @@ from src.infrastructure.dao.registrations.redis import RedisRegistrationsFlow
 from src.infrastructure.dao.solutions.sqlalchemy import SQLAlchemySolutionsDAO
 from src.infrastructure.dao.task_criteria.sqlalchemy import SQLAlchemyTaskCriteriaDAO
 from src.infrastructure.dao.tasks.sqlalchemy import SQLAlchemyTasksDAO
+from src.infrastructure.dao.transactions.sqlalchemy import SQLAlchemyTransactionsDAO
 from src.infrastructure.dao.users.sqlalchemy import SQLAlchemyUsersDAO
 from src.infrastructure.dao.workspace_join_rules.sqlalchemy import SQLAlchemyWorkspaceJoinRulesDAO
 from src.infrastructure.dao.workspace_members.sqlalchemy import SQLAlchemyWorkspaceMembersDAO
@@ -49,6 +50,7 @@ class Container(containers.DeclarativeContainer):
     task_criteria_dao = providers.Factory(lambda: SQLAlchemyTaskCriteriaDAO)
     solutions_dao = providers.Factory(lambda: SQLAlchemySolutionsDAO)
     pipeline_tasks_dao = providers.Factory(lambda: SQLAlchemyPipelineTasksDAO)
+    transactions_dao = providers.Factory(lambda: SQLAlchemyTransactionsDAO)
 
     redis_client = providers.Resource[Redis](init_redis_client)
     registrations_flow = providers.Factory[RegistrationsFlow](
@@ -78,6 +80,7 @@ class Container(containers.DeclarativeContainer):
         task_criteria_dao_factory=task_criteria_dao,
         solutions_dao_factory=solutions_dao,
         pipeline_tasks_dao_factory=pipeline_tasks_dao,
+        transactions_dao_factory=transactions_dao,
     )
 
     solution_storage = providers.Factory[SolutionStorage](
@@ -132,6 +135,7 @@ async def init_container() -> Container:
             "src.application.ai_review",
             "src.application.tasks",
             "src.application.solutions",
+            "src.application.transactions",
         ]
     )
     await container.init_resources()  # type: ignore[misc]

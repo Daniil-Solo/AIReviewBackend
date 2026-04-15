@@ -8,6 +8,7 @@ from src.infrastructure.dao.pipeline_tasks.interface import PipelineTasksDAO
 from src.infrastructure.dao.solutions.interface import SolutionsDAO
 from src.infrastructure.dao.task_criteria.interface import TaskCriteriaDAO
 from src.infrastructure.dao.tasks.interface import TasksDAO
+from src.infrastructure.dao.transactions.interface import TransactionsDAO
 from src.infrastructure.dao.users.interface import UsersDAO
 from src.infrastructure.dao.workspace_join_rules.interface import WorkspaceJoinRulesDAO
 from src.infrastructure.dao.workspace_members.interface import WorkspaceMembersDAO
@@ -37,6 +38,7 @@ class UnitOfWork:
         task_criteria_dao_factory: Callable[[AsyncSession], TaskCriteriaDAO],
         solutions_dao_factory: Callable[[AsyncSession], SolutionsDAO],
         pipeline_tasks_dao_factory: Callable[[AsyncSession], PipelineTasksDAO],
+        transactions_dao_factory: Callable[[AsyncSession], TransactionsDAO],
     ) -> None:
         self._session_factory = session_factory
         self._session: AsyncSession | None = None
@@ -50,6 +52,7 @@ class UnitOfWork:
         self._task_criteria_dao_factory = task_criteria_dao_factory
         self._solutions_dao_factory = solutions_dao_factory
         self._pipeline_tasks_dao_factory = pipeline_tasks_dao_factory
+        self._transactions_dao_factory = transactions_dao_factory
         # dao
         self._users: UsersDAO | None = None
         self._workspaces: WorkspacesDAO | None = None
@@ -60,6 +63,7 @@ class UnitOfWork:
         self._task_criteria: TaskCriteriaDAO | None = None
         self._solutions: SolutionsDAO | None = None
         self._pipeline_tasks: PipelineTasksDAO | None = None
+        self._transactions: TransactionsDAO | None = None
 
     @asynccontextmanager
     async def connection(self) -> AsyncGenerator[Connection, None]:
@@ -85,6 +89,7 @@ class UnitOfWork:
                 self._task_criteria = None
                 self._solutions = None
                 self._pipeline_tasks = None
+                self._transactions = None
 
     @property
     def session(self) -> AsyncSession:
@@ -145,3 +150,9 @@ class UnitOfWork:
         if self._pipeline_tasks is None:
             self._pipeline_tasks = self._pipeline_tasks_dao_factory(self._session)  # type: ignore[assignment]
         return self._pipeline_tasks
+
+    @property
+    def transactions(self) -> TransactionsDAO:
+        if self._transactions is None:
+            self._transactions = self._transactions_dao_factory(self._session)  # type: ignore[assignment]
+        return self._transactions

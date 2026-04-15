@@ -6,6 +6,7 @@ from src.constants.ai_review import (
     SolutionFormatEnum,
     SolutionStatusEnum,
 )
+from src.constants.transactions import TransactionTypeEnum
 from src.constants.workspaces import (
     WorkspaceMemberRoleEnum,
 )
@@ -195,6 +196,17 @@ pipeline_tasks_table = sa.Table(
     sa.Index("ix_pipeline_tasks_last_checked_at", "last_checked_at"),
 )
 
+transactions_table = sa.Table(
+    "transactions",
+    metadata,
+    sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
+    sa.Column("user_id", sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"), nullable=False),
+    sa.Column("amount", sa.Float, nullable=False),
+    sa.Column("type", sa.Enum(TransactionTypeEnum, name="transaction_type_enum"), nullable=False),
+    sa.Column("metadata", sa.JSON, nullable=True),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+)
+
 ALL_TABLES = [
     users_table,
     workspaces_table,
@@ -206,4 +218,5 @@ ALL_TABLES = [
     solutions_table,
     solution_criteria_checks_table,
     pipeline_tasks_table,
+    transactions_table,
 ]
