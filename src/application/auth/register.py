@@ -103,7 +103,7 @@ async def confirm_registration(
         welcome_bonus = TransactionCreateDTO(
             user_id=user.id,
             amount=100.0,
-            type=TransactionTypeEnum.WELCOME_BONUS.value,
+            type=TransactionTypeEnum.WELCOME_BONUS,
             metadata={"source": "registration"},
         )
         await uow.transactions.create(welcome_bonus)

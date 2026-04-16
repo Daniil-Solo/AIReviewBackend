@@ -6,7 +6,6 @@ from src.constants.ai_review import (
     SolutionFormatEnum,
     SolutionStatusEnum,
 )
-from src.constants.transactions import TransactionTypeEnum
 from src.constants.workspaces import (
     WorkspaceMemberRoleEnum,
 )
@@ -202,7 +201,7 @@ transactions_table = sa.Table(
     sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
     sa.Column("user_id", sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"), nullable=False),
     sa.Column("amount", sa.Float, nullable=False),
-    sa.Column("type", sa.Enum(TransactionTypeEnum, name="transaction_type_enum"), nullable=False),
+    sa.Column("type",  sa.String(100), nullable=False),
     sa.Column("metadata", sa.JSON, nullable=True),
     sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
 )

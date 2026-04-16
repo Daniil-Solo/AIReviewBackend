@@ -32,11 +32,7 @@ class BalanceResponseDTO(BaseDTO):
     balance: float = Field(description="Текущий баланс пользователя")
 
 
-class TransactionHourlyGroupDTO(BaseDTO):
-    hour: datetime = Field(description="Время (час)")
-    amount: float = Field(description="Сумма за час")
-
-
 class TransactionFilterDTO(BaseDTO):
     started_at: datetime | None = Field(default=None, description="Начало периода (UTC)")
     ended_at: datetime | None = Field(default=None, description="Конец периода (UTC)")
+    types: list[TransactionTypeEnum] | None = Field(default=None, description="Фильтр по типам транзакций")

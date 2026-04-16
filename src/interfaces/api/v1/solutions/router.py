@@ -79,7 +79,7 @@ async def get_artefact_endpoint(
     step: PipelineStepEnum,
     user: ShortUserDTO = Depends(get_current_user),
 ) -> StreamingResponse:
-    content = await solution_service.get_artefact(solution_id, step, user)
+    content = await solution_service.get_artifact(solution_id, step, user)
     return StreamingResponse(
         content=iter([content]),
         media_type="text/plain; charset=utf-8",

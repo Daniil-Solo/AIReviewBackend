@@ -25,7 +25,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
-    sa.Column('type', sa.Enum('WELCOME_BONUS', 'REVIEW', 'ADMIN_TOP_UP', 'DEPOSIT', name='transaction_type_enum'), nullable=False),
+    sa.Column('type', sa.String(100), nullable=False),
     sa.Column('metadata', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], onupdate='CASCADE', ondelete='CASCADE'),

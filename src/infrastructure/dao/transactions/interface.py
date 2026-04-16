@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from src.dto.transactions.transactions import (
     TransactionCreateDTO,
     TransactionFilterDTO,
-    TransactionHourlyGroupDTO,
     TransactionResponseDTO,
 )
 
@@ -22,5 +21,5 @@ class TransactionsDAO(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_grouped_by_hour(self, user_id: int, filters: TransactionFilterDTO) -> list[TransactionHourlyGroupDTO]:
+    async def get_with_filters(self, user_id: int, filters: TransactionFilterDTO) -> list[TransactionResponseDTO]:
         raise NotImplementedError

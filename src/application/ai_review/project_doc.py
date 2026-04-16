@@ -1,14 +1,17 @@
 from dependency_injector.wiring import Provide, inject
 
-from src.application.ai_review.task_graph import  PipelineStepEnum
+from src.application.ai_review.task_graph import PipelineStepEnum
+from src.application.solutions.utils import get_workspace_id
+from src.application.transactions.utils import charge_for_llm_call
 from src.constants.ai_review import SolutionStatusEnum
 from src.di.container import Container
 from src.dto.solutions.solutions import SolutionUpdateDTO
+from src.dto.transactions.metadata import LLMCallTransactionMetadataDTO
 from src.infrastructure.ai.llm.interface import LLMInterface
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface
 from src.infrastructure.logging import get_logger
-from src.infrastructure.storage.artifact import SolutionArtifactStorage
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
+from src.infrastructure.storage.artifact import SolutionArtifactStorage
 
 
 logger = get_logger()
@@ -27,13 +30,19 @@ async def create_project_doc(
 
     system_content = prompt_builder.build(prompt_path="project_doc/creating/system.tpl")
     user_content = prompt_builder.build(
-        prompt_path="project_doc/creating/user.tpl",
-        project_tree=project_tree,
-        project_content=project_content
+        prompt_path="project_doc/creating/user.tpl", project_tree=project_tree, project_content=project_content
     )
     answer = await default_model.run(system_content, user_content)
     project_doc = answer.content
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.CREATE_PROJECT_DOC, project_doc)
+
+    metadata = LLMCallTransactionMetadataDTO(
+        solution_id=solution_id, task=PipelineStepEnum.CREATE_PROJECT_DOC,
+        input_tokens=answer.input_tokens, output_tokens=answer.output_tokens,
+    )
+    async with uow.connection():
+        workspace_id = await get_workspace_id(uow, solution_id)
+        await charge_for_llm_call(uow, workspace_id, metadata)
 
 
 @inject
@@ -46,10 +55,7 @@ async def generate_critic(
 ) -> None:
     project_doc = await artifact_storage.get_artifact(solution_id, PipelineStepEnum.CREATE_PROJECT_DOC)
 
-    system_content = prompt_builder.build(
-        prompt_path="project_doc/criticism/system.tpl",
-        letter_prefix="A"
-    )
+    system_content = prompt_builder.build(prompt_path="project_doc/criticism/system.tpl", letter_prefix="A")
     user_content = prompt_builder.build(
         prompt_path="project_doc/criticism/user.tpl",
         project_doc=project_doc,
@@ -57,6 +63,14 @@ async def generate_critic(
     answer = await default_model.run(system_content, user_content)
     critic_doc = answer.content
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.GENERATE_CRITIC, critic_doc)
+
+    metadata = LLMCallTransactionMetadataDTO(
+        solution_id=solution_id, task=PipelineStepEnum.GENERATE_CRITIC,
+        input_tokens=answer.input_tokens, output_tokens=answer.output_tokens,
+    )
+    async with uow.connection():
+        workspace_id = await get_workspace_id(uow, solution_id)
+        await charge_for_llm_call(uow, workspace_id, metadata)
 
 
 @inject
@@ -72,10 +86,7 @@ async def resolve_gaps(
     project_doc = await artifact_storage.get_artifact(solution_id, PipelineStepEnum.CREATE_PROJECT_DOC)
     critic_doc = await artifact_storage.get_artifact(solution_id, PipelineStepEnum.GENERATE_CRITIC)
 
-    system_content = prompt_builder.build(
-        prompt_path="project_doc/resolving/system.tpl",
-        letter_prefix="A"
-    )
+    system_content = prompt_builder.build(prompt_path="project_doc/resolving/system.tpl", letter_prefix="A")
     user_content = prompt_builder.build(
         prompt_path="project_doc/resolving/user.tpl",
         project_tree=project_tree,
@@ -86,6 +97,14 @@ async def resolve_gaps(
     answer = await default_model.run(system_content, user_content)
     resolve_doc = answer.content
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.RESOLVE_GAPS, resolve_doc)
+
+    metadata = LLMCallTransactionMetadataDTO(
+        solution_id=solution_id, task=PipelineStepEnum.RESOLVE_GAPS,
+        input_tokens=answer.input_tokens, output_tokens=answer.output_tokens,
+    )
+    async with uow.connection():
+        workspace_id = await get_workspace_id(uow, solution_id)
+        await charge_for_llm_call(uow, workspace_id, metadata)
 
 
 @inject
@@ -109,9 +128,14 @@ async def improve_doc(
     final_doc = answer.content
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.IMPROVE_DOC, final_doc)
 
-    async with uow.connection():
+    metadata = LLMCallTransactionMetadataDTO(
+        solution_id=solution_id, task=PipelineStepEnum.IMPROVE_DOC,
+        input_tokens=answer.input_tokens, output_tokens=answer.output_tokens,
+    )
+    async with uow.connection() as conn, conn.transaction():
+        workspace_id = await get_workspace_id(uow, solution_id)
+        await charge_for_llm_call(uow, workspace_id, metadata)
         await uow.solutions.update(
             solution_id,
             SolutionUpdateDTO(status=SolutionStatusEnum.REVIEWED),
         )
-

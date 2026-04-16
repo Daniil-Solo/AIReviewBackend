@@ -3,7 +3,6 @@ from src.dto.transactions.transactions import (
     BalanceResponseDTO,
     TransactionCreateDTO,
     TransactionFilterDTO,
-    TransactionHourlyGroupDTO,
     TransactionResponseDTO,
 )
 
@@ -12,6 +11,5 @@ __all__ = [
     "BalanceResponseDTO",
     "TransactionCreateDTO",
     "TransactionFilterDTO",
-    "TransactionHourlyGroupDTO",
     "TransactionResponseDTO",
 ]

@@ -8,11 +8,14 @@ from src.dto.transactions.transactions import (
     BalanceResponseDTO,
     TransactionCreateDTO,
     TransactionFilterDTO,
-    TransactionHourlyGroupDTO,
     TransactionResponseDTO,
 )
 from src.dto.users.user import ShortUserDTO
+from src.infrastructure.logging import get_logger
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
+
+
+logger = get_logger()
 
 
 @inject
@@ -34,12 +37,12 @@ async def create_admin_top_up_transaction(
     if not admin.is_admin:
         raise ForbiddenError(message="Только администратор может создавать транзакции")
 
-    data = TransactionCreateDTO(
+    create_data = TransactionCreateDTO(
         **data.model_dump(),
         type=TransactionTypeEnum.ADMIN_TOP_UP,
     )
     async with uow.connection():
-        return await uow.transactions.create(data)
+        return await uow.transactions.create(create_data)
 
 
 @inject
@@ -47,6 +50,6 @@ async def get_transactions(
     user: ShortUserDTO,
     filters: TransactionFilterDTO,
     uow: UnitOfWork = Provide[Container.uow],
-) -> list[TransactionHourlyGroupDTO]:
+) -> list[TransactionResponseDTO]:
     async with uow.connection():
-        return await uow.transactions.get_grouped_by_hour(user.id, filters)
+        return await uow.transactions.get_with_filters(user.id, filters)

@@ -21,6 +21,7 @@ from src.dto.solutions.solutions import (
     SolutionUpdateDTO,
 )
 from src.dto.users.user import ShortUserDTO
+from src.dto.workspaces.member import WorkspaceMemberFiltersDTO
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 from src.infrastructure.storage.artifact import SolutionArtifactStorage
 from src.infrastructure.storage.interface import SolutionStorage
@@ -76,12 +77,19 @@ async def create(
     async with uow.connection() as conn, conn.transaction():
         task = await uow.tasks.get_by_id(data.task_id)
         await check_member_role(uow, user.id, task.workspace_id)
+
+        workspace = await uow.workspaces.get_by_id(task.workspace_id)
+        owner_member = (await uow.workspace_members.get_list(WorkspaceMemberFiltersDTO(workspace_id=workspace.id, roles=[WorkspaceMemberRoleEnum.OWNER])))[0]
+        balance = await uow.transactions.get_balance_by_user_id(owner_member.user_id)
+        initial_status = SolutionStatusEnum.ERROR if balance < 0 else  SolutionStatusEnum.AI_REVIEW
+
         solution = await uow.solutions.create(SolutionCreateDTO(**data.model_dump(), link=link), user.id)
         solution = await uow.solutions.update(
             solution.id,
-            SolutionUpdateDTO(status=SolutionStatusEnum.AI_REVIEW, steps=[]),
+            SolutionUpdateDTO(status=initial_status, steps=[]),
         )
-        await uow.pipeline_tasks.create_many(solution.id, ALL_STEPS)
+        if balance > 0:
+            await uow.pipeline_tasks.create_many(solution.id, ALL_STEPS)
     return SolutionShortResponseDTO.model_validate(solution)
 
 
@@ -151,7 +159,7 @@ async def get_my_solutions(
 
 
 @inject
-async def get_artefact(
+async def get_artifact(
     solution_id: int,
     step: PipelineStepEnum,
     user: ShortUserDTO,
@@ -165,5 +173,5 @@ async def get_artefact(
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code", "")
             if error_code == "NoSuchKey":
-                raise EntityNotFoundError(message=f"Артефакт не найден") from e
+                raise EntityNotFoundError(message="Артефакт не найден") from e
             raise
