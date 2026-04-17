@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from src.dto.solutions.solutions import (
     SolutionCreateDTO,
+    SolutionFiltersDTO,
     SolutionResponseDTO,
     SolutionShortResponseDTO,
     SolutionUpdateDTO,
@@ -22,7 +23,7 @@ class SolutionsDAO(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list_by_task(self, task_id: int) -> list[SolutionShortResponseDTO]:
+    async def get_list(self, filters: SolutionFiltersDTO | None) -> list[SolutionShortResponseDTO]:
         raise NotImplementedError
 
     @abstractmethod

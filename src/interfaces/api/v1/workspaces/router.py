@@ -155,7 +155,7 @@ async def transfer_ownership_endpoint(
     return await change_workspace_owner(workspace_id, data, user)
 
 
-@router.post("/slugs/availability", response_model=SlugCheckResponseDTO)
+@router.get("/slugs/availability", response_model=SlugCheckResponseDTO)
 async def check_slug_endpoint(
     slug: str = Query(),
 ) -> SlugCheckResponseDTO:

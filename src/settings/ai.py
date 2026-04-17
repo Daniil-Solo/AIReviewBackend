@@ -10,3 +10,5 @@ class AISettings(BaseSettings):
     )
     LLM_API_KEY: str = Field(description="Ключ доступа", examples=["sk-***"])
     LLM_DEFAULT_MODEL: str = Field(description="Ключ доступа", examples=["qwen/qwen3-235b-a22b-2507"])
+    LLM_DEFAULT_MODEL_INPUT_TOKEN_PRICE: float = Field(description="Цена за 1М входных токенов (в рублях)")
+    LLM_DEFAULT_MODEL_OUTPUT_TOKEN_PRICE: float = Field(description="Цена за 1М выходных токенов (в рублях)")

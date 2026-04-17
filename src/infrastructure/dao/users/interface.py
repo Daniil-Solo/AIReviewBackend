@@ -21,3 +21,7 @@ class UsersDAO(ABC):
     @abstractmethod
     async def get_all(self) -> list[UserResponseDTO]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_ids(self, user_ids: list[int]) -> list[UserResponseDTO]:
+        raise NotImplementedError

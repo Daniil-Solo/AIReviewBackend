@@ -44,7 +44,7 @@ async def test__success(uow, create_solution):
     assert solution.task_id == task.id
     assert solution.format == solution.format
     assert solution.link == solution.link
-    assert solution.status == SolutionStatusEnum.CREATED
+    assert solution.status == SolutionStatusEnum.AI_REVIEW
 
 
 

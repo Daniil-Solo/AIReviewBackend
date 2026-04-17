@@ -66,6 +66,12 @@ class SQLAlchemyWorkspaceMembersDAO(WorkspaceMembersDAO):
             raise EntityNotFoundError(message="Участник не найден")
         return WorkspaceMemberResponseDTO.model_validate(row)
 
+    async def get_by_user(self, user_id: int) -> list[WorkspaceMemberResponseDTO]:
+        query = self._get_query().where(workspace_members_table.c.user_id == user_id)
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+        return [WorkspaceMemberResponseDTO.model_validate(row) for row in rows]
+
     async def update(self, member_id: int, data: WorkspaceMemberUpdateDTO) -> WorkspaceMemberResponseDTO:
         query = (
             sa.update(workspace_members_table)

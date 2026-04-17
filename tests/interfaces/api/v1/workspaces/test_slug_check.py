@@ -10,7 +10,7 @@ from tests.helpers.workspaces import create_workspace, create_join_rule
 @pytest_asyncio.fixture()
 def request_check_slug(client: AsyncClient):
     async def inner(slug: str) -> Response:
-        return await client.post(f"/api/v1/workspaces/slugs/availability?slug={slug}")
+        return await client.get(f"/api/v1/workspaces/slugs/availability?slug={slug}")
 
     return inner
 

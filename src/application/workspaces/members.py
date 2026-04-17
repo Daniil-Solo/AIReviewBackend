@@ -40,7 +40,7 @@ async def join_to_workspace(
         if rule.expired_at and rule.expired_at < datetime.datetime.now(datetime.UTC):
             raise ApplicationError(message="Срок действия приглашения истёк", code="joining_expired")
 
-        if rule.password is not None:
+        if rule.hashed_password is not None:
             if not data.password:
                 raise ApplicationError(message="Требуется пароль для вступления", code="required_joining_password")
             if not verify_password(data.password, rule.hashed_password):

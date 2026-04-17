@@ -1,22 +1,29 @@
 import re
 
+from botocore.exceptions import ClientError
 from dependency_injector.wiring import Provide, inject
 from fastapi import UploadFile
 import httpx
 
-from src.application.exceptions import ApplicationError, ForbiddenError
+from src.application.exceptions import ApplicationError, EntityNotFoundError, ForbiddenError
+from src.application.solutions.common import check_solution_permissions
 from src.application.workspaces.common import check_member_role
+from src.constants.ai_pipeline import ALL_STEPS, PipelineStepEnum
 from src.constants.ai_review import SolutionFormatEnum, SolutionStatusEnum
 from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.di.container import Container
 from src.dto.solutions.solutions import (
     SolutionCreateDTO,
     SolutionCreateRequestDTO,
+    SolutionFiltersDTO,
+    SolutionFiltersRequestDTO,
     SolutionShortResponseDTO,
     SolutionUpdateDTO,
 )
 from src.dto.users.user import ShortUserDTO
+from src.dto.workspaces.member import WorkspaceMemberFiltersDTO
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
+from src.infrastructure.storage.artifact import SolutionArtifactStorage
 from src.infrastructure.storage.interface import SolutionStorage
 
 
@@ -67,10 +74,26 @@ async def create(
 
         await validate_github_link(link)
 
-    async with uow.connection():
+    async with uow.connection() as conn, conn.transaction():
         task = await uow.tasks.get_by_id(data.task_id)
         await check_member_role(uow, user.id, task.workspace_id)
+
+        workspace = await uow.workspaces.get_by_id(task.workspace_id)
+        owner_member = (
+            await uow.workspace_members.get_list(
+                WorkspaceMemberFiltersDTO(workspace_id=workspace.id, roles=[WorkspaceMemberRoleEnum.OWNER])
+            )
+        )[0]
+        balance = await uow.transactions.get_balance_by_user_id(owner_member.user_id)
+        initial_status = SolutionStatusEnum.ERROR if balance < 0 else SolutionStatusEnum.AI_REVIEW
+
         solution = await uow.solutions.create(SolutionCreateDTO(**data.model_dump(), link=link), user.id)
+        solution = await uow.solutions.update(
+            solution.id,
+            SolutionUpdateDTO(status=initial_status, steps=[]),
+        )
+        if balance > 0:
+            await uow.pipeline_tasks.create_many(solution.id, ALL_STEPS)
     return SolutionShortResponseDTO.model_validate(solution)
 
 
@@ -81,15 +104,11 @@ async def get(
     uow: UnitOfWork = Provide[Container.uow],
 ) -> SolutionShortResponseDTO:
     async with uow.connection():
-        solution = await uow.solutions.get_by_id(solution_id)
-        task = await uow.tasks.get_by_id(solution.task_id)
-        member = await check_member_role(uow, user.id, task.workspace_id)
-        if solution.created_by != user.id and member.role not in {
-            WorkspaceMemberRoleEnum.OWNER,
-            WorkspaceMemberRoleEnum.TEACHER,
-        }:
-            raise ForbiddenError(message="Пользователь не имеет доступ к этому решению")
-        return SolutionShortResponseDTO.model_validate(solution)
+        solution = await check_solution_permissions(uow, user.id, solution_id)
+        author = await uow.users.get_by_id(solution.created_by)
+        sol_dict = solution.model_dump()
+        sol_dict["author"] = author.as_short()
+        return SolutionShortResponseDTO(**sol_dict)
 
 
 @inject
@@ -98,10 +117,16 @@ async def cancel(
     user: ShortUserDTO,
     uow: UnitOfWork = Provide[Container.uow],
 ) -> None:
-    async with uow.connection():
+    async with uow.connection() as conn, conn.transaction():
         solution = await uow.solutions.get_by_id(solution_id)
-        if solution.created_by != user.id:
-            raise ForbiddenError(message="Нет доступа к этому решению")
+
+        if solution.status != SolutionStatusEnum.AI_REVIEW:
+            raise ApplicationError(
+                message="Отмена проверки решения возможна только во время AI-проверки", code="solution_status_invalid"
+            )
+
+        await check_solution_permissions(uow, user.id, solution.id)
+        await uow.pipeline_tasks.delete_many_not_completed(solution_id)
         await uow.solutions.update(solution_id, SolutionUpdateDTO(status=SolutionStatusEnum.CANCELLED))
 
 
@@ -117,4 +142,46 @@ async def get_list_by_task(
         await check_member_role(
             uow, user.id, workspace.id, {WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )
-        return await uow.solutions.get_list_by_task(task_id)
+        filters = SolutionFiltersDTO(task_id=task_id)
+        solutions = await uow.solutions.get_list(filters)
+
+        user_ids = list({s.created_by for s in solutions})
+        users = {u.id: u.as_short() for u in await uow.users.get_by_ids(user_ids)}
+
+        result = []
+        for solution in solutions:
+            sol_dict = solution.model_dump()
+            sol_dict["author"] = users.get(solution.created_by)
+            result.append(SolutionShortResponseDTO(**sol_dict))
+
+        return result
+
+
+@inject
+async def get_my_solutions(
+    filters: SolutionFiltersRequestDTO,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> list[SolutionShortResponseDTO]:
+    async with uow.connection():
+        dao_filters = SolutionFiltersDTO(created_by=user.id, task_id=filters.task_id)
+        return await uow.solutions.get_list(dao_filters)
+
+
+@inject
+async def get_artifact(
+    solution_id: int,
+    step: PipelineStepEnum,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+    artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
+) -> str:
+    async with uow.connection():
+        await check_solution_permissions(uow, user.id, solution_id)
+        try:
+            return await artifact_storage.get_artifact(solution_id, str(step))
+        except ClientError as e:
+            error_code = e.response.get("Error", {}).get("Code", "")
+            if error_code == "NoSuchKey":
+                raise EntityNotFoundError(message="Артефакт не найден") from e
+            raise

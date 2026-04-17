@@ -6,7 +6,7 @@ from src.di.container import Container
 from src.dto.tasks.task_criteria import (
     TaskCriteriaCreateDTO,
     TaskCriteriaResponseDTO,
-    TaskCriteriaUpdateWeightDTO,
+    TaskCriteriaUpdateWeightDTO, TaskCriteriaFullResponseDTO, TaskCriteriaCreateBatchDTO,
 )
 from src.dto.users.user import ShortUserDTO
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
@@ -27,6 +27,27 @@ async def create(
             allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER},
         )
         return await uow.task_criteria.create(data)
+
+
+
+@inject
+async def create_batch(
+    task_id: int,
+    data: TaskCriteriaCreateBatchDTO,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> None:
+    async with uow.connection():
+        task = await uow.tasks.get_by_id(task_id)
+        await check_member_role(
+            uow,
+            user.id,
+            task.workspace_id,
+            allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER},
+        )
+        for criterion_id in data.criterion_ids:
+            data = TaskCriteriaCreateDTO(task_id=task_id, criterion_id=criterion_id, weight=1)
+            await uow.task_criteria.create(data)
 
 
 @inject
@@ -71,7 +92,7 @@ async def get_by_task(
     task_id: int,
     user: ShortUserDTO,
     uow: UnitOfWork = Provide[Container.uow],
-) -> list[TaskCriteriaResponseDTO]:
+) -> list[TaskCriteriaFullResponseDTO]:
     async with uow.connection():
         task = await uow.tasks.get_by_id(task_id)
         await check_member_role(
@@ -80,4 +101,9 @@ async def get_by_task(
             task.workspace_id,
             allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER},
         )
-        return await uow.task_criteria.get_by_task_id(task_id)
+        result = []
+        task_criteria = await uow.task_criteria.get_by_task_id(task_id)
+        for tc in task_criteria:
+            criterion = await uow.criteria.get_by_id(tc.criterion_id)
+            result.append(TaskCriteriaFullResponseDTO(**tc.model_dump(), criterion=criterion))
+        return result

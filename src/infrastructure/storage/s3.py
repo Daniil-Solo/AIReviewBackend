@@ -49,7 +49,7 @@ class S3SolutionStorage(SolutionStorage):
                 ContentType="application/zip",
             )
 
-        return f"{self._endpoint}/{self._bucket}/{key}"
+        return key
 
     async def get_content(self, key: str) -> bytes:
         async with self._session.create_client(

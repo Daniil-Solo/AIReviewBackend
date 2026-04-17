@@ -9,6 +9,7 @@ from src.dto.tasks.task_criteria import (
     TaskCriteriaCreateDTO,
     TaskCriteriaResponseDTO,
     TaskCriteriaUpdateWeightDTO,
+    TaskCriteriaCreateRequestDTO, TaskCriteriaFullResponseDTO, TaskCriteriaCreateBatchDTO,
 )
 from src.dto.tasks.tasks import TaskCreateDTO, TaskResponseDTO, TaskUpdateDTO
 from src.dto.users.user import ShortUserDTO
@@ -63,14 +64,24 @@ async def delete_endpoint(
 @router.post("/{task_id}/criteria", response_model=TaskCriteriaResponseDTO)
 async def create_criterion_endpoint(
     task_id: int,
-    data: TaskCriteriaCreateDTO,
+    data: TaskCriteriaCreateRequestDTO,
     user: ShortUserDTO = Depends(get_current_user),
 ) -> TaskCriteriaResponseDTO:
-    data.task_id = task_id
+    data = TaskCriteriaCreateDTO(**data.model_dump(), task_id=task_id)
     return await task_criteria_service.create(data, user)
 
 
-@router.get("/{task_id}/criteria", response_model=list[TaskCriteriaResponseDTO])
+@router.post("/{task_id}/criteria/batch", response_model=SuccessOperationDTO)
+async def create_criteria_batch_endpoint(
+    task_id: int,
+    data: TaskCriteriaCreateBatchDTO,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> SuccessOperationDTO:
+    await task_criteria_service.create_batch(task_id, data, user)
+    return SuccessOperationDTO(message="Критерии прикреплены к задаче")
+
+
+@router.get("/{task_id}/criteria", response_model=list[TaskCriteriaFullResponseDTO])
 async def get_criteria_endpoint(
     task_id: int,
     user: ShortUserDTO = Depends(get_current_user),

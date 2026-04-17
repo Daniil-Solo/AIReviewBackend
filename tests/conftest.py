@@ -27,9 +27,16 @@ async def test_database_name():
     try:
         conn = await asyncpg.connect(settings.db.sync_url)
 
+        exists = await conn.fetchval(
+            "SELECT 1 FROM pg_database WHERE datname = $1", test_db_name
+        )
+        if exists:
+            await conn.execute(f"DROP DATABASE {test_db_name}")
+
         await conn.execute(f"CREATE DATABASE {test_db_name}")
 
         logger.info(f"Test database {test_db_name} created successfully")
+        settings.db.DB = test_db_name
 
         yield test_db_name
 
@@ -45,9 +52,8 @@ async def test_database_name():
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def run_migrations(test_database_name):
-    test_sync_url = f"postgresql://{settings.db.USER}:{settings.db.PASSWORD}@{settings.db.HOST}:{settings.db.PORT}/{test_database_name}"
     alembic_cfg = Config("alembic.ini")
-    alembic_cfg.set_main_option("sqlalchemy.url", test_sync_url)
+    alembic_cfg.set_main_option("sqlalchemy.url", settings.db.sync_url)
 
     command.downgrade(alembic_cfg, "base")
     command.upgrade(alembic_cfg, "head")
@@ -57,7 +63,7 @@ async def run_migrations(test_database_name):
     command.downgrade(alembic_cfg, "base")
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function")
 async def container(run_migrations):
     container = await init_container()
 
@@ -72,16 +78,17 @@ async def container(run_migrations):
         await shutdown_container(container)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture(scope="function")
 def uow(container):
     uow = container.uow()
     return uow
 
 
-@pytest.fixture
+@pytest.fixture(scope="session", autouse=True)
 def init_settings():
     settings.logging.LOKI_ENABLED = False
     settings.redis.ENABLED = False
+
 
 @pytest_asyncio.fixture(scope="session")
 async def client() -> AsyncGenerator[AsyncClient, Any]:
