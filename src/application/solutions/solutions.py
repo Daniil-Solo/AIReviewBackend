@@ -79,9 +79,13 @@ async def create(
         await check_member_role(uow, user.id, task.workspace_id)
 
         workspace = await uow.workspaces.get_by_id(task.workspace_id)
-        owner_member = (await uow.workspace_members.get_list(WorkspaceMemberFiltersDTO(workspace_id=workspace.id, roles=[WorkspaceMemberRoleEnum.OWNER])))[0]
+        owner_member = (
+            await uow.workspace_members.get_list(
+                WorkspaceMemberFiltersDTO(workspace_id=workspace.id, roles=[WorkspaceMemberRoleEnum.OWNER])
+            )
+        )[0]
         balance = await uow.transactions.get_balance_by_user_id(owner_member.user_id)
-        initial_status = SolutionStatusEnum.ERROR if balance < 0 else  SolutionStatusEnum.AI_REVIEW
+        initial_status = SolutionStatusEnum.ERROR if balance < 0 else SolutionStatusEnum.AI_REVIEW
 
         solution = await uow.solutions.create(SolutionCreateDTO(**data.model_dump(), link=link), user.id)
         solution = await uow.solutions.update(
@@ -113,10 +117,16 @@ async def cancel(
     user: ShortUserDTO,
     uow: UnitOfWork = Provide[Container.uow],
 ) -> None:
-    async with uow.connection():
+    async with uow.connection() as conn, conn.transaction():
         solution = await uow.solutions.get_by_id(solution_id)
-        if solution.created_by != user.id:
-            raise ForbiddenError(message="Только автор решения может отменить его")
+
+        if solution.status != SolutionStatusEnum.AI_REVIEW:
+            raise ApplicationError(
+                message="Отмена проверки решения возможна только во время AI-проверки", code="solution_status_invalid"
+            )
+
+        await check_solution_permissions(uow, user.id, solution.id)
+        await uow.pipeline_tasks.delete_many_not_completed(solution_id)
         await uow.solutions.update(solution_id, SolutionUpdateDTO(status=SolutionStatusEnum.CANCELLED))
 
 

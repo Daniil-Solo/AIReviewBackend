@@ -1,7 +1,7 @@
-
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.application.exceptions import EntityNotFoundError
 from src.constants.ai_pipeline import PipelineStepEnum, PipelineTaskStatusEnum
 from src.dto.ai_review.pipeline import (
     PipelineTaskDTO,
@@ -45,7 +45,7 @@ class SQLAlchemyPipelineTasksDAO(PipelineTasksDAO):
         )
         await self.session.execute(query)
 
-    async def update(self, task_id: int, data: PipelineTaskUpdateDTO) -> PipelineTaskDTO | None:
+    async def update(self, task_id: int, data: PipelineTaskUpdateDTO) -> PipelineTaskDTO:
         update_query = (
             sa.update(pipeline_tasks_table)
             .where(pipeline_tasks_table.c.id == task_id)
@@ -55,7 +55,7 @@ class SQLAlchemyPipelineTasksDAO(PipelineTasksDAO):
         result = await self.session.execute(update_query)
         row = result.fetchone()
         if row is None:
-            return None
+            raise EntityNotFoundError(message="Задача не найдена")
         return PipelineTaskDTO.model_validate(row)
 
     async def get_many(self, filters: PipelineTaskFiltersDTO) -> list[PipelineTaskDTO]:
@@ -70,4 +70,11 @@ class SQLAlchemyPipelineTasksDAO(PipelineTasksDAO):
 
     async def delete_many(self, solution_id: int) -> None:
         query = sa.delete(pipeline_tasks_table).where(pipeline_tasks_table.c.solution_id == solution_id)
+        await self.session.execute(query)
+
+    async def delete_many_not_completed(self, solution_id: int) -> None:
+        query = sa.delete(pipeline_tasks_table).where(
+            pipeline_tasks_table.c.solution_id == solution_id,
+            pipeline_tasks_table.c.status != str(PipelineTaskStatusEnum.COMPLETED),
+        )
         await self.session.execute(query)

@@ -18,7 +18,7 @@ class PipelineTasksDAO(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, task_id: int, data: PipelineTaskUpdateDTO) -> PipelineTaskDTO | None:
+    async def update(self, task_id: int, data: PipelineTaskUpdateDTO) -> PipelineTaskDTO:
         raise NotImplementedError
 
     @abstractmethod
@@ -27,4 +27,8 @@ class PipelineTasksDAO(ABC):
 
     @abstractmethod
     async def delete_many(self, solution_id: int) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete_many_not_completed(self, solution_id: int) -> None:
         raise NotImplementedError

@@ -47,9 +47,11 @@ async def run_worker() -> None:
             async with uow.connection():
                 task = await uow.pipeline_tasks.get_ready_pending()
                 if task is None:
-                    logger.debug(f"No tasks in queue")
+                    logger.debug("No tasks in queue")
                     continue
 
+            start_time = time.perf_counter()
+            try:
                 solution = await uow.solutions.get_by_id(task.solution_id)
                 if not is_step_ready(task.step, solution.steps):
                     await uow.pipeline_tasks.update_last_checked_at(task.id)
@@ -58,17 +60,18 @@ async def run_worker() -> None:
 
                 logger.info(f"Processing task {task.id}: solution_id={task.solution_id}, step={task.step}")
 
-                marked = await uow.pipeline_tasks.update(
+                if solution.status == SolutionStatusEnum.CANCELLED:
+                    await uow.pipeline_tasks.update_last_checked_at(task.id)
+                    logger.debug(f"Solution {solution.id} is CANCELLED, skipping task {task.id}")
+                    continue
+
+                await uow.pipeline_tasks.update(
                     task.id,
                     PipelineTaskUpdateDTO(
                         status=PipelineTaskStatusEnum.RUNNING, ran_at=datetime.datetime.now(datetime.UTC)
                     ),
                 )
-                if marked is None:
-                    continue
 
-            start_time = time.perf_counter()
-            try:
                 handler = STEP_HANDLER_MAP.get(task.step)
                 if not handler:
                     raise ValueError(f"Неизвестный шаг: {task.step}")
@@ -90,21 +93,25 @@ async def run_worker() -> None:
             except Exception as e:
                 error_time = time.perf_counter()
                 logger.exception("Ошибка во время выполнения шага", task_id=task.id, step=task.step)
-                async with uow.connection() as conn, conn.transaction():
-                    await uow.solutions.update(
-                        task.solution_id,
-                        SolutionUpdateDTO(
-                            status=SolutionStatusEnum.ERROR,
-                        ),
-                    )
-                    await uow.pipeline_tasks.update(
-                        task.id,
-                        PipelineTaskUpdateDTO(
-                            status=PipelineTaskStatusEnum.FAILED,
-                            error_text=f"{str(e)}\n{traceback.format_exc()}",
-                            duration=error_time - start_time,
-                        ),
-                    )
+                try:
+                    async with uow.connection() as conn, conn.transaction():
+                        await uow.solutions.update(
+                            task.solution_id,
+                            SolutionUpdateDTO(
+                                status=SolutionStatusEnum.ERROR,
+                            ),
+                        )
+                        await uow.pipeline_tasks.update(
+                            task.id,
+                            PipelineTaskUpdateDTO(
+                                status=PipelineTaskStatusEnum.FAILED,
+                                error_text=f"{str(e)}\n{traceback.format_exc()}",
+                                duration=error_time - start_time,
+                            ),
+                        )
+                except Exception:
+                    logger.exception("Ошибка во время сохранения данных об ошибке", task_id=task.id, step=task.step)
+                    continue
 
     except KeyboardInterrupt:
         logger.info("Worker stopped by user")
