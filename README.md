@@ -24,12 +24,12 @@
 
 ## Документация
 
-| Раздел | Описание | Ссылка |
-|-------|----------|--------|
+| Раздел | Описание                  | Ссылка |
+|-------|---------------------------|--------|
 | Архитектура | Общая архитектура системы | [`docs/architecture/architecture.md`](docs/architecture/architecture.md) |
-| Модель данных | Сущности и связи | [`docs/architecture/data_model.md`](docs/architecture/data_model.md) |
-| AI-пайплайн | Устройство ИИ для ревью | [`docs/architecture/ai.md`](docs/architecture/ai.md) |
-| Разработка | Инструкции по запуску | [`docs/development.md`](docs/development.md) |
+| Модель данных | Сущности и связи          | [`docs/architecture/data_model.md`](docs/architecture/data_model.md) |
+| AI-пайплайн | Устройство ИИ для ревью   | [`docs/architecture/ai.md`](docs/architecture/ai.md) |
+| Разработка | Инструкции по разработке  | [`docs/development.md`](docs/development.md) |
 
 ## Быстрый старт
 
@@ -37,16 +37,3 @@
 bash scripts/gen_env.sh
 docker compose up -d
 ```
-
-## API Endpoints
-
-- `POST /api/v1/auth/login` - Аутентификация
-- `GET/POST /api/v1/users` - Управление пользователями
-- `GET/POST /api/v1/workspaces` - Управление рабочими пространствами
-- `GET/POST /api/v1/joins` - Присоединение к пространствам
-
-## Требования
-
-- Python 3.11+
-- PostgreSQL 14+
-- OpenAI API Key
