@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "comment": "Страница со списком товаров реализована: в файле core/templates/core/jewelry_catalog.html отображаются товары с названием, ценой, фото и кратким описанием. Используется ListView с моделью Jewelry, в шаблоне выводятся title, price, main_photo и категории.",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "Детальная страница товара реализована: в файле core/templates/core/jewelry_view.html отображается полное описание, цена, фото, характеристики, а также возможность добавления в корзину. Используется DetailView с моделью Jewelry.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Реализована возможность добавлять/удалять товары, видеть итоговую сумму: в файле cart/cart.py реализован класс Cart с методами add, remove, set_quantity, get_total_price. В шаблоне cart/cart.html отображается итоговая сумма и количество товаров.",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Реализована форма сбора данных покупателя (имя, адрес, телефон) и сохранение заказа в БД: в файле order/models.py определена модель Order с полями full_name, email, phone, city, address, postal_code. В order/views.py реализовано сохранение заказа в БД при POST-запросе.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Реализовано управление товарами заказами через стандартную админку Django: в файле core/admin.py и order/admin.py настроены админ-панели для моделей Jewelry, Order, OrderItem. В админке можно редактировать, добавлять, удалять товары и заказы.",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "Пользователи могут регистрироваться и входить в систему: в файле users/views.py реализованы RegistrationView и LoginView. В users/urls.py определены URL-адреса для регистрации и входа. В шаблонах users/templates/registration/register.html и login.html реализованы формы.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Реализован поиск товаров по категориям, цене, наличию: в файле core/views.py класс Search реализует поиск по title, а JewelryCatalog реализует фильтрацию по категориям, цене, наличию через GET-параметры. В шаблоне core/templates/core/jewelry_catalog.html отображаются фильтры.",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Пользователи могут отслеживать статус заказа в личном кабинете: в файле order/views.py реализовано сохранение заказа, но отсутствует личный кабинет с отслеживанием статуса заказа. Нет шаблона и URL для просмотра истории заказов.",
+    "is_passed": false
+  },
+  {
+    "id": 12,
+    "comment": "Использованы именованные URL, пространства имён, отсутствует хардкод путей в шаблонах: в файле jewshop/urls.py определены пространства имён, в шаблонах используются {% url 'name' %}, нет хардкода путей.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Бизнес-логика вынесена из представлений в сервисы или формы: в файле cart/cart.py реализован класс Cart с бизнес-логикой добавления, удаления, проверки количества. В order/views.py логика сохранения заказа вынесена в метод form_valid.",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "Использование base.html, блоков, include, тегов: в файле core/templates/core/base.html определён базовый шаблон, в core/templates/core/content.html используется {% extends %}, {% block %}, {% include %}, {% load %}. В шаблонах используются теги.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "Наличие docstring для сложных методов и классов, комментарии к неочевидным участкам: в файле cart/cart.py класс Cart и его методы имеют docstring. В файле core/views.py есть комментарии к сложным участкам кода.",
+    "is_passed": true
+  },
+  {
+    "id": 19,
+    "comment": "Кастомные страницы для ошибок 404: в файле jewshop/jewshop/urls.py определён handler404 = \"pages.views.page_not_found_view\". В файле pages/views.py реализовано представление page_not_found_view, в шаблоне pages/templates/pages/404.html отображается страница ошибки.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "Во всех POST-формах присутствует {% csrf_token %}: в файлах users/templates/registration/login.html, users/templates/registration/register.html, order/templates/order/create_order.html, users/templates/password/password_change_form.html, users/templates/password/password_reset_form.html присутствует {% csrf_token %}.",
+    "is_passed": true
+  },
+  {
+    "id": 23,
+    "comment": "Использование Bootstrap или другого CSS-фреймворка для корректного отображения на мобильных устройствах: в файле core/templates/core/base.html подключён Bootstrap 5.0.1. В шаблонах используются классы Bootstrap для адаптивного отображения.",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "После действий (добавление в корзину, оформление заказа) выводятся уведомления через django.contrib.messages: в файле order/views.py при успешном создании заказа используется HttpResponseRedirect, но в коде отсутствует вызов messages.success. Уведомления не выводятся.",
+    "is_passed": false
+  },
+  {
+    "id": 26,
+    "comment": "Использование кеша (например, для списка товаров, категорий) для снижения нагрузки на БД: в проекте отсутствует использование кеша. Нет настроек cache, нет использования cache в представлениях.",
+    "is_passed": false
+  },
+  {
+    "id": 27,
+    "comment": "Разбивка списка товаров на страницы (например, по 12 товаров): в файле core/views.py класс JewelryCatalog использует ListView, но не реализована пагинация. В шаблоне отсутствует пагинация, нет использования Paginator.",
+    "is_passed": false
+  },
+  {
+    "id": 29,
+    "comment": "Реализован простой API на DRF для получения списка товаров: в проекте отсутствует Django REST Framework. Нет настроек DRF, нет views.py с API-представлениями, нет urls.py для API.",
+    "is_passed": false
+  },
+  {
+    "id": 30,
+    "comment": "Написаны unit-тесты для проверки сценариев: в папке core/tests/ и order/tests/ есть файлы test_models.py, test_urls.py, test_views.py. В них реализованы тесты для моделей, URL, представлений. Тесты покрывают основные сценарии.",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Проект запускается через Docker Compose: в проекте отсутствует файл docker-compose.yml. Нет Dockerfile, нет docker-compose.yml. Проект не может быть запущен через Docker Compose.",
+    "is_passed": false
+  },
+  {
+    "id": 32,
+    "comment": "Пользователи могут оставлять текстовые отзывы и/или рейтинг к товарам: в файле core/models.py определена модель Review с полями title, stars, text. В шаблоне core/templates/core/jewelry_view.html отображаются отзывы. Но нет формы для добавления отзыва.",
+    "is_passed": false
+  },
+  {
+    "id": 33,
+    "comment": "Файл README с описанием проекта, инструкцией по установке, запуску: в проекте отсутствует файл README.md. В корне проекта есть README.md, но он пустой. Нет описания проекта, инструкции по установке и запуску.",
+    "is_passed": false
+  },
+  {
+    "id": 34,
+    "comment": "Файл requirements.txt (или poetry.lock) добавлены в репозиторий: в проекте присутствует файл requirements.txt с перечнем зависимостей. Он добавлен в репозиторий.",
+    "is_passed": true
+  },
+  {
+    "id": 36,
+    "comment": "Фото товара при создании или редактировании товара загружает в S3-подобное хранилище: в файле core/models.py поле main_photo использует ImageField с upload_to='photos/%Y/%m/%d/'. Нет настроек для S3, файлы сохраняются локально.",
+    "is_passed": false
+  },
+  {
+    "id": 38,
+    "comment": "Проект содержит e2e-тесты для проверки пользовательских сценариев, реализованные на Playwright: в проекте есть папка e2e-testing/ с файлом tests_pages.py. Тесты написаны на Selenium, а не на Playwright. Нет тестов на Playwright.",
+    "is_passed": false
+  },
+  {
+    "id": 39,
+    "comment": "Реализованы все статические страницы 'Об авторе' и 'О доставке' (payment.html): в файле pages/views.py реализованы классы AboutView, DeliveryView, PaymentView. В шаблонах pages/templates/pages/about.html, delivery.html, payment.html реализованы страницы. В urls.py определены URL-адреса.",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "В проекте определена собственная модель пользователя, наследуемая от AbstractUser: в файле users/models.py определена модель User, наследующая от AbstractUser. В settings.py установлено AUTH_USER_MODEL = 'users.User'.",
+    "is_passed": true
+  },
+  {
+    "id": 45,
+    "comment": "На странице корзины при отсутствии товаров выводится сообщение: 'Корзина пуста': в файле cart/templates/cart/cart.html при отсутствии товаров выводится <p>Пока товаров нет</p>. Условие {% if cart.is_not_empty %} проверяет наличие товаров.",
+    "is_passed": true
+  },
+  {
+    "id": 52,
+    "comment": "При регистрации аккаунта электронная почта проверяется на внешнем сервисе, что она не является временной: в файле users/forms.py нет проверки почты на временные домены. Нет вызова внешнего сервиса для проверки. Проверка только на формат email.",
+    "is_passed": false
+  },
+  {
+    "id": 62,
+    "comment": "Для длительных операций (например, отправка уведомления на почту после создания заказа) используется асинхронная задача через Celery: в проекте отсутствует Celery. Нет настроек Celery, нет задач, нет асинхронных операций. Отправка писем происходит синхронно.",
+    "is_passed": false
+  },
+  {
+    "id": 63,
+    "comment": "Магазин называется 'Be Beauty': в проекте название магазина 'Fragile Mystery'. В шаблонах, в админке, в коде используется 'Fragile Mystery'. Название 'Be Beauty' отсутствует.",
+    "is_passed": false
+  }
+]

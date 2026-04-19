@@ -1,9 +1,9 @@
 IGNORED_DIRECTORIES = ["venv", "__pycache__"]
-ALLOWED_EXTENSIONS = [
+ALLOWED_EXTENSIONS = {
     # language
     ".py",
     ".jinja",
-    ".tpl"  # ".ipynb",
+    ".tpl",  # ".ipynb",
     ".html",
     ".css",
     ".js", ".jsx",
@@ -11,7 +11,7 @@ ALLOWED_EXTENSIONS = [
     # execs
     ".sh",
     ".bat",
-    ".ps1"
+    ".ps1",
     # envs
     ".env",
     # docs
@@ -23,4 +23,4 @@ ALLOWED_EXTENSIONS = [
     ".yml",  # ".json" -> структуру
     # data
     # ".csv" -> first 4 lines
-]
+}

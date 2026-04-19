@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "comment": "Критерий 1: Реализована страница со списком товаров. В файле jewshop/core/templates/core/jewelry_catalog.html используется шаблон для отображения списка украшений с названием, ценой, фото и описанием (через card-body и card-footer).",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "Критерий 2: Реализована детальная страница товара. В jewshop/core/views.py класс JewelryView (шаблон jewelry_view.html) отображает полное описание, цену и кнопку добавления в корзину.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Критерий 3: Реализована корзина. В jewshop/cart/views.py класс CartView отображает товары, их количество и итоговую сумму (метод get_total_price).",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Критерий 4: Форма сбора данных и сохранение заказа. В jewshop/order/views.py класс CreateOrderView сохраняет заказ и данные покупателя в БД.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Критерий 5: Управление через админку. В jewshop/core/admin.py и jewshop/order/admin.py зарегистрированы модели для управления через стандартную админку Django.",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "Критерий 6: Регистрация и вход. В jewshop/users/views.py реализованы RegistrationView и LoginView, в jewshop/users/urls.py соответствующие пути.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Критерий 7: Поиск и фильтрация. В jewshop/core/views.py классы Search и JewelryCatalog реализуют поиск по названию и фильтрацию по категориям, цене и наличию.",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Критерий 8: Отслеживание статуса заказа. В проекте отсутствует личный кабинет для пользователя, где он мог бы видеть свои заказы и их статусы (в админку доступ только у персонала).",
+    "is_passed": false
+  },
+  {
+    "id": 12,
+    "comment": "Критерий 12: Именованные URL. Во всех файлах urls.py (core, cart, order, pages, users) используются именованные пути (name='...'), в шаблонах теги {% url %}.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Критерий 13: Бизнес-логика вынесена. Логика работы с корзиной вынесена в класс Cart (jewshop/cart/cart.py), логика оформления заказа — в views и forms.",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "Критерий 15: Использование base.html и include. Присутствует jewshop/core/templates/core/base.html и content.html, используются блоки и include (хотя в данном коде include используется мало, структура наследования соблюдена).",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "Критерий 17: Docstrings. В jewshop/cart/cart.py и jewshop/core/models.py присутствуют docstrings для методов и классов.",
+    "is_passed": true
+  },
+  {
+    "id": 19,
+    "comment": "Критерий 19: Страница 404. В jewshop/jewshop/urls.py указан handler404, в jewshop/pages/views.py реализована функция page_not_found_view.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "Критерий 20: CSRF токены. Во всех POST-формах (login, register, order, cart) присутствует {% csrf_token %}.",
+    "is_passed": true
+  },
+  {
+    "id": 23,
+    "comment": "Критерий 23: Bootstrap. В jewshop/core/templates/core/base.html подключается Bootstrap CDN.",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Критерий 24: Django messages. В jewshop/users/views.py (RegistrationView) и других view используется redirect, который в связке с middleware messages мог бы работать, но явных вызовов messages.success/error в коде не найдено (используются form.add_error и редиректы).",
+    "is_passed": false
+  },
+  {
+    "id": 26,
+    "comment": "Критерий 26: Кеширование. В проекте не настроено использование django.core.cache для снижения нагрузки на БД.",
+    "is_passed": false
+  },
+  {
+    "id": 27,
+    "comment": "Критерий 27: Пагинация. В jewshop/core/views.py классы ListView (JewelryCatalog, Search) не используют пагинацию (paginate_by отсутствует).",
+    "is_passed": false
+  },
+  {
+    "id": 29,
+    "comment": "Критерий 29: API на DRF. В проекте отсутствует установленный пакет djangorestframework и соответствующие view/serializers.",
+    "is_passed": false
+  },
+  {
+    "id": 30,
+    "comment": "Критерий 30: Unit-тесты. В проекте присутствуют тесты (jewshop/core/tests, jewshop/cart/tests_cart.py, jewshop/order/tests и др.), написанные на Django TestCase.",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Критерий 31: Docker Compose. В корне проекта отсутствует файл docker-compose.yml и Dockerfile.",
+    "is_passed": false
+  },
+  {
+    "id": 32,
+    "comment": "Критерий 32: Отзывы. В jewshop/core/models.py есть модель Review, в админке есть возможность их добавлять, на главной странице они отображаются.",
+    "is_passed": true
+  },
+  {
+    "id": 33,
+    "comment": "Критерий 33: README. В корне проекта есть файл README.md (согласно дереву файлов).",
+    "is_passed": true
+  },
+  {
+    "id": 34,
+    "comment": "Критерий 34: requirements.txt. Файл requirements.txt присутствует в корне проекта.",
+    "is_passed": true
+  },
+  {
+    "id": 36,
+    "comment": "Критерий 36: Загрузка в S3. В моделях (jewshop/core/models.py) используется ImageField с локальным хранилищем (upload_to='photos/...'), настроек S3 нет.",
+    "is_passed": false
+  },
+  {
+    "id": 38,
+    "comment": "Критерий 38: E2E тесты. В jewshop/e2e-testing/tests_pages.py есть тесты на Selenium (Selenium указан в requirements), Playwright не используется.",
+    "is_passed": false
+  },
+  {
+    "id": 39,
+    "comment": "Критерий 39: Статические страницы. В jewshop/pages/templates/pages/ присутствуют about.html, delivery.html и payment.html.",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "Критерий 40: Кастомная модель User. В jewshop/users/models.py определена класс User, наследуемый от AbstractUser, в settings.py AUTH_USER_MODEL = 'users.User'.",
+    "is_passed": true
+  },
+  {
+    "id": 45,
+    "comment": "Критерий 45: Пустая корзина. В jewshop/cart/templates/cart/cart.html есть проверка {% if cart.is_not_empty %} и блок {% else %} с сообщением.",
+    "is_passed": true
+  },
+  {
+    "id": 52,
+    "comment": "Критерий 52: Проверка почты на временные адреса. В RegistrationView (jewshop/users/views.py) нет проверки почты через внешние сервисы (например, проверка на disposable).",
+    "is_passed": false
+  },
+  {
+    "id": 62,
+    "comment": "Критерий 62: Celery. В проекте отсутствуют настройки Celery и асинхронные задачи (например, для отправки писем).",
+    "is_passed": false
+  },
+  {
+    "id": 63,
+    "comment": "Критерий 63: Название магазина. Название магазина в шаблонах (например, jewshop/core/templates/core/content.html) указано как 'Fragile Mystery', а не 'Be Beauty'.",
+    "is_passed": false
+  }
+]

@@ -1,0 +1,164 @@
+```json
+[
+  {
+    "id": 1,
+    "comment": "Страница каталога (jewelry_catalog.html) и главная (home.html) отображают название, цену, фото и описание товара.",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "Детальная страница товара (jewelry_view.html) содержит полное описание, цену и кнопку добавления в корзину.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Логика добавления/удаления товаров и подсчет итоговой суммы реализована в cart/cart.py и cart/views.py.",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Форма заказа (order/forms.py) собирает данные покупателя, а CreateOrderView сохраняет их в БД.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Управление заказами реализовано через стандартную админку Django (order/admin.py).",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "Реализована регистрация (users/views.py RegistrationView) и вход (users/views.py LoginView).",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Поиск и фильтрация по категориям, цене и наличию реализованы в core/views.py (JewelryCatalog).",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Отсутствует страница личного кабинета для отслеживания статуса заказа. Нет соответствующего view в users/views.py или order/views.py.",
+    "is_passed": false
+  },
+  {
+    "id": 12,
+    "comment": "Используются именованные URL (core/urls.py, cart/urls.py) и теги {% url %} в шаблонах.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Бизнес-логика вынесена в cart/cart.py (сервис) и forms.py.",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "Используется базовый шаблон base.html, блоки и наследование (core/templates/core/content.html).",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "В cart/cart.py и core/views.py присутствуют docstring для методов и классов.",
+    "is_passed": true
+  },
+  {
+    "id": 19,
+    "comment": "Кастомная страница 404 настроена в jewshop/urls.py (handler404) и pages/views.py.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "Во всех POST-формах присутствует {% csrf_token %} (order/create_order.html, users/templates/registration/login.html и др.).",
+    "is_passed": true
+  },
+  {
+    "id": 23,
+    "comment": "Используется Bootstrap 5 (base.html) и адаптивные классы (col-12, col-md-4 и др.).",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Уведомления через django.contrib.messages не используются ни в одном из представлений.",
+    "is_passed": false
+  },
+  {
+    "id": 26,
+    "comment": "Кеширование не реализовано (нет декораторов @cache_page в core/views.py).",
+    "is_passed": false
+  },
+  {
+    "id": 27,
+    "comment": "Разбивка на страницы не реализована (нет атрибута paginate_by в JewelryCatalog).",
+    "is_passed": false
+  },
+  {
+    "id": 29,
+    "comment": "DRF не подключен (нет djangorestframework в requirements.txt).",
+    "is_passed": false
+  },
+  {
+    "id": 30,
+    "comment": "Unit-тесты присутствуют в core/tests/, cart/tests_cart.py, order/tests/, users/tests.py.",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Файл docker-compose.yml отсутствует в структуре проекта.",
+    "is_passed": false
+  },
+  {
+    "id": 32,
+    "comment": "Модель Review (core/models.py) позволяет оставлять текстовые отзывы и рейтинг.",
+    "is_passed": true
+  },
+  {
+    "id": 33,
+    "comment": "Файл README.md присутствует в корне проекта.",
+    "is_passed": true
+  },
+  {
+    "id": 34,
+    "comment": "Файл requirements.txt присутствует в корне проекта.",
+    "is_passed": true
+  },
+  {
+    "id": 36,
+    "comment": "Хранение фото локальное (ImageField в core/models.py), а не в S3-подобном хранилище.",
+    "is_passed": false
+  },
+  {
+    "id": 38,
+    "comment": "E2E-тесты написаны на Selenium (e2e-testing/tests_pages.py), а не на Playwright.",
+    "is_passed": false
+  },
+  {
+    "id": 39,
+    "comment": "Статические страницы 'Об авторе', 'О доставке' и 'Оплата' реализованы в pages/.",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "Пользовательская модель User наследуется от AbstractUser (users/models.py).",
+    "is_passed": true
+  },
+  {
+    "id": 45,
+    "comment": "В cart/templates/cart/cart.html при отсутствии товаров выводится сообщение 'Пока товаров нет'.",
+    "is_passed": true
+  },
+  {
+    "id": 52,
+    "comment": "При регистрации аккаунт не проверяется на внешнем сервисе (нет логики email verification в users/views.py).",
+    "is_passed": false
+  },
+  {
+    "id": 62,
+    "comment": "Celery не настроен (нет CELERY_BROKER_URL в settings.py, нет задач).",
+    "is_passed": false
+  },
+  {
+    "id": 63,
+    "comment": "Название магазина 'Fragile Mystery', а не 'Be Beauty'.",
+    "is_passed": false
+  }
+]
+```

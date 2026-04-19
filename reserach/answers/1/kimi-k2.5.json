@@ -1,0 +1,164 @@
+ ```json
+[
+  {
+    "id": 1,
+    "comment": "Реализована страница каталога (JewelryCatalog в core/views.py) с отображением названия, цены, фото (main_photo) и краткого описания товаров в шаблоне jewelry_catalog.html",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "Реализована детальная страница товара (JewelryView в core/views.py, шаблон jewelry_view.html) с полным описанием, ценой и кнопкой добавления в корзину (ссылка на cart_add)",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Реализована корзина (cart/cart.py) с методами add, remove, get_total_price. В шаблоне cart.html отображается итоговая сумма и возможность удаления товаров",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Реализована форма OrderForm (order/forms.py) с полями ФИО, email, телефон, город, адрес, индекс. Данные сохраняются в модель Order (order/models.py) при оформлении заказа",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Настроена админка Django: JewelryAdmin, CategoryAdmin, MaterialAdmin, MetalAdmin (core/admin.py) и OrderAdmin (order/admin.py) для управления товарами и заказами",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "Реализована регистрация (RegistrationView в users/views.py) и вход (LoginView) с использованием кастомной модели User. Есть шаблоны login.html и register.html",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Реализован поиск и фильтрация в JewelryCatalog (core/views.py): по категориям (jew_cat), цене (min_price/max_price), наличию (is_in_stock), материалам и фурнитуре",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Отсутствует личный кабинет пользователя с историей заказов. Модель Order не связана с пользователем (нет ForeignKey на User), нет view для просмотра списка заказов пользователем. CreateOrderDoneView только показывает номер последнего заказа",
+    "is_passed": false
+  },
+  {
+    "id": 12,
+    "comment": "Используются именованные URL (name='cart', name='jewelries' и др.) и {% url %} в шаблонах. Пространства имён не используются (app_name), но хардкод путей отсутствует",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Бизнес-логика корзины вынесена в отдельный класс Cart (cart/cart.py), но логика создания заказа (создание OrderItem, очистка корзины) находится прямо в CreateOrderView.form_valid (order/views.py), не вынесена в сервисы",
+    "is_passed": false
+  },
+  {
+    "id": 15,
+    "comment": "Используется base.html как базовый шаблон, content.html его расширяет, остальные шаблоны расширяют content.html. Используются блоки {% block content %}, {% block maincontent %} и include",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "Docstring присутствуют в классе Cart (cart/cart.py) и его методах, а также в моделях (core/models.py). Комментарии к неочевидным участкам кода есть",
+    "is_passed": true
+  },
+  {
+    "id": 19,
+    "comment": "Настроена кастомная страница 404: handler404 в jewshop/urls.py указывает на pages.views.page_not_found_view, существует шаблон pages/404.html",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "Во всех POST-формах (login.html, register.html, create_order.html, password_change_form.html и др.) присутствует {% csrf_token %}",
+    "is_passed": true
+  },
+  {
+    "id": 23,
+    "comment": "Используется Bootstrap 5 (CDN в base.html), responsive design через классы Bootstrap (col-md-4, col-lg-2 и т.д.)",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Отсутствует использование django.contrib.messages. В views.py нет вызовов messages.success/add после добавления в корзину или оформления заказа",
+    "is_passed": false
+  },
+  {
+    "id": 26,
+    "comment": "Кеширование не используется. Нет декораторов cache_page, не используется django.core.cache",
+    "is_passed": false
+  },
+  {
+    "id": 27,
+    "comment": "Пагинация не реализована. В JewelryCatalog (core/views.py) нет paginate_by, выводятся все товары без разбивки на страницы",
+    "is_passed": false
+  },
+  {
+    "id": 29,
+    "comment": "DRF не используется. В requirements.txt нет djangorestframework, нет serializers.py или API endpoints",
+    "is_passed": false
+  },
+  {
+    "id": 30,
+    "comment": "Unit-тесты написаны: test_models.py, test_urls.py, test_views.py (core/tests), test_views.py, test_urls.py (order/tests), tests_cart.py (cart), tests.py (users)",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Docker Compose не используется. В проекте отсутствуют Dockerfile и docker-compose.yml",
+    "is_passed": false
+  },
+  {
+    "id": 32,
+    "comment": "Реализована модель Review (core/models.py) с полями stars (рейтинг 1-5) и text (текст отзыва). Отзывы выводятся на главной странице (home.html)",
+    "is_passed": true
+  },
+  {
+    "id": 33,
+    "comment": "Файл README.md присутствует в корне проекта",
+    "is_passed": true
+  },
+  {
+    "id": 34,
+    "comment": "Файл requirements.txt присутствует в корне проекта с перечнем зависимостей",
+    "is_passed": true
+  },
+  {
+    "id": 36,
+    "comment": "Фото загружаются локально (upload_to='photos/%Y/%m/%d/'), не в S3. В settings.py нет конфигурации AWS/S3 (django-storages не используется)",
+    "is_passed": false
+  },
+  {
+    "id": 38,
+    "comment": "E2e-тесты реализованы на Selenium (e2e-testing/tests_pages.py использует webdriver.Chrome), а не на Playwright. В requirements.txt указан selenium, а не playwright",
+    "is_passed": false
+  },
+  {
+    "id": 39,
+    "comment": "Реализованы статические страницы: about.html (О нас), delivery.html (О доставке), payment.html (Оплата). Есть соответствующие views (AboutView, DeliveryView, PaymentView)",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "Определена кастомная модель User (users/models.py), наследуемая от AbstractUser, с полем email как USERNAME_FIELD",
+    "is_passed": true
+  },
+  {
+    "id": 45,
+    "comment": "В шаблоне cart.html при отсутствии товаров выводится 'Пока товаров нет', а не 'Корзина пуста' как требуется критерием",
+    "is_passed": false
+  },
+  {
+    "id": 52,
+    "comment": "Проверка email на временность не реализована. В RegistrationForm (users/forms.py) используется стандартная EmailField без внешней валидации",
+    "is_passed": false
+  },
+  {
+    "id": 62,
+    "comment": "Celery не используется. В проекте нет tasks.py, нет конфигурации CELERY_BROKER_URL в settings.py",
+    "is_passed": false
+  },
+  {
+    "id": 63,
+    "comment": "Магазин называется 'Fragile Mystery' (Хрупкое чудо), а не 'Be Beauty'. Название указано в логотипе, admin.site.site_header и README",
+    "is_passed": false
+  }
+]
+```

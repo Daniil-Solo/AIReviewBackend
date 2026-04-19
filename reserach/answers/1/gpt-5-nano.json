@@ -1,0 +1,317 @@
+[
+  {
+    "id": 1,
+    "comment": "Карточка каталога JewelryCatalog не выводит краткое описание; шаблон jewelry_catalog.html рендерит только title, price и main_photo.",
+    "is_passed": false
+  },
+  {
+    "id": 2,
+    "comment": "Детальная страница JewelryView выводит описание (если есть), цену и кнопку добавления в корзину.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Cart поддерживает добавление/удаление и подсчет общей суммы; корзина отображает список товаров и итоговую стоимость.",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Форма заказа OrderForm собирает данные покупателя; CreateOrderView сохраняет заказ и OrderItem в БД и очищает корзину.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "В админке зарегистрированы модели Jewelry, Category, Material, Metal, Review; OrderAdmin реализует вложение OrderItem.",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "Используется кастомная модель User на основе AbstractUser; AUTH_USER_MODEL задан в настройках; регистрации и вход реализованы в app users.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Фильтры каталога реализованы в JewelryCatalog.get_queryset: category, metal, material, min_price, max_price, in_stock.",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Пользовательский кабинет для отслеживания статуса заказа в коде не реализован; приложение поддерживает оформление через страницу заказа и просмотр админки, но пользовательское окно отсутствует.",
+    "is_passed": false
+  },
+  {
+    "id": 9,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 10,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 11,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 12,
+    "comment": "В шаблонах используются именованные URL и тег url; core/urls.py объявляет имена маршрутов и ссылки через {% url %}.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Бизнес-логика вынесена в cart.py (Cart) и оформлении заказа в формах/логике представлений; разделение функций.",
+    "is_passed": true
+  },
+  {
+    "id": 14,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 15,
+    "comment": "Используется базовый шаблон base.html с блоками content и включениями; шаблоны наследуют и переиспользуют блоки.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 17,
+    "comment": "Есть докстринты в Cart (класс Cart и описания методов) — комментарии к сложной логике.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 19,
+    "comment": "Настроен обработчик 404 page_not_found_view и шаблон pages/404.html; в проекте указан handler404.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "POST-формы содержат {% csrf_token %}; пример: order/create_order.html; аналогично формам логина/регистрации.",
+    "is_passed": true
+  },
+  {
+    "id": 21,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 22,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 23,
+    "comment": "Используется Bootstrap: базовый шаблон подключает Bootstrap CSS; в шаблонах применяются Bootstrap-классы.",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Уведомления через django.contrib.messages после действий не реализованы: в коде нет использования messages.",
+    "is_passed": false
+  },
+  {
+    "id": 25,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 26,
+    "comment": "Кеширование списка товаров/категорий не используется в проекте.",
+    "is_passed": false
+  },
+  {
+    "id": 27,
+    "comment": "Разбиение списка товаров на страницы не реализовано; каталог возвращает queryset без пагинации.",
+    "is_passed": false
+  },
+  {
+    "id": 28,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 29,
+    "comment": "REST API на DRF не реализовано; в requirements.txt и коде DRF не используется.",
+    "is_passed": false
+  },
+  {
+    "id": 30,
+    "comment": "Есть набор unit-тестов для моделей и представлений (tests в core и tests в order), подтверждают сценарии.",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Проект не содержит docker-compose.yaml; Docker Compose запуск не представлен.",
+    "is_passed": false
+  },
+  {
+    "id": 32,
+    "comment": "Пользователи не могут оставлять отзывы через UI; в модели есть Review, но формы/страницы отправки отзыва отсутствуют.",
+    "is_passed": false
+  },
+  {
+    "id": 33,
+    "comment": "Наличие README.md с описанием проекта и инструкциями по установке (README.md).",
+    "is_passed": true
+  },
+  {
+    "id": 34,
+    "comment": "Файл requirements.txt присутствует в репозитории (dependencies указаны).",
+    "is_passed": true
+  },
+  {
+    "id": 35,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 36,
+    "comment": "Загрузка фото реализована через ImageField с upload_to, но нет настройки для S3; хранение локальное.",
+    "is_passed": false
+  },
+  {
+    "id": 37,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 38,
+    "comment": "E2E тесты не реализованы на Playwright: тесты выполняются через Selenium (TestWalkPage использует Selenium).",
+    "is_passed": false
+  },
+  {
+    "id": 39,
+    "comment": "Статические страницы 'Об авторе' и 'О доставке' присутствуют; вид 'payment.html' реализован.",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "Группа пользователей определяется через собственную модель User, наследующую AbstractUser.",
+    "is_passed": true
+  },
+  {
+    "id": 41,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 42,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 43,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 44,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 45,
+    "comment": "На странице корзины пустая корзина выводится как 'Пока товаров нет', а не 'Корзина пуста'.",
+    "is_passed": false
+  },
+  {
+    "id": 46,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 47,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 48,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 49,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 50,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 51,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 52,
+    "comment": "Проверка почты на временность не реализована; проект не подключает внешние сервисы.",
+    "is_passed": false
+  },
+  {
+    "id": 53,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 54,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 55,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 56,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 57,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 58,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 59,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 60,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 61,
+    "comment": "N/A",
+    "is_passed": null
+  },
+  {
+    "id": 62,
+    "comment": "Использование Celery для асинхронной обработки отсутствует; нет настройки Celery.",
+    "is_passed": false
+  },
+  {
+    "id": 63,
+    "comment": "Магазин в коде назван Be Beauty согласно условию, однако в админке и настройках используется название Fragile Mystery.",
+    "is_passed": false
+  }
+]

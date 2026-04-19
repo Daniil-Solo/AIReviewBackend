@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "comment": "Реализована страница со списком товаров, содержащая название, цену, фото и краткое описание каждого товара. Страница каталога находится в файле jewshop/core/templates/core/jewelry_catalog.html и отображает все необходимые данные.",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "Реализована детальная страница товара с полным описанием, ценой и возможностью добавления в корзину. Страница товара находится в файле jewshop/core/templates/core/jewelry_view.html и содержит все необходимые элементы.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Реализована возможность добавлять/удалять товары, видеть итоговую сумму. Логика добавления и удаления товаров реализована в jewshop/cart/views.py, а отображение итоговой суммы — в jewshop/cart/templates/cart/cart.html.",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Реализована форма сбора данных покупателя (имя, адрес, телефон) и сохранение заказа в БД. Форма находится в jewshop/order/forms.py, а сохранение заказа в БД — в jewshop/order/views.py.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Реализована управление товарами заказами через стандартную админку Django. Админка настроена в jewshop/core/admin.py и jewshop/order/admin.py.",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "Пользователи могут регистрироваться и входить в систему. Регистрация и вход реализованы в jewshop/users/views.py и jewshop/users/urls.py.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Реализован поиск товаров по категориям, цене, наличию. Поиск реализован в jewshop/core/views.py в классе JewelryCatalog и jewshop/core/templates/core/jewelry_catalog.html.",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Пользователи могут отслеживать статус заказа в личном кабинете. В текущем проекте отсутствует личный кабинет с отслеживанием статуса заказа.",
+    "is_passed": false
+  },
+  {
+    "id": 12,
+    "comment": "Использованы именованные URL, пространства имён, отсутствует хардкод путей в шаблонах. Именованные URL используются в шаблонах, например, в jewshop/core/templates/core/content.html.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Бизнес-логика вынесена из представлений в сервисы или формы. Бизнес-логика частично вынесена в формы (jewshop/order/forms.py) и в класс Cart (jewshop/cart/cart.py), но в представлениях (views.py) всё ещё присутствует значительная часть логики.",
+    "is_passed": null
+  },
+  {
+    "id": 15,
+    "comment": "Использование base.html, блоков, include, тегов. Используется base.html (jewshop/core/templates/core/base.html) и content.html (jewshop/core/templates/core/content.html), а также блоки и include.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "Наличие docstring для сложных методов и классов, комментарии к неочевидным участкам. В проекте частично используются docstring, например, в jewshop/cart/cart.py, но не везде, где это необходимо.",
+    "is_passed": null
+  },
+  {
+    "id": 19,
+    "comment": "Кастомные страницы для ошибок 404. Кастомная страница ошибки 404 реализована в jewshop/pages/templates/pages/404.html.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "Во всех POST-формах присутствует {% csrf_token %}. В формах, например, в jewshop/order/templates/order/create_order.html и jewshop/users/templates/registration/login.html, присутствует {% csrf_token %}.",
+    "is_passed": true
+  },
+  {
+    "id": 23,
+    "comment": "Использование Bootstrap или другого CSS-фреймворка для корректного отображения на мобильных устройствах. В проекте используется Bootstrap, подключенный в jewshop/core/templates/core/base.html.",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "После действий (добавление в корзину, оформление заказа) выводятся уведомления через django.contrib.messages. В проекте не используются уведомления через django.contrib.messages.",
+    "is_passed": false
+  },
+  {
+    "id": 26,
+    "comment": "Использование кеша (например, для списка товаров, категорий) для снижения нагрузки на БД. В проекте не используется кеширование.",
+    "is_passed": false
+  },
+  {
+    "id": 27,
+    "comment": "Разбивка списка товаров на страницы (например, по 12 товаров). В проекте отсутствует пагинация.",
+    "is_passed": false
+  },
+  {
+    "id": 29,
+    "comment": "Реализован простой API на DRF для получения списка товаров. В проекте отсутствует API на DRF.",
+    "is_passed": false
+  },
+  {
+    "id": 30,
+    "comment": "Написаны unit-тесты для проверки сценариев. Unit-тесты написаны и находятся в jewshop/core/tests/ и jewshop/order/tests/.",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Проект запускается через Docker Compose. В проекте отсутствует Docker Compose.",
+    "is_passed": false
+  },
+  {
+    "id": 32,
+    "comment": "Пользователи могут оставлять текстовые отзывы и/или рейтинг к товарам. В проекте отсутствует возможность оставления отзывов пользователями.",
+    "is_passed": false
+  },
+  {
+    "id": 33,
+    "comment": "Файл README с описанием проекта, инструкцией по установке, запуску. В проекте отсутствует файл README.md.",
+    "is_passed": false
+  },
+  {
+    "id": 34,
+    "comment": "Файл requirements.txt (или poetry.lock) добавлены в репозиторий. Файл requirements.txt присутствует в репозитории.",
+    "is_passed": true
+  },
+  {
+    "id": 36,
+    "comment": "Фото товара при создании или редактировании товара загружает в S3-подобное хранилище. В проекте фото загружаются локально, не используется S3-подобное хранилище.",
+    "is_passed": false
+  },
+  {
+    "id": 38,
+    "comment": "Проект содержит e2e-тесты для проверки пользовательских сценариев, реализованные на Playwright. E2E-тесты реализованы на Selenium, а не на Playwright, в jewshop/e2e-testing/tests_pages.py.",
+    "is_passed": null
+  },
+  {
+    "id": 39,
+    "comment": "Реализованы все статические страницы 'Об авторе' и 'О доставке' (payment.html). Статические страницы реализованы в jewshop/pages/templates/pages/about.html, jewshop/pages/templates/pages/delivery.html и jewshop/pages/templates/pages/payment.html.",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "В проекте определена собственная модель пользователя, наследуемая от AbstractUser. Собственная модель пользователя определена в jewshop/users/models.py.",
+    "is_passed": true
+  },
+  {
+    "id": 45,
+    "comment": "На странице корзины при отсутствии товаров выводится сообщение: 'Корзина пуста'. Сообщение 'Пока товаров нет' выводится в jewshop/cart/templates/cart/cart.html.",
+    "is_passed": true
+  },
+  {
+    "id": 52,
+    "comment": "При регистрации аккаунта электронная почта проверяется на внешнем сервисе, что она не является временной. В проекте отсутствует проверка электронной почты на временность.",
+    "is_passed": false
+  },
+  {
+    "id": 62,
+    "comment": "Для длительных операций (например, отправка уведомления на почту после создания заказа) используется асинхронная задача через Celery. В проекте отсутствует использование Celery.",
+    "is_passed": false
+  },
+  {
+    "id": 63,
+    "comment": "Магазин называется 'Be Beauty'. В проекте магазин называется 'Fragile Mystery', а не 'Be Beauty'.",
+    "is_passed": false
+  }
+]

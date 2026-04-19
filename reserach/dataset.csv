@@ -1,0 +1,3 @@
+id, link, branch, criteria_path, reference_path
+1,https://github.com/Daniil-Solo/Jewelry-Shop-on-Django,master,data/1/criteria.json,data/1/reference.json
+2,https://github.com/Daniil-Solo/PastaBeanAuthService,master,data/2/criteria.json,data/2/reference.json
