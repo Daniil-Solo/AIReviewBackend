@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "comment": "Project contains migrations directory with env.py and version files (e.g., 2105cf88eb29_init_db.py).",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "pyproject.toml contains [tool.ruff] configuration.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Project uses PostgreSQL (docker-compose.yaml: postgres:13.3, config.py: postgresql+asyncpg://...), not MySQL.",
+    "is_passed": false
+  },
+  {
+    "id": 4,
+    "comment": "src/constants.py defines PASSWORD_MIN_LENGTH = 8, used in src/services/password.py.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "src/constants.py defines AUTH_TOKEN_TTL = 60 * 60 * 24 (24 hours).",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "src/app.py defines add_service_exceptions function with @application.exception_handler(ServiceException).",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "FastAPI title in src/app.py is 'Shop Placement Platform', not 'Pasta Bean Auth Service'.",
+    "is_passed": false
+  },
+  {
+    "id": 8,
+    "comment": "src/app.py sets docs_url='/docs' only if app_config.is_debug is True, disabling it in production.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "Dates in cache are stored as ISO format strings (src/cache/repositories/session.py), not Unix timestamps.",
+    "is_passed": false
+  },
+  {
+    "id": 10,
+    "comment": "src/database/session.py sets autocommit=False in async_sessionmaker.",
+    "is_passed": true
+  },
+  {
+    "id": 11,
+    "comment": "Database model 'sign_ins' in src/database/models.py has 'logout_at' column, allowing SQL queries for logout time.",
+    "is_passed": true
+  },
+  {
+    "id": 12,
+    "comment": "Migration 1961c6ce7d4b_add_uniq_field.py creates unique constraint on 'users.email'.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Password data is stored in 'secure_user_infos' table, not in the 'users' table.",
+    "is_passed": false
+  },
+  {
+    "id": 14,
+    "comment": "Password validation logic is in src/services/password.py, not in the Pydantic model (UserRegisterDTO).",
+    "is_passed": false
+  },
+  {
+    "id": 15,
+    "comment": "Business logic is implemented in src/services/ (auth.py, password.py).",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "src/services/password.py uses os.urandom(32) for salt and hashlib.pbkdf2_hmac for hashing.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "src/endpoints/routers/auth.py implements /auth/register, /auth/login, and /auth/logout endpoints.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "No PUT /users/me endpoint is found. Available endpoints are GET /user/, POST /user/change_name, etc.",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "Integration tests exist in integration_tests/ and unit tests in tests/.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "No email verification logic or external service call is present in the code to verify email validity.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "docker-compose.test.yaml defines services for PostgreSQL and Redis, used by integration_tests/conftest.py.",
+    "is_passed": true
+  }
+]

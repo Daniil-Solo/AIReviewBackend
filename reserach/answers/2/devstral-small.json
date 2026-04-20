@@ -1,0 +1,109 @@
+```json
+[
+  {
+    "id": 1,
+    "comment": "Проект использует alembic-миграции, что подтверждается наличием папки migrations и файла alembic.ini.",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "В проекте используются линтеры, что подтверждается наличием конфигурации линтера ruff в файле pyproject.toml.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "В проекте используется MySQL в качестве основной базы данных, что подтверждается конфигурацией в файле src/config.py.",
+    "is_passed": false
+  },
+  {
+    "id": 4,
+    "comment": "Минимальная длина пароля составляет 8 символов, что подтверждается константой PASSWORD_MIN_LENGTH в файле src/constants.py.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Токен доступен в течение суток, что подтверждается константой AUTH_TOKEN_TTL в файле src/constants.py.",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "Приложение FastAPI имеет централизованный обработчик сервисных ошибок, что подтверждается функциями add_service_exceptions и add_other_exceptions в файле src/app.py.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Swagger-документация имеет заголовок 'Pasta Bean Auth Service', что подтверждается конфигурацией в файле src/app.py.",
+    "is_passed": false
+  },
+  {
+    "id": 8,
+    "comment": "В режиме Production нет доступа к Swagger-документации, что подтверждается конфигурацией в файле src/app.py.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "Даты в кэше хранятся в виде timestamp, что подтверждается методом __from_user_dto_to_json_string в файле src/cache/repositories/session.py.",
+    "is_passed": true
+  },
+  {
+    "id": 10,
+    "comment": "В проекте отключен автокоммит при работе с SQLAlchemy, что подтверждается конфигурацией в файле src/database/session.py.",
+    "is_passed": true
+  },
+  {
+    "id": 11,
+    "comment": "С помощью SQL и реализованных таблиц можно найти информацию о том, когда человек разлогинился из текущей сессии, что подтверждается наличием поля logout_at в таблице sign_ins.",
+    "is_passed": true
+  },
+  {
+    "id": 12,
+    "comment": "В системе не допускается существование двух пользователей с одинаковыми электронными почтами, что подтверждается уникальными ограничениями в миграциях.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Информация о пароле хранится в таблице users, что подтверждается наличием поля hashed_password в таблице secure_user_infos.",
+    "is_passed": true
+  },
+  {
+    "id": 14,
+    "comment": "Валидация пароля является частью Pydantic-модели, что подтверждается наличием метода validate_password в классе PasswordService.",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "Бизнес-логика находится в сервисах, что подтверждается наличием файлов в папке src/services.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "Пароль дополнительно просаливается, что подтверждается методом create_hashed_password_and_salt в классе PasswordService.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "В системе реализованы эндпоинты /auth/login, /auth/logout, /auth/register, что подтверждается файлом src/endpoints/routers/auth.py.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "В системе реализован эндпоинт для изменения информации о пользователе PUT /users/me, что подтверждается файлом src/endpoints/routers/user.py.",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "В проекте написаны интеграционные и юнит-тесты, что подтверждается наличием папок integration_tests и tests.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "Почта проверяется через внешний сервис, что она не является временной, что не подтверждается наличием соответствующего кода.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "Интеграционные тесты используют запущенные инстансы PostgreSQL и Redis, что подтверждается файлом docker-compose.test.yaml.",
+    "is_passed": true
+  }
+]
+```

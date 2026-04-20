@@ -1,0 +1,167 @@
+[
+  {
+    "id": 2,
+    "comment": "Валидация выполняется через Pydantic модели, например, CreateCourseRequest в src/api/admin/courses/schemas.py и LoginRequest в src/api/auth/schemas.py.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Настроены Alembic-миграции, папка alembic содержит env.py и множество файлов версий в alembic/versions (например, e967288e19c5_user.py).",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "В src/app.py реализован глобальный обработчик исключений add_exception_handler для ApplicationError и IncorrectUUIDError с возвратом кастомных JSON-ответов.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Используется Depends для инъекции зависимостей, например, в src/api/admin/courses/router.py для получения сервисов и текущего пользователя.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Используется CORSMiddleware в src/app.py (функция add_cors) для обработки CORS-заголовков.",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Реализована пагинация в эндпоинте получения курсов (src/api/courses/router.py, функция get_courses) с использованием класса Paginator из src/api/base_pagination.py.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "В pyproject.toml указан ruff в качестве линтера, а в readme.md описаны команды для его запуска.",
+    "is_passed": true
+  },
+  {
+    "id": 10,
+    "comment": "В проекте присутствуют как unit-тесты (папка unit_tests), так и интеграционные тесты (папка integration_tests).",
+    "is_passed": true
+  },
+  {
+    "id": 14,
+    "comment": "У полей Pydantic-моделей есть примеры (Field(examples=[...])), например, в src/api/base_schemas.py и src/api/auth/schemas.py.",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "Пароль хэшируется в src/infrastructure/security/password_service.py с использованием pbkdf2_hmac и соли.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "Работа с БД вынесена в классы Repository, например, SQLAlchemyUserRepository в src/infrastructure/sqlalchemy/users/repository.py.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "CORS политика настроена в src/app.py через функцию add_cors, разрешающая все источники в режиме отладки.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "В предоставленном коде не обнаружено использование фоновых задач (BackgroundTasks или Celery) для длительных операций.",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "В alembic/env.py используется стандартная библиотека logging, однако в основном коде приложения (src/app.py, сервисы) логирование практически отсутствует.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "Функции именуются согласно логике, например, get_actual_timetable_by_id в src/services/course_run/command_service.py.",
+    "is_passed": true
+  },
+  {
+    "id": 22,
+    "comment": "Публичные функции и методы классов имеют аннотации типов аргументов и возвращаемых значений (например, в src/services/auth/command_service.py).",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Состояние инкапсулировано в классах (Entity, Service, Repository), мутация глобальных переменных не обнаружена.",
+    "is_passed": true
+  },
+  {
+    "id": 25,
+    "comment": "В проекте не найдено использование генераторов (yield) для обработки больших последовательностей данных из БД или кэша.",
+    "is_passed": false
+  },
+  {
+    "id": 28,
+    "comment": "Избыточных сравнений с True/False не обнаружено. Используются конструкции вида 'if not credentials' или 'if course_from_cache'.",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Используются list comprehensions для преобразований, например, в src/api/admin/course_run/router.py: '[CourseRunDTO.from_domain(run)...]'.",
+    "is_passed": true
+  },
+  {
+    "id": 32,
+    "comment": "Магические числа вынесены в константы, например, TIME_TO_LIVE_AUTH_SESSION в src/domain/auth/constants.py.",
+    "is_passed": true
+  },
+  {
+    "id": 33,
+    "comment": "Сложные условия вынесены в методы, например, is_actual_by_date в src/domain/course_run/entities.py.",
+    "is_passed": true
+  },
+  {
+    "id": 35,
+    "comment": "Мутабельные аргументы по умолчанию не используются. В src/domain/courses/entities.py используется field(default_factory=list).",
+    "is_passed": true
+  },
+  {
+    "id": 37,
+    "comment": "Созданы утилитарные функции и методы, например, в src/infrastructure/security/password_service.py.",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "Используются pytest-фикстуры в integration_tests/conftest.py и параметризация в unit_tests/domain/auth/test_value_objects.py.",
+    "is_passed": true
+  },
+  {
+    "id": 41,
+    "comment": "Блокирующий синхронный код в асинхронных функциях не обнаружен. Для БД и Redis используются асинхронные драйверы.",
+    "is_passed": true
+  },
+  {
+    "id": 42,
+    "comment": "В коде не обнаружено использование asyncio.gather или asyncio.create_task для параллельного выполнения задач.",
+    "is_passed": false
+  },
+  {
+    "id": 43,
+    "comment": "Таймауты для внешних вызовов (БД, Redis) явно не установлены в конфигурации клиентов в src/infrastructure/sqlalchemy/session.py и src/infrastructure/redis/session.py.",
+    "is_passed": false
+  },
+  {
+    "id": 49,
+    "comment": "Секреты загружаются через Pydantic Settings из переменных окружения (.env), захардкоженных секретов в коде src/ не обнаружено.",
+    "is_passed": true
+  },
+  {
+    "id": 54,
+    "comment": "В корне проекта присутствует Dockerfile.production.",
+    "is_passed": true
+  },
+  {
+    "id": 55,
+    "comment": "Зависимости (Postgres, Redis) описаны в dev.docker-compose.yaml и test.docker-compose.yaml.",
+    "is_passed": true
+  },
+  {
+    "id": 65,
+    "comment": "Проект имеет четкую модульную структуру (api, domain, infrastructure, services).",
+    "is_passed": true
+  },
+  {
+    "id": 66,
+    "comment": "Бизнес-логика вынесена в сервисные классы в папке src/services (например, AuthCommandService).",
+    "is_passed": true
+  }
+]

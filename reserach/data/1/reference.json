@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Отслеживание заказа не реализовано, только его создание",
+    "is_passed": false
+  },
+  {
+    "id": 12,
+    "comment": "Для переход на страницу украшения используется свойство модели jew.get_absolute_url вместо указания названия пути и параметров",
+    "is_passed": false
+  },
+  {
+    "id": 13,
+    "comment": "Часть бизнес-логики содержится в формах и сервисе корзины",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "Комментарии почти отсутствуют в коде, а если есть, то они бесполезные",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 23,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Не реализовано вообще",
+    "is_passed": false
+  },
+  {
+    "id": 26,
+    "comment": "Не реализовано вообще",
+    "is_passed": false
+  },
+  {
+    "id": 27,
+    "comment": "Не реализовано вообще",
+    "is_passed": false
+  },
+  {
+    "id": 29,
+    "comment": "Проект не использует DRF",
+    "is_passed": false
+  },
+  {
+    "id": 30,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Нет Dockerfile и docker-compose, используется база данных Sqlite",
+    "is_passed": false
+  },
+  {
+    "id": 32,
+    "comment": "Пользователи не могут создавать отзывы, их может создавать только админ через админ-платформу. И относятся они не к товарам, а к магазину в целом.",
+    "is_passed": false
+  },
+  {
+    "id": 33,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 34,
+    "comment": "Полностью реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 36,
+    "comment": "Фото хранится в локальной файловой системе",
+    "is_passed": false
+  },
+  {
+    "id": 38,
+    "comment": "Тесты написаны на Selenium",
+    "is_passed": false
+  },
+  {
+    "id": 39,
+    "comment": "Страницы 'Об авторе' не существует",
+    "is_passed": false
+  },
+  {
+    "id": 40,
+    "comment": "Да, именно так",
+    "is_passed": true
+  },
+  {
+    "id": 45,
+    "comment": "Сообщение содержит 'Пока товаров нет' жирным шрифтом",
+    "is_passed": false
+  },
+  {
+    "id": 52,
+    "comment": "Такой проверки не реализовано",
+    "is_passed": false
+  },
+  {
+    "id": 62,
+    "comment": "Celery не используется в проекте",
+    "is_passed": false
+  },
+  {
+    "id": 63,
+    "comment": "Магазин называется Fragile Mystery",
+    "is_passed": false
+  }
+]

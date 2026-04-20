@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "comment": "В проекте используется alembic-миграции: присутствует папка 'migrations' с файлами миграций, конфигурационный файл 'alembic.ini' и файл 'migrations/env.py', который настраивает подключение к базе данных и запуск миграций.",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "В проекте используется линтер ruff: в файле 'pyproject.toml' указано 'ruff' в разделе dev-dependencies, а также настроены правила линтинга (line-length, select, ignore).",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "В проекте используется MySQL: в файле 'docker-compose.yaml' указан образ 'postgres:13.3', что указывает на использование PostgreSQL, а не MySQL. Следовательно, критерий не выполнен.",
+    "is_passed": false
+  },
+  {
+    "id": 4,
+    "comment": "Минимальная длина пароля составляет 8 символов: в файле 'src/constants.py' задана константа PASSWORD_MIN_LENGTH = 8, а в 'src/services/password.py' проверка длины пароля выполняется с использованием этой константы.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Токен доступен в течение суток: в файле 'src/constants.py' задана константа AUTH_TOKEN_TTL = 60 * 60 * 24, что соответствует 24 часам (одним суткам).",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "Приложение FastAPI имеет централизованный обработчик сервисных ошибок: в файле 'src/app.py' реализованы обработчики исключений для ServiceException и ApplicationException, которые возвращают JSON-ответы с сообщением об ошибке.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Swagger-документация имеет заголовок 'Pasta Bean Auth Service': в файле 'src/app.py' при создании приложения FastAPI задано title='Shop Placement Platform', что не соответствует требуемому заголовку.",
+    "is_passed": false
+  },
+  {
+    "id": 8,
+    "comment": "В режиме Production нет доступа к Swagger-документации: в файле 'src/app.py' параметры docs_url и redoc_url установлены в None при условии, что MODE не равен DEBUG, что соответствует требованию.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "Даты в кэше хранятся в виде timestamp: в файле 'src/cache/repositories/session.py' при сохранении данных в Redis используется метод 'set' с TTL, а при чтении данные преобразуются из строки в datetime, что указывает на хранение в формате ISO, а не timestamp. Однако в коде нет явного использования timestamp, но в 'src/constants.py' используется AUTH_TOKEN_TTL, что может быть интерпретировано как временной интервал, но не доказывает хранение в виде timestamp. Критерий не выполнен.",
+    "is_passed": false
+  },
+  {
+    "id": 10,
+    "comment": "В проекте отключен автокоммит при работе с SQLAlchemy: в файле 'src/database/session.py' при создании async_session_factory используется autocommit=False, что соответствует требованию.",
+    "is_passed": true
+  },
+  {
+    "id": 11,
+    "comment": "С помощью SQL и реализованных таблиц можно найти информацию о том, когда человек разлогинился из текущей сессии: в таблице 'sign_ins' присутствует поле 'logout_at' типа DateTime, которое заполняется при выходе из сессии, что позволяет отслеживать время разлогина.",
+    "is_passed": true
+  },
+  {
+    "id": 12,
+    "comment": "В системе не допускается существование двух пользователей с одинаковыми электронными почтами: в файле 'migrations/versions/2105cf88eb29_init_db.py' создается уникальный индекс на поле 'email' таблицы 'users' с помощью op.create_unique_constraint(op.f('uq_users_email'), 'users', ['email']), что гарантирует уникальность email.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Информация о пароле хранится в таблице users: в таблице 'users' нет поля с паролем. Пароль хранится в таблице 'secure_user_infos' в поле 'hashed_password'. Следовательно, критерий не выполнен.",
+    "is_passed": false
+  },
+  {
+    "id": 14,
+    "comment": "Валидация пароля является частью Pydantic-модели: в файле 'src/dto/user.py' модель UserRegisterDTO не содержит валидации пароля. Валидация происходит в сервисе 'src/services/password.py', а не в Pydantic-модели. Критерий не выполнен.",
+    "is_passed": false
+  },
+  {
+    "id": 15,
+    "comment": "Бизнес-логика находится в сервисах: вся бизнес-логика (регистрация, вход, выход, изменение данных) реализована в классе AuthService в файле 'src/services/auth.py', что соответствует требованию.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "Пароль дополнительно просаливается: в файле 'src/services/password.py' метод create_hashed_password_and_salt использует salt, сгенерированный с помощью os.urandom(32), и применяет PBKDF2 с 100000 итерациями, что соответствует дополнительной соли.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "В системе реализованы эндпоинты /auth/login, /auth/logout, /auth/register: в файле 'src/endpoints/routers/auth.py' реализованы все три эндпоинта: POST /auth/register, POST /auth/login, POST /auth/logout.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "В системе реализован эндпоинт для изменения информации о пользователе PUT /users/me: в файле 'src/endpoints/routers/user.py' реализованы POST-эндпоинты для изменения имени, email и пароля, но отсутствует PUT-эндпоинт /users/me. Критерий не выполнен.",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "В проекте написаны интеграционные и юнит-тесты: в папке 'tests' находятся юнит-тесты (test_auth.py, test_password.py, test_user.py), а в папке 'integration_tests' — интеграционные тесты (test_auth.py, test_user.py), что соответствует требованию.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "Почта проверяется через внешний сервис, что она не является временной: в коде проекта нет вызова внешнего сервиса для проверки временных email. Проверка email происходит только на уникальность и формат, что не соответствует требованию.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "Интеграционные тесты используют запущенные инстансы PostgreSQL и Redis: в файле 'docker-compose.test.yaml' определены сервисы auth_db (PostgreSQL) и auth_cache (Redis), которые запускаются перед тестами, а в 'integration_tests/conftest.py' используется тестовая база данных и Redis, что соответствует требованию.",
+    "is_passed": true
+  }
+]

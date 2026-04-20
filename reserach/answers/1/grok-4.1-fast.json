@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "comment": "В core/templates/core/jewelry_catalog.html показаны title, price, main_photo для jewelries, но отсутствует краткое описание (description не отображается в списке). Аналогично в home.html.",
+    "is_passed": false
+  },
+  {
+    "id": 2,
+    "comment": "В core/templates/core/jewelry_view.html полное описание (jew.description), цена (jew.price), кнопка добавления в корзину ({% url \"cart_add\" jew.slug %}) при наличии и авторизации.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "В cart/cart.html таблица с товарами, quantity, total_price, ссылки на удаление (cart_remove) и добавление (cart_add), итого cart.get_total_price.",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "В order/templates/order/create_order.html форма OrderForm с full_name, email, phone, city, address, postal_code; сохраняется в order/models.py Order и OrderItem.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "core/admin.py регистрирует Jewelry, Category и др.; order/admin.py регистрирует Order с OrderItemInline.",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "users/views.py RegistrationView и LoginView; templates/registration/register.html и login.html.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "core/views.py Search по title__icontains; JewelryCatalog.get_queryset фильтры по category, metal, material, min_price/max_price, in_stock в core/templates/core/jewelry_catalog.html.",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Отсутствует личный кабинет; order/models.py Order не связан с User; нет views для отслеживания заказов.",
+    "is_passed": false
+  },
+  {
+    "id": 12,
+    "comment": "Именованные URL в core/urls.py ('home', 'catalog'), cart/urls.py ('cart_add'); в шаблонах {% url 'cart' %}, нет хардкода; app_name отсутствует во всех urls.py.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Логика корзины в cart/cart.py (класс Cart); фильтры в core/views.py JewelryCatalog.get_queryset; check_order в order/views.py; не полностью вынесено в сервисы/формы.",
+    "is_passed": false
+  },
+  {
+    "id": 15,
+    "comment": "core/templates/core/base.html, content.html extends с block maincontent; использует {% load static %}, {% url %}, {% for %}, {% if %} в jewelry_catalog.html и др.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "cart/cart.py docstrings для класса Cart и методов (add, remove и т.д.); core/models.py без docstrings; views.py без; комментарии в cart.py и tests.",
+    "is_passed": true
+  },
+  {
+    "id": 19,
+    "comment": "pages/templates/pages/404.html; jewshop/urls.py handler404 = 'pages.views.page_not_found_view'.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "{% csrf_token %} в order/create_order.html, users/templates/registration/register.html, login.html.",
+    "is_passed": true
+  },
+  {
+    "id": 23,
+    "comment": "core/templates/core/base.html использует Bootstrap 5 CDN; responsive классы col-lg-*, viewport meta; styles.css с media queries.",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Отсутствует django.contrib.messages в views (cart/views.py, order/views.py, users/views.py); нет сообщений после add_to_cart или order.",
+    "is_passed": false
+  },
+  {
+    "id": 26,
+    "comment": "Нет CACHES в jewshop/settings.py; нет @cache_page или cache в views/core/views.py JewelryCatalog.",
+    "is_passed": false
+  },
+  {
+    "id": 27,
+    "comment": "core/views.py JewelryCatalog ListView без paginate_by; jewelry_catalog.html без пагинации.",
+    "is_passed": false
+  },
+  {
+    "id": 29,
+    "comment": "Нет DRF (djangorestframework) в requirements.txt; нет api/ или DRF views.",
+    "is_passed": false
+  },
+  {
+    "id": 30,
+    "comment": "core/tests/test_models.py, test_views.py, test_urls.py; cart/tests_cart.py; order/tests/test_views.py, test_urls.py; users/tests.py.",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Нет docker-compose.yml или Dockerfile в структуре проекта.",
+    "is_passed": false
+  },
+  {
+    "id": 32,
+    "comment": "core/models.py Review с title, stars, text; отображается в home.html; нет формы/вью для добавления отзыва пользователем.",
+    "is_passed": false
+  },
+  {
+    "id": 33,
+    "comment": "README.md присутствует в структуре.",
+    "is_passed": true
+  },
+  {
+    "id": 34,
+    "comment": "requirements.txt присутствует с зависимостями (Django==4.0.3 и др.).",
+    "is_passed": true
+  },
+  {
+    "id": 36,
+    "comment": "core/models.py Jewelry.main_photo = ImageField(upload_to='photos/%Y/%m/%d/'); локальное хранение media/.",
+    "is_passed": false
+  },
+  {
+    "id": 38,
+    "comment": "e2e-testing/tests_pages.py использует Selenium, не Playwright.",
+    "is_passed": false
+  },
+  {
+    "id": 39,
+    "comment": "pages/templates/pages/about.html ('О нас'), delivery.html, payment.html.",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "users/models.py class User(AbstractUser); jewshop/settings.py AUTH_USER_MODEL = 'users.User'.",
+    "is_passed": true
+  },
+  {
+    "id": 45,
+    "comment": "cart/templates/cart/cart.html: '<b>Пока товаров нет</b>' вместо 'Корзина пуста'.",
+    "is_passed": false
+  },
+  {
+    "id": 52,
+    "comment": "users/forms.py RegistrationForm.EmailField без внешней проверки (только валидация EmailField).",
+    "is_passed": false
+  },
+  {
+    "id": 62,
+    "comment": "Нет Celery в requirements.txt; order/views.py CreateOrderView.form_valid сохраняет синхронно, без задач.",
+    "is_passed": false
+  },
+  {
+    "id": 63,
+    "comment": "core/admin.py admin.site.site_title = 'Fragile Mystery'; templates с 'Fragile Mystery', не 'Be Beauty'.",
+    "is_passed": false
+  }
+]

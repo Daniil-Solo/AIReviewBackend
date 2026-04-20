@@ -1,0 +1,169 @@
+```json
+[
+  {
+    "id": 2,
+    "comment": "Pydantic models are used for validation in schemas (e.g., src/api/admin/courses/schemas.py, src/api/auth/schemas.py).",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Alembic migrations are configured in the alembic/versions/ directory (e.g., 2504c51722b5_course.py).",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Global exception handlers are defined in src/app.py (handle_application_error, handler_incorrect_uuid_error).",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Dependency injection is used via Depends() in routers (e.g., src/api/admin/courses/dependencies.py).",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "CORS middleware is configured in src/app.py (add_cors function).",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Pagination is implemented in src/api/base_pagination.py using the Paginator class.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "Linter configuration is present in pyproject.toml (ruff).",
+    "is_passed": true
+  },
+  {
+    "id": 10,
+    "comment": "Tests exist in unit_tests/ and integration_tests/ directories.",
+    "is_passed": true
+  },
+  {
+    "id": 14,
+    "comment": "Pydantic models use Field with examples (e.g., src/api/base_schemas.py, src/api/health_check.py).",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "Password hashing is implemented using hashlib.pbkdf2_hmac in src/infrastructure/security/password_service.py.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "Data access is abstracted via Repository/DAO pattern (src/infrastructure/sqlalchemy/*/repository.py and src/domain/*/repository.py).",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "CORS policy is configured in src/app.py.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "No background tasks (BackgroundTasks or asyncio.create_task) found in the codebase.",
+    "is_passed": null
+  },
+  {
+    "id": 19,
+    "comment": "No Python logging module usage found; only print in shell script entrypoint.sh.",
+    "is_passed": null
+  },
+  {
+    "id": 21,
+    "comment": "Functions are named according to their logic (e.g., get_courses, create_course, update_profile).",
+    "is_passed": true
+  },
+  {
+    "id": 22,
+    "comment": "Public functions and classes have type annotations (e.g., src/api/admin/courses/router.py).",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "State is encapsulated in classes; no mutation of global variables found.",
+    "is_passed": true
+  },
+  {
+    "id": 25,
+    "comment": "No generators (yield) found in the codebase.",
+    "is_passed": null
+  },
+  {
+    "id": 28,
+    "comment": "No redundant comparisons like 'if is_valid:' found; conditions are explicit.",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "List/dict/set comprehensions are used instead of map/filter with lambdas (e.g., src/api/courses/schemas.py).",
+    "is_passed": true
+  },
+  {
+    "id": 32,
+    "comment": "Magic numbers/strings are extracted to named constants (e.g., src/domain/auth/constants.py, src/domain/courses/constants.py).",
+    "is_passed": true
+  },
+  {
+    "id": 33,
+    "comment": "Complex conditions are broken into named methods (e.g., __matched in src/services/courses/query_service_for_talent.py).",
+    "is_passed": true
+  },
+  {
+    "id": 35,
+    "comment": "No mutable default arguments found; None is used instead (e.g., def func(array: list | None = None)).",
+    "is_passed": true
+  },
+  {
+    "id": 37,
+    "comment": "No custom reusable decorators found in the codebase.",
+    "is_passed": null
+  },
+  {
+    "id": 40,
+    "comment": "Pytest fixtures and parameterization are used in unit_tests/ and integration_tests/.",
+    "is_passed": true
+  },
+  {
+    "id": 41,
+    "comment": "All database and cache operations are asynchronous; no blocking calls (time.sleep, requests) found.",
+    "is_passed": true
+  },
+  {
+    "id": 42,
+    "comment": "No parallel async task execution (asyncio.gather or create_task) found.",
+    "is_passed": null
+  },
+  {
+    "id": 43,
+    "comment": "No timeout configuration (asyncio.timeout or client timeout params) found.",
+    "is_passed": null
+  },
+  {
+    "id": 49,
+    "comment": "Secrets are loaded from environment variables via pydantic-settings in src/config.py.",
+    "is_passed": true
+  },
+  {
+    "id": 54,
+    "comment": "Dockerfile.production exists.",
+    "is_passed": true
+  },
+  {
+    "id": 55,
+    "comment": "Docker Compose files exist (dev.docker-compose.yaml, test.docker-compose.yaml).",
+    "is_passed": true
+  },
+  {
+    "id": 65,
+    "comment": "Project uses modular folder structure (src/api, src/domain, src/infrastructure, src/services).",
+    "is_passed": true
+  },
+  {
+    "id": 66,
+    "comment": "Business logic is separated from endpoints and located in service classes (src/services/).",
+    "is_passed": true
+  }
+]
+```

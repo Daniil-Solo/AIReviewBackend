@@ -154,6 +154,16 @@ services:
     depends_on:
       - redis
 
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    ports:
+      - "6006:6006"
+      - "4317:4317"
+    environment:
+      - PHOENIX_WORKING_DIR=/mnt/data
+    volumes:
+      - phoenix_data:/mnt/data
+
 volumes:
   postgres_data:
   loki_data:
@@ -161,6 +171,7 @@ volumes:
   minio_data:
   redis_data:
   redisinsight_data:
+  phoenix_data:
 
 networks:
   autoreviewer:

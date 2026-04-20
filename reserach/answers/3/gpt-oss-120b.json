@@ -1,0 +1,167 @@
+[
+  {
+    "id": 2,
+    "comment": "Pydantic models are used for request validation and response schemas, e.g., src/api/admin/course_run/schemas.py and src/api/courses/schemas.py.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Alembic migration scripts are present in alembic/versions and alembic/env.py configures migrations.",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Global exception handlers are registered in src/app.py via add_exception_handler for ApplicationError and IncorrectUUIDError.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Dependency injection is performed with FastAPI Depends throughout the project, e.g., src/api/auth/dependencies.py.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Middleware is added in src/app.py (CORSMiddleware) to process requests before handlers.",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Pagination is implemented for course listings using the Paginator class in src/api/courses/router.py.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "The project uses the ruff linter, declared in pyproject.toml under [tool.ruff].",
+    "is_passed": true
+  },
+  {
+    "id": 10,
+    "comment": "Unit and integration tests are provided in unit_tests/ and integration_tests/ directories.",
+    "is_passed": true
+  },
+  {
+    "id": 14,
+    "comment": "Pydantic fields include examples via Field(..., examples=[...]) in schemas such as src/api/courses/schemas.py.",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "Passwords are hashed using PasswordService in src/infrastructure/security/password_service.py before storage.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "Database access is abstracted through repository classes, e.g., src/infrastructure/sqlalchemy/courses/repository.py.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "CORS policy is configured in src/app.py with CORSMiddleware allowing all origins.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "No background tasks (e.g., FastAPI BackgroundTasks) are used for long‑running operations.",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "The code does not use a logging library; there are no logging statements, only occasional prints (none found).",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "Function names describe their purpose, e.g., create_course_run, get_actual_timetable_by_id, update_course.",
+    "is_passed": true
+  },
+  {
+    "id": 22,
+    "comment": "Public functions and class methods include type annotations for parameters and return types throughout the codebase.",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Global mutable state is avoided; state is kept inside classes or request‑scoped dependencies.",
+    "is_passed": true
+  },
+  {
+    "id": 25,
+    "comment": "Generators (yield) are not used for large sequences; data is loaded into lists directly.",
+    "is_passed": false
+  },
+  {
+    "id": 28,
+    "comment": "Logical expressions avoid redundant comparisons, e.g., no \"if x == True\" patterns found.",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "List, dict, and set comprehensions are used instead of map/filter with lambdas throughout the project.",
+    "is_passed": true
+  },
+  {
+    "id": 32,
+    "comment": "Some magic numbers (e.g., page_size=9 in src/api/courses/router.py) are hard‑coded instead of being constants.",
+    "is_passed": false
+  },
+  {
+    "id": 33,
+    "comment": "Complex conditional logic is not always broken into named boolean helpers; conditions are inlined in methods like __matched.",
+    "is_passed": false
+  },
+  {
+    "id": 35,
+    "comment": "Functions avoid mutable default arguments; defaults are None or immutable values.",
+    "is_passed": true
+  },
+  {
+    "id": 37,
+    "comment": "Reusable operations are encapsulated in service classes, but no custom decorators for reuse are defined.",
+    "is_passed": false
+  },
+  {
+    "id": 40,
+    "comment": "Tests use pytest fixtures and parametrization (e.g., test_incorrect_email in unit_tests/domain/auth).",
+    "is_passed": true
+  },
+  {
+    "id": 41,
+    "comment": "Async functions do not call blocking code like time.sleep or requests; all I/O uses async libraries.",
+    "is_passed": true
+  },
+  {
+    "id": 42,
+    "comment": "Parallel async operations are not combined with asyncio.gather or create_task in the current code.",
+    "is_passed": false
+  },
+  {
+    "id": 43,
+    "comment": null,
+    "is_passed": null
+  },
+  {
+    "id": 49,
+    "comment": "Secrets are loaded from environment variables via src/config.py; no hard‑coded passwords or keys.",
+    "is_passed": true
+  },
+  {
+    "id": 54,
+    "comment": "A Dockerfile for production exists (Dockerfile.production) and builds the application.",
+    "is_passed": true
+  },
+  {
+    "id": 55,
+    "comment": "docker‑compose files (dev.docker-compose.yaml, test.docker-compose.yaml) define multiple services (postgres, redis).",
+    "is_passed": true
+  },
+  {
+    "id": 65,
+    "comment": "The project follows a modular folder structure with separate packages for api, domain, services, infrastructure, etc.",
+    "is_passed": true
+  },
+  {
+    "id": 66,
+    "comment": "Business logic resides in service classes (e.g., src/services/course_run/command_service.py) separate from FastAPI routers.",
+    "is_passed": true
+  }
+]

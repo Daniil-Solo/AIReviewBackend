@@ -1,0 +1,107 @@
+[
+  {
+    "id": 534,
+    "comment": "В проекте используется alembic для миграций. Наличие файла alembic.ini и папки migrations подтверждает это.",
+    "is_passed": true
+  },
+  {
+    "id": 535,
+    "comment": "В проекте используется линтер ruff, что видно из pyproject.toml, где он указан как dev-зависимость и настроен.",
+    "is_passed": true
+  },
+  {
+    "id": 536,
+    "comment": "В проекте используется PostgreSQL, а не MySQL. Это видно из docker-compose.yaml, где указан образ postgres:13.3, а также из pyproject.toml, где используется asyncpg.",
+    "is_passed": false
+  },
+  {
+    "id": 537,
+    "comment": "Минимальная длина пароля составляет 8 символов. Это подтверждается значением PASSWORD_MIN_LENGTH = 8 в src/constants.py и валидацией в src/services/password.py.",
+    "is_passed": true
+  },
+  {
+    "id": 538,
+    "comment": "Токен доступен в течение суток. Это подтверждается значением AUTH_TOKEN_TTL = 60 * 60 * 24 в src/constants.py.",
+    "is_passed": true
+  },
+  {
+    "id": 539,
+    "comment": "Приложение FastAPI имеет централизованный обработчик сервисных ошибок. Это реализовано в src/app.py в функции add_service_exceptions.",
+    "is_passed": true
+  },
+  {
+    "id": 540,
+    "comment": "Swagger-документация имеет заголовок 'Shop Placement Platform', а не 'Pasta Bean Auth Service'. Это видно в src/app.py при создании FastAPI приложения.",
+    "is_passed": false
+  },
+  {
+    "id": 541,
+    "comment": "В режиме Production нет доступа к Swagger-документации. Это реализовано в src/app.py, где docs_url и redoc_url устанавливаются в None, если не debug режим.",
+    "is_passed": true
+  },
+  {
+    "id": 542,
+    "comment": "Даты в кэше хранятся в виде строк, а не timestamp. В src/cache/repositories/session.py даты преобразуются в строки через str() и fromisoformat().",
+    "is_passed": false
+  },
+  {
+    "id": 543,
+    "comment": "В проекте отключен автокоммит при работе с SQLAlchemy. Это видно в src/database/session.py, где async_session_factory создается с autocommit=False.",
+    "is_passed": true
+  },
+  {
+    "id": 544,
+    "comment": "С помощью SQL и реализованных таблиц можно найти информацию о том, когда человек разлогинился из текущей сессии. В таблице sign_ins есть поле logout_at, которое заполняется при логауте.",
+    "is_passed": true
+  },
+  {
+    "id": 545,
+    "comment": "В системе не допускается существование двух пользователей с одинаковыми электронными почтами. Это обеспечивается уникальным ограничением на поле email в таблице users (см. миграцию 1961c6ce7d4b) и проверкой в AuthService.",
+    "is_passed": true
+  },
+  {
+    "id": 546,
+    "comment": "Информация о пароле хранится в таблице secure_user_infos, а не в таблице users. Таблица users не содержит полей с паролем.",
+    "is_passed": false
+  },
+  {
+    "id": 547,
+    "comment": "Валидация пароля является частью бизнес-логики в сервисе AuthService, а не в Pydantic-модели. Хотя Pydantic-модели используются для входных данных, валидация происходит в PasswordService.",
+    "is_passed": false
+  },
+  {
+    "id": 548,
+    "comment": "Бизнес-логика находится в сервисах. Это подтверждается наличием AuthService в src/services/auth.py, который содержит всю логику работы с пользователями и сессиями.",
+    "is_passed": true
+  },
+  {
+    "id": 549,
+    "comment": "Пароль дополнительно просаливается. Это реализовано в src/services/password.py с использованием os.urandom(32) для генерации соли и hashlib.pbkdf2_hmac для хеширования.",
+    "is_passed": true
+  },
+  {
+    "id": 550,
+    "comment": "В системе реализованы эндпоинты /auth/login, /auth/logout, /auth/register. Это подтверждается наличием соответствующих роутов в src/endpoints/routers/auth.py.",
+    "is_passed": true
+  },
+  {
+    "id": 551,
+    "comment": "В системе реализован эндпоинт для изменения информации о пользователе PUT /users/me. Однако в проекте реализованы эндпоинты POST /user/change_name, POST /user/change_email и POST /user/change_password, но не PUT /users/me.",
+    "is_passed": false
+  },
+  {
+    "id": 552,
+    "comment": "В проекте написаны интеграционные и юнит-тесты. Это подтверждается наличием папок tests и integration_tests с соответствующими тестами.",
+    "is_passed": true
+  },
+  {
+    "id": 553,
+    "comment": "Проверка почты на временность не реализована. В коде нет обращений к внешним сервисам для проверки email.",
+    "is_passed": false
+  },
+  {
+    "id": 554,
+    "comment": "Интеграционные тесты используют запущенные инстансы PostgreSQL и Redis. Это подтверждается docker-compose.test.yaml, где определены сервисы auth_db (PostgreSQL) и auth_cache (Redis).",
+    "is_passed": true
+  }
+]

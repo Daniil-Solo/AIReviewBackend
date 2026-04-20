@@ -1,0 +1,169 @@
+```json
+[
+  {
+    "id": 2,
+    "comment": "В проекте используется Pydantic для валидации запросов и ответов. Примеры: src/api/base_schemas.py, src/api/auth/schemas.py, src/api/courses/schemas.py и другие файлы в папках schemas содержат Pydantic-модели для запросов и ответов.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "В проекте настроены Alembic-миграции для схемы базы данных. Папка alembic/versions содержит файлы миграций, alembic/env.py настроен для работы с SQLAlchemy и моделями.",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "В проекте есть глобальный обработчик исключений с кастомными ответами. В src/app.py функция add_exception_handler добавляет обработчики для ApplicationError и IncorrectUUIDError, возвращающие JSONResponse с сообщением об ошибке.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "В проекте используется Depends для инъекции зависимостей. Примеры: src/api/auth/dependencies.py, src/api/courses/dependencies.py и другие файлы dependencies используют Depends для внедрения сервисов и сессий.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "В проекте используется middleware для CORS (добавлен в src/app.py функция add_cors), но других middleware не обнаружено.",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Для эндпоинтов, возвращающих списки элементов, реализована пагинация. В src/api/courses/router.py эндпоинт get_courses использует Paginator из src/api/base_pagination.py для пагинации курсов.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "Проект использует линтеры (ruff) и форматтеры, как указано в pyproject.toml в разделе tool.ruff и в readme.md.",
+    "is_passed": true
+  },
+  {
+    "id": 10,
+    "comment": "В проекте есть тесты: папки unit_tests и integration_tests содержат тесты для различных компонентов.",
+    "is_passed": true
+  },
+  {
+    "id": 14,
+    "comment": "У полей Pydantic-моделей есть описания или примеры. Например, в src/api/base_schemas.py поля имеют examples, в других схемах также есть Field с примерами.",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "При реализации аутентификации пароль хэшируется. В src/infrastructure/security/password_service.py используется hashlib для хэширования пароля.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "Работа с базой данных вынесена в отдельные классы Repository или DAO. Например, src/domain/auth/user_repository.py, src/infrastructure/sqlalchemy/users/repository.py и другие репозитории.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "В FastAPI-проекте настроена CORS политика. В src/app.py функция add_cors добавляет CORSMiddleware с разрешением всех origins в debug-режиме.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "В API-сервисе длительные операции выносятся в фоновые задачи. В коде не обнаружено явного использования фоновых задач (например, через BackgroundTasks).",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "Для отладки используется библиотека логирования вместо print. В коде не обнаружено использования logging, только print отсутствует.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "Функции именуются согласно их внутренней логике. Имена функций отражают их purpose (например, create_course, get_user, etc.).",
+    "is_passed": true
+  },
+  {
+    "id": 22,
+    "comment": "Все публичные функции и классы имеют аннотации типов для аргументов и возвращаемого значения. Примеры: большинство функций в router files и service files имеют аннотации типов.",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Избегается мутация глобальных переменных; состояние инкапсулировано в классах или локальных контекстах. Глобальные переменные не используются, состояние управляется через классы и зависимости.",
+    "is_passed": true
+  },
+  {
+    "id": 25,
+    "comment": "Используются генераторы (yield) для обработки больших последовательностей вместо загрузки всех данных в память. В коде не обнаружено использования yield для больших последовательностей.",
+    "is_passed": false
+  },
+  {
+    "id": 28,
+    "comment": "Логические выражения не содержат избыточных сравнений. В коде используются конструкции like if user.role.value != 'admin', без избыточных сравнений с True/False.",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "В проекте применяются list/dict/set comprehensions вместо map/filter с лямбдами для простых преобразований. Примеры: в src/api/courses/router.py используется list comprehension для преобразования курсов в DTO.",
+    "is_passed": true
+  },
+  {
+    "id": 32,
+    "comment": "Избегаются магические числа и строки — они вынесены в именованные константы. Примеры: в src/domain/auth/constants.py определены константы like EMAIL_REGULAR_EXPRESSION, USER_ROLES, etc.",
+    "is_passed": true
+  },
+  {
+    "id": 33,
+    "comment": "Сложные условные выражения разбиты на хорошо именованные булевы функции или переменные. Пример: в src/services/courses/query_service_for_talent.py метод __matched инкапсулирует сложную логику фильтрации.",
+    "is_passed": true
+  },
+  {
+    "id": 35,
+    "comment": "Функции не имеют необязательных мутабельных аргументов. В коде не обнаружено функций с mutable default arguments like def func(array=[]).",
+    "is_passed": true
+  },
+  {
+    "id": 37,
+    "comment": "Для повторно используемых операций созданы декораторы или утилитарные функции. Примеры: зависимости в FastAPI (get_user, get_admin) используются для повторяющейся логики.",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "Для проекта с тестами используются pytest-фикстуры и параметризация тестов. В integration_tests/conftest.py определены фикстуры, в unit-тестах используется параметризация (например, в unit_tests/domain/auth/test_value_objects.py).",
+    "is_passed": true
+  },
+  {
+    "id": 41,
+    "comment": "Асинхронные функции не вызывают синхронный блокирующий код без использования run_in_executor. В коде используется асинхронный код с async/await, блокирующие вызовы не обнаружены.",
+    "is_passed": true
+  },
+  {
+    "id": 42,
+    "comment": "Для параллельного выполнения нескольких асинхронных задач используются asyncio.gather или asyncio.create_task. В коде не обнаружено явного использования asyncio.gather или create_task.",
+    "is_passed": false
+  },
+  {
+    "id": 43,
+    "comment": "Таймауты установлены для всех внешних вызовов (HTTP, БД) через asyncio.timeout или timeout-параметры клиентов. В коде не обнаружено установки таймаутов для внешних вызовов.",
+    "is_passed": false
+  },
+  {
+    "id": 49,
+    "comment": "Секреты (пароли, ключи токены, JWT secret) не захардкожены в коде и не логируются; используются переменные окружения. В src/config.py секреты загружаются из переменных окружения через pydantic-settings.",
+    "is_passed": true
+  },
+  {
+    "id": 54,
+    "comment": "Для сервиса есть Dockerfile с корректной сборкой. Dockerfile.production присутствует в корне проекта.",
+    "is_passed": true
+  },
+  {
+    "id": 55,
+    "comment": "Есть приложение требует несколько компонентов, то его зависимости описаны в docker-compose-файле. Файлы dev.docker-compose.yaml и test.docker-compose.yaml описывают зависимости (PostgreSQL, Redis).",
+    "is_passed": true
+  },
+  {
+    "id": 65,
+    "comment": "Проект использует модульную структуру папок и не хранит весь код в одном файле. Код организован в папки src, domain, infrastructure, services, api с подпапками по функциональности.",
+    "is_passed": true
+  },
+  {
+    "id": 66,
+    "comment": "Бизнес-логика отделена от эндпоинта и находится в сервисных функциях или классах. Эндпоинты в router files вызывают методы из service classes (например, CourseCommandService, AuthCommandService).",
+    "is_passed": true
+  }
+]
+```

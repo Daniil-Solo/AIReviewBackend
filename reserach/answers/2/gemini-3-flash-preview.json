@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "comment": "В проекте присутствует папка migrations, файл alembic.ini и настроенный env.py, использующий модели SQLAlchemy.",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "В pyproject.toml в секции dev-зависимостей указан ruff, также присутствует конфигурация [tool.ruff].",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "В docker-compose.yaml и src/config.py (метод __generate_asyncpg_db_url) используется PostgreSQL, а не MySQL.",
+    "is_passed": false
+  },
+  {
+    "id": 4,
+    "comment": "В src/constants.py PASSWORD_MIN_LENGTH установлен в 8, и это значение используется в PasswordService.validate_password.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "В src/constants.py AUTH_TOKEN_TTL равен 60 * 60 * 24 (86400 секунд), что соответствует суткам.",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "В src/app.py реализованы функции add_service_exceptions и add_other_exceptions, обрабатывающие ServiceException и ApplicationException.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "В src/app.py заголовок (title) приложения FastAPI указан как 'Shop Placement Platform', а не 'Pasta Bean Auth Service'.",
+    "is_passed": false
+  },
+  {
+    "id": 8,
+    "comment": "В src/app.py параметры docs_url и redoc_url устанавливаются в None, если app_config.is_debug ложно (режим Production).",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "В src/cache/repositories/session.py даты преобразуются в строки (str(user_dict[...])) перед сохранением в JSON, а не в timestamp.",
+    "is_passed": false
+  },
+  {
+    "id": 10,
+    "comment": "В src/database/session.py при создании async_sessionmaker параметр autocommit явно установлен в False.",
+    "is_passed": true
+  },
+  {
+    "id": 11,
+    "comment": "В src/database/models.py таблица 'sign_ins' содержит колонки 'is_logout' и 'logout_at', которые обновляются в SignInSQLARepository.update_logout_status.",
+    "is_passed": true
+  },
+  {
+    "id": 12,
+    "comment": "В src/database/models.py для колонки email таблицы users установлен unique=True, а в AuthService.register_user есть проверка exist_by_email.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Информация о пароле (hashed_password) хранится в отдельной таблице 'secure_user_infos', а не в 'users'.",
+    "is_passed": false
+  },
+  {
+    "id": 14,
+    "comment": "Валидация пароля вынесена в отдельный класс PasswordService и вызывается в AuthService, а не является частью Pydantic-модели UserRegisterDTO.",
+    "is_passed": false
+  },
+  {
+    "id": 15,
+    "comment": "Бизнес-логика (регистрация, логин, смена данных) сосредоточена в классе AuthService в папке src/services.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "В PasswordService.create_hashed_password_and_salt генерируется случайная соль (os.urandom(32)), которая используется в pbkdf2_hmac.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "В src/endpoints/routers/auth.py реализованы эндпоинты /register, /login и /logout (с учетом префикса /auth).",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "В src/endpoints/routers/user.py реализованы эндпоинты для изменения пароля, имени и почты, но отсутствует метод PUT /users/me.",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "В проекте есть папка tests (юнит-тесты сервисов) и integration_tests (интеграционные тесты API).",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "В коде AuthService.register_user и PasswordService отсутствует логика обращения к внешним сервисам для проверки временной почты.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "В docker-compose.test.yaml и integration_tests/conftest.py используются PostgreSQL (image: postgres:13.3) и Redis (image: redis:alpine).",
+    "is_passed": true
+  }
+]

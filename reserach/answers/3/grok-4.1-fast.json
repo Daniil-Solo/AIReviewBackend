@@ -1,0 +1,167 @@
+[
+  {
+    "id": 2,
+    "comment": "Pydantic models used extensively for requests/responses, e.g., src/api/courses/schemas.py CourseFullDTO with Field(examples), routers use response_model=list[CourseShortDTO]",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Alembic migrations configured, alembic/versions/ multiple files like d21fb58adff2_init_db.py, env.py imports all models from src.infrastructure.sqlalchemy.*.models",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Global handlers in src/app.py add_exception_handler for ApplicationError and IncorrectUUIDError returning JSONResponse(ErrorResponse), used in routers",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Depends used everywhere, e.g., src/api/admin/course_run/dependencies.py get_admin_course_run_command_service(db_session=Depends(get_async_session))",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "CORSMiddleware added in src/app.py add_cors(application.add_middleware(CORSMiddleware, allow_origins=['*'], ...))",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Pagination in src/api/base_pagination.py Paginator, used in src/api/courses/router.py get_courses with Paginator(data=courses, page_size=9), CoursesPaginationResponse",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "Ruff configured in pyproject.toml [tool.ruff] with lint.select=['ALL'], ignore list, fix=true; readme.md poetry run ruff check src",
+    "is_passed": true
+  },
+  {
+    "id": 10,
+    "comment": "unit_tests/domain/*/*.py and integration_tests/*/*.py with tests, conftest.py fixtures",
+    "is_passed": true
+  },
+  {
+    "id": 14,
+    "comment": "Pydantic Fields with examples, e.g., src/api/auth/schemas.py AuthTokenResponse(auth_token=Field('423fsdf23ffs3a2sd3432sd2fa2fag'))",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "src/infrastructure/security/password_service.py create_hashed_password with pbkdf2_hmac, used in auth command_service.register_talent",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "Repositories like src/domain/courses/course_repository.py ICourseRepository, implemented in src/infrastructure/sqlalchemy/courses/repository.py",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "CORS in src/app.py CORSMiddleware(allow_origins=['*'], allow_credentials=True, allow_methods=['*'], allow_headers=['*'])",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "No BackgroundTasks or Celery in routers/services; all operations synchronous in endpoints",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "No print statements; no import logging or logging calls in src/ code",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "Functions like create_course_run(course_id: str, season: str, year: int) -> str in src/services/course_run/command_service.py descriptive",
+    "is_passed": true
+  },
+  {
+    "id": 22,
+    "comment": "All public methods annotated, e.g., src/services/courses/command_service.py async def create_course(self, name_: str) -> str",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "No global mutables; state in repos/services like self.session in SQLAlchemy repos",
+    "is_passed": true
+  },
+  {
+    "id": 25,
+    "comment": "No generators/yield for sequences; lists loaded fully e.g., await repo.get_all()",
+    "is_passed": false
+  },
+  {
+    "id": 28,
+    "comment": "No redundant comparisons like if is_valid == True; conditions direct e.g., if user.role.value != 'admin'",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Comprehensions used e.g., src/api/courses/router.py [CourseShortDTO.from_domain(course) for course in paginator.get_data_by_page(page)]",
+    "is_passed": true
+  },
+  {
+    "id": 32,
+    "comment": "Constants like src/domain/courses/constants.py PERIODS, ROLES; used in value_objects e.g., if value not in PERIODS",
+    "is_passed": true
+  },
+  {
+    "id": 33,
+    "comment": "Conditions simple; no complex broken into booleans, but no violations",
+    "is_passed": true
+  },
+  {
+    "id": 35,
+    "comment": "No mutable defaults like list=[]; uses | None = None patterns not seen but no violations",
+    "is_passed": true
+  },
+  {
+    "id": 37,
+    "comment": "No custom decorators; repeated error handling manual in routers, DI via Depends",
+    "is_passed": false
+  },
+  {
+    "id": 40,
+    "comment": "integration_tests/conftest.py fixtures test_async_session, test_cache_session; unit_tests/domain/auth/test_value_objects.py @pytest.mark.parametrize",
+    "is_passed": true
+  },
+  {
+    "id": 41,
+    "comment": "Async with asyncpg/async_redis/SQLAlchemy asyncsession; no sync blocking like time.sleep/requests",
+    "is_passed": true
+  },
+  {
+    "id": 42,
+    "comment": "No asyncio.gather/create_task; no parallel async tasks",
+    "is_passed": false
+  },
+  {
+    "id": 43,
+    "comment": "No asyncio.timeout or client timeouts visible in DB/Redis/HTTP calls",
+    "is_passed": false
+  },
+  {
+    "id": 49,
+    "comment": "src/config.py loads POSTGRES_PASSWORD etc. from .env; .test.env example; no hardcodes",
+    "is_passed": true
+  },
+  {
+    "id": 54,
+    "comment": "Dockerfile.production present in root",
+    "is_passed": true
+  },
+  {
+    "id": 55,
+    "comment": "dev.docker-compose.yaml and test.docker-compose.yaml for postgres/redis",
+    "is_passed": true
+  },
+  {
+    "id": 65,
+    "comment": "Modular: src/api/domain/infrastructure/services; routers/schemas per module",
+    "is_passed": true
+  },
+  {
+    "id": 66,
+    "comment": "Business logic in src/services/*/*.py command_service/query_service; routers depend on services e.g., command_service.create_course",
+    "is_passed": true
+  }
+]

@@ -1,0 +1,167 @@
+[
+  {
+    "id": 2,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Используется CORSMiddleware",
+    "is_passed": true
+  },
+  {
+    "id": 8,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 10,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 14,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "Не применимо",
+    "is_passed": null
+  },
+  {
+    "id": 19,
+    "comment": "Логирование не используется",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 22,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 25,
+    "comment": "Все данные загружаются в память без генераторов",
+    "is_passed": false
+  },
+  {
+    "id": 28,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 32,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 33,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 35,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 37,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 41,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 42,
+    "comment": "Не применимо в этом проекте",
+    "is_passed": null
+  },
+  {
+    "id": 43,
+    "comment": "Именно так",
+    "is_passed": false
+  },
+  {
+    "id": 49,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 54,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 55,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 65,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 66,
+    "comment": "Именно так",
+    "is_passed": true
+  }
+]

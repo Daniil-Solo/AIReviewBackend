@@ -17,7 +17,10 @@
 - Анализ кода: tree-sitter, tree-sitter-python, treeproject
 - Конфигурация: pydantic-settings
 - Аутентификация: pyjwt
-
+- Хранилище: boto3 (S3)
+- Уведомления: maileroo (сервис отправки писем), jinja2 (шаблон письма)
+- Rate limiting: redis
+- Логирование: structlog
 
 ## Структура проекта
 
@@ -40,41 +43,90 @@
     - architecture.md - C4-диаграмма компонентов системы (уровень контейнеров)
     - data_model.md - ER-диаграмма (модель данных)
   - application - сервисы бизнес-логики
-    - auth/ - сервис аутентификации (логин)
+    - auth/ - сервис аутентификации (login, register)
     - health/ - сервис проверки здоровья
     - users/ - сервисы для работы с пользователями
-    - project/ - пайплайн анализа проектов (в разработке)
+    - workspaces/ - сервисы для работы с пространствами (workspaces, members, join_rules)
+    - criteria/ - сервисы для работы с критериями
+    - tasks/ - сервисы для работы с заданиями (tasks, task_criteria)
+    - solutions/ - сервисы для работы с решениями
+    - transactions/ - сервисы для транзакций
+    - ai_review/ - AI-пайплайн (pipeline, preprocessing, criteria_grading, report, project_doc, task_graph)
+    - project/ - анализ проекта (preprocessing, linters, ast)
     - exceptions.py - кастомные исключения (ApplicationError и др.)
   - di/ - контейнер dependency-injector
     - container.py - объявление всех зависимостей
   - dto - Data Transfer Objects для API и Service слоев
-    - auth/ - DTO для аутентификации (UserLoginDTO, TokenDTO)
+    - auth/ - DTO для аутентификации (UserLoginDTO, TokenDTO, UserRegisterDTO)
     - users/ - DTO для пользователей (UserCreateDTO, ShortUserDTO, UserResponseDTO)
     - workspaces/ - DTO для пространств (WorkspaceCreateDTO, WorkspaceUpdateDTO, WorkspaceResponseDTO, WorkspaceFiltersDTO)
-    - members/ - DTO для участников (MemberCreateDTO, MemberResponseDTO, etc.)
+    - members/ - DTO для участников (MemberCreateDTO, MemberResponseDTO)
+    - join/ - DTO для присоединения (JoinWorkspaceDTO, JoinWorkspaceResponseDTO)
+    - join_rule/ - DTO для правил присоединения (JoinRuleCreateDTO, JoinRuleResponseDTO)
+    - criteria/ - DTO для критериев (CriteriaCreateDTO, CriteriaResponseDTO)
+    - tasks/ - DTO для заданий (TaskCreateDTO, TaskResponseDTO, TaskCriteriaDTO)
+    - solutions/ - DTO для решений (SolutionCreateDTO, SolutionResponseDTO, SolutionSubmitDTO)
+    - transactions/ - DTO для транзакций (TransactionCreateDTO, TransactionResponseDTO)
+    - ai_review/ - DTO для AI-ревью (pipeline, criteria, message)
+    - common.py - базовые DTO (BaseDTO, SuccessOperationDTO)
+  - constants/ - константы и перечисления
+    - ai_review.py - enums для AI-ревью (CriterionStageEnum, CriterionCheckStatusEnum, SolutionFormatEnum, SolutionStatusEnum)
+    - workspaces.py - enums для пространств (WorkspaceMemberRoleEnum)
+    - transactions.py - константы транзакций
+    - preprocessing.py - константы препроцессинга
+    - ai_pipeline.py - константы AI-пайплайна
   - infrastructure - коннекторы к базе данных и внешним сервисам
     - auth/ - утилиты аутентификации (JWT, хеширование паролей SHA256+salt)
       - jwt.py - создание и декодирование JWT
       - password.py - хеширование паролей
     - dao/ - Data Access Object для работы с БД
-      - interfaces/ - абстрактные интерфейсы для конкретных сущностей
-      - sqlalchemy/ - реализации интерфейсов на SQLAlchemy
+      - users/ - DAO пользователей
+      - workspaces/ - DAO пространств
+      - workspace_members/ - DAO участников
+      - workspace_join_rules/ - DAO правил присоединения
+      - criteria/ - DAO критериев
+      - tasks/ - DAO заданий
+      - task_criteria/ - DAO связей заданий и критериев
+      - solutions/ - DAO решений
+      - pipeline_tasks/ - DAO задач пайплайна
+      - transactions/ - DAO транзакций
+      - registrations/ - Redis DAO для регистраций
     - llm/ - инфраструктура для работы с LLM
       - base.py - BaseLLM, Message, Answer
       - openai_like.py - OpenAI-совместимый клиент
       - file_writer.py - FileWriterLLM (для отладки)
     - sqlalchemy/ - модели и таблицы БД
-      - models.py - все таблицы SQLAlchemy Core
+      - models.py - все таблицы SQLAlchemy Core (11 таблиц)
       - engine.py - асинхронный engine и session factory
       - uow.py - UnitOfWork, агрегация всех DAO для одной сессии
-    - constants/ - константы и перечисления
+    - storage/ - хранилище S3
+      - interface.py - абстрактный интерфейс
+      - s3.py - S3 storage для решений
+      - s3_artifact.py - S3 storage для артефактов
+    - ai/ - AI инфраструктура
+      - llm/ - LLM интерфейс и реализации
+      - prompt_builder/ - построитель промптов (jinja2)
+    - email_sender/ - отправка email
+      - interface.py - абстрактный интерфейс
+      - maileroo.py - реализация через Maileroo
+    - email_templater/ - шаблоны email
+      - interface.py - абстрактный интерфейс
+      - jinja2.py - реализация чер��з Jinja2
+    - logs_sender/ - отправка логов
+    - rate_limiter/ - rate limiting
+    - redis/ - Redis клиент
   - interfaces - различные точки входа в приложение
     - api - содержит эндпоинты API
       - v1/ - эндпоинты версии v1
-        - auth/ - аутентификация (POST /api/v1/auth/login)
+        - auth/ - аутентификация (POST /api/v1/auth/login, POST /api/v1/auth/register)
         - users/ - управление пользователями (GET/POST /api/v1/users/*)
         - workspaces/ - управление пространствами (GET/POST /api/v1/workspaces/*)
-        - joins/ - присоединение к пространству (/api/v1/joins/*)
+        - joins/ - присоединение к пространству (POST /api/v1/joins/*)
+        - tasks/ - управление заданиями (GET/POST /api/v1/tasks/*)
+        - criteria/ - управление критериями (GET/POST /api/v1/criteria/*)
+        - solutions/ - управление решениями (GET/POST /api/v1/solutions/*)
+        - profile/ - профиль пользователя (GET /api/v1/profile/*)
+        - transactions/ - транзакции (GET /api/v1/transactions/*)
       - internal/ - внутренние эндпоинты
         - health.py - GET /api/internal/health
       - app.py - точка входа в приложение с объявлением FastAPI
@@ -84,6 +136,19 @@
     - tasks - фоновые задачи (заглушка)
   - settings/ - настройки
 
+## Таблицы БД (SQLAlchemy Core)
+
+1. users - пользователи
+2. workspaces - пространства
+3. workspace_members - участники пространств
+4. workspace_join_rules - правила присоединения
+5. criteria - критерии оценки
+6. tasks - задания
+7. task_criteria - связь заданий и критериев
+8. solutions - решения студентов
+9. solution_criteria_checks - проверки критериев для решений
+10. pipeline_tasks - задачи AI-пайплайна
+11. transactions - транзакции
 
 ## Архитектурные слои
 
@@ -94,11 +159,12 @@
 3. **Infrastructure** - реализация доступа к данным и внешним сервисам
 4. **DTO** - объекты передачи данных между слоями
 
-
 ## Дополнительные сведения
 
 - `docs/development.md` - инструкции для запуска проекта, линтеров, миграций
-
+- Все DAO реализуют паттерн Repository через SQLAlchemy Core
+- UnitOfWork управляет сессиями и транзакциями
+- DI-контейнер связывает все зависимости
 
 ## Важно
 
@@ -107,8 +173,8 @@
 - Для добавления библиотек в проект используй: `uv add ...` вместо прямого добавления в pyproject.toml
 - Для полей DTO всегда указывай описание и возможную валидацию: `Field(description="...")`
 - SQLAlchemy используется в режиме Core (императивные таблицы), не ORM; запросы в DAO также составляются с помощью Core
-- Всегда реализиуй эндпоинты, дао, сервисные функции по аналогии с уже существующими(src/infrastructure/dao/users, src/interfaces/api/v1/users, )
-- Название сервисных функций в application слое формируется без указания сущности, поскольку из файла application/{entities}/{entity}.py итак понятно к какой сущности относится функция (например, в файле application/tasks/tasks.py функции называются create, update, get, а не create_task, update_task, get_task)
+- Всегда реализуй эндпоинты, dao, сервисные функции по аналогии с уже существующими
+- Название сервисных функций в application слое формируется без указания сущности, поскольку из файла application/{entities}/{entity}.py итак понятно к какой сущности относится функция
 - Никогда не пытайся запустить сам тесты, а также любой Docker-контейнер
 - Не пиши код alembic-миграции, я ее сгенерирую сам командой и поправлю как мне нужно
 - Никогда не используй импорты внутри функций, методов. Импорты должны быть строго в начале файла
@@ -186,6 +252,8 @@ class EntitiesDAO(ABC):
 После этого создаем реализацию интерфейса на SQLALChemy в `src/infrastructure/dao/entities/sqlalchemy.py`
 ```python
 import sqlalchemy as sa
+from src.infrastructure.dao.entities.interface import EntitiesDAO
+from src.dto.entities import EntityCreateDTO, EntityUpdateDTO, EntityResponseDTO
 
 class SQLAlchemyEntitiesDAO(EntitiesDAO):
     def __init__(self, session: AsyncSession) -> None:
@@ -276,6 +344,9 @@ class UnitOfWork:
 Создаем сервисные функции в `src/application/entities/entities.py`
 
 ```python
+from dependency_injector import inject
+from dependency_injector.wiring import Provide
+
 @inject
 async def create_entity(
     data: EntityCreateDTO,
@@ -287,7 +358,7 @@ async def create_entity(
         return entity
 ```
 
-Если в сервисной фукнии используется последовтельное обновление нескольких записей, то такие операции необходимо дополнительно обернуть в транзакцию:
+Если в сервисной функции используется последовательное обновление нескольких записей, то такие операции необходимо дополнительно обернуть в транзакцию:
 ```python
 async with uow.connection() as conn, conn.transaction():
     await operation_1()
@@ -311,9 +382,9 @@ async def init_container() -> Container:
 ### Endpoints
 Эндпоинты добавляются в `src/interfaces/api/v1/entities/router.py`
 ```python
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from src.interfaces.api.dependencies import get_current_user
-from src.application.workspaces import create_entity
+from src.application.entities import create_entity
 
 router = APIRouter(prefix="/entities", tags=["entities"])
 
@@ -391,6 +462,6 @@ async def test__failed__duplicated_email(uow, request_create_user):
 
 Важно:
 - Тест в качестве обязательной фикстуры всегда должен использовать uow или container (они инициализируют DI-контейнер для работы сервисных функций)
-- Подготовка данных для создания обектов в БД должна осуществлятсья через Factory-классы (пример: `tests/factories/users.py`)
-- Если в тестах повторяются какие-то операции, их следует вынести во вспомогательные функции (пример: `tests/helpers/users.py`)
-- Конвенкция по наименованию тестов: test__success - успешный, test__failed__not_admin - проваленный тест
+- Подготовка данных для создания объектов в БД должна осуществляться через Factory-классы
+- Если в тестах повторяются какие-то операции, их следует вынести во вспомогательные функции
+- Конвенция по наименованию тестов: test__success - успешный, test__failed__not_admin - проваленный тест

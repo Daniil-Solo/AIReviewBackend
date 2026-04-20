@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "comment": "Folder `migrations` with Alembic scripts (e.g., `migrations/versions/2105cf88eb29_init_db.py`) and `alembic.ini` show Alembic migrations are used.",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "`pyproject.toml` lists `ruff` in `[tool.poetry.group.dev.dependencies]` and provides a `[tool.ruff]` config, indicating a linter is set up.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": The database configuration (`src/config.py`) builds a PostgreSQL DSN (`postgresql+asyncpg://...`) and Docker files start a Postgres container; no MySQL usage is present.",
+    "is_passed": false
+  },
+  {
+    "id": 4,
+    "comment": `src/constants.py` defines `PASSWORD_MIN_LENGTH = 8` and `PasswordService.validate_password` checks `len(password) < PASSWORD_MIN_LENGTH`.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": `src/constants.py` sets `AUTH_TOKEN_TTL = 60 * 60 * 24` (one day) and `SessionRedisRepository.set` stores the token with this TTL.",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": `src/app.py` registers global exception handlers for `ServiceException` and `ApplicationException` via `add_service_exceptions` and `add_other_exceptions`.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": FastAPI is instantiated with `title=\"Shop Placement Platform\"` in `src/app.py`; the required title `Pasta Bean Auth Service` is absent.",
+    "is_passed": false
+  },
+  {
+    "id": 8,
+    "comment": `src/app.py` sets `docs_url` to `None` when `app_config.is_debug` is false, disabling Swagger in production mode.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": `SessionRedisRepository` stores dates as ISO‑8601 strings in JSON (`datetime.isoformat()`), not as timestamps.",
+    "is_passed": false
+  },
+  {
+    "id": 10,
+    "comment": `src/database/session.py` creates `async_sessionmaker(..., autocommit=False, autoflush=False)`, disabling autocommit.",
+    "is_passed": true
+  },
+  {
+    "id": 11,
+    "comment": The `sign_ins` table (see `src/database/models.py`) contains `logout_at`; `SignInSQLARepository.update_logout_status` writes the logout time, allowing SQL queries to retrieve it.",
+    "is_passed": true
+  },
+  {
+    "id": 12,
+    "comment": Migration `1961c6ce7d4b_add_uniq_field.py` adds a unique constraint on `users.email`, and repository checks for existing email before insert.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": Password hash and salt are stored in the `secure_user_infos` table, not in the `users` table (`src/database/models.py`).",
+    "is_passed": false
+  },
+  {
+    "id": 14,
+    "comment": Password validation is performed in `PasswordService.validate_password`, not inside any Pydantic model.",
+    "is_passed": false
+  },
+  {
+    "id": 15,
+    "comment": Core business logic (registration, login, logout, profile changes) resides in `src/services/auth.py`.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": `PasswordService.create_hashed_password_and_salt` generates a random 32‑byte salt and uses it in PBKDF2 hashing.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": Endpoints `/auth/register`, `/auth/login`, and `/auth/logout` are defined in `src/endpoints/routers/auth.py`.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": No route matching `PUT /users/me` exists; only `GET /user/` and several `POST` change endpoints are present.",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": Both `integration_tests` (e.g., `integration_tests/tests/test_auth.py`) and unit tests in `tests` directory are provided.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": There is no implementation that contacts an external service to verify that an email is not temporary.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": `docker-compose.test.yaml` launches PostgreSQL (`auth_db`) and Redis (`auth_cache`) containers, and integration tests use them via the configured URLs.",
+    "is_passed": true
+  }
+]

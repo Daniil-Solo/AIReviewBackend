@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "comment": "Именно так",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "В проекте используется линтер Ruff",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Основной базой данных является PostgreSQL",
+    "is_passed": false
+  },
+  {
+    "id": 4,
+    "comment": "Корректно реализовано",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Время жизни токена 24 часа, что равняется суткам",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "Реализовано именно так",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Нет, у нее другое название",
+    "is_passed": false
+  },
+  {
+    "id": 8,
+    "comment": "Реализовано именно так",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "Даты приводятся к строковому формату YYYY-MM-DDThh:mm:ss",
+    "is_passed": false
+  },
+  {
+    "id": 10,
+    "comment": "Реализовано именно так",
+    "is_passed": true
+  },
+  {
+    "id": 11,
+    "comment": "Да, у таблицы sign_ins есть поле logout_at и связь с пользователем user_id",
+    "is_passed": true
+  },
+  {
+    "id": 12,
+    "comment": "Да, email является уникальным в таблице users",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Поля hashed_password, salt хранятся в таблице secure_user_infos",
+    "is_passed": false
+  },
+  {
+    "id": 14,
+    "comment": "Валидация пароля полностью вынесена в отдельный PasswordService",
+    "is_passed": false
+  },
+  {
+    "id": 15,
+    "comment": "Бизнес-логика находится в AuthService",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "Реализовано именно так",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "Реализовано именно так",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "Такого эндпоинта нет, существующие меняют только отдельно пароль, почту или имя",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "Оба вида тестов есть",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "Такой проверки нет",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "Реализовано именно так",
+    "is_passed": true
+  }
+]
