@@ -1,0 +1,167 @@
+[
+  {
+    "id": 534,
+    "comment": "Используются Pydantic-модели для валидации запросов и ответов во FastAPI (например, BaseModel в src/api/.../schemas.py и модели ответов).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Alembic миграции настроены (файлы в alembic/env.py и alembic/versions) и используются для управления схемой БД.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Глобальный обработчик исключений реализован в create_application (src/app.py) с возвращением структур ErrorResponse.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Используются Depends и внедрение зависимостей (dependencies в разных модулях, пример get_admin_course_run_command_service).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "В проекте присутствует middleware CORSMiddleware (через add_cors в src/app.py).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Реализована пагинация для списков, например в /api/courses с использованием Paginator и CoursesPaginationResponse.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Используются линтеры/форматтеры: Ruff в pyproject.toml и секция [tool.ruff].",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Есть тесты: unit_tests и integration_tests (структура проекта).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "У полей Pydantic-моделей заданы описания или примеры через Field/explainers (пример: общие схемы в base_schemas и др.).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Пароли хэшируются при регистрации через PasswordService (AuthCommandService.register_talent).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Используются репозитории/DAO: интерфейсы в domain и реализации в infrastructure/sqlalchemy/.../repository.py.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "CORS политика настроена (CORSMiddleware) в приложении.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Долгие операции вынесены в фоновую обработку не найдено (нет явных фоновых задач).",
+    "is_passed": false
+  },
+  {
+    "id": 534,
+    "comment": "Использование библиотеки логирования вместо print не просматривается в коде приложения (нет явных вызовов logging).",
+    "is_passed": false
+  },
+  {
+    "id": 534,
+    "comment": "Имена функций в коде в целом отражают смысл бизнес-логики (например, get_admin, create_course_run).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Все публичные функции и классы имеют аннотации типов аргументов и возвращаемых значений.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Глобальные переменные не мутируются; состояние инкапсулировано в классах/контекстах (константы и конфигурации не изменяются).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Используются генераторы (yield) для работы с потоками данных; get_redis_session возвращает генератор.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Сложные булевые выражения разбиты на именованные функции/переменные (например, __matched в TalentCourseQueryService).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Используются list/dict/set comprehensions для простых преобразований (пример: списки DTO-объектов в маршрутах).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Магические числа и строки вынесены в константы (UPPER_CASE) во многих модулях.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Сложные условные выражения разбиты на булевые функции/переменные (похоже на 28).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Нет необязательных мутабельных аргументов по умолчанию в сигнатурах функций (mutable defaults отсутствуют).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Для повторно используемых операций созданы утилитные функции/декораторы (dependencies и unit_of_work).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Тесты используют pytest-фикстуры и параметризацию (integration_tests/unit_tests).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Асинхронные функции не вызывают блокирующий код без run_in_executor (используются async-соединения к БД/Redis).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Для параллельного выполнения асинхронных задач не используются asyncio.gather/create_task (нет явной параллельной логики).",
+    "is_passed": false
+  },
+  {
+    "id": 534,
+    "comment": "Таймауты для внешних вызовов не явно задаются через asyncio.timeout или параметры клиентов (не видно явной установки таймаутов).",
+    "is_passed": false
+  },
+  {
+    "id": 534,
+    "comment": "Секреты не хардкодятся: конфигурация загружается из окружения (.env/.test.env) и через app_config.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Для проекта есть Dockerfile с корректной сборкой (Dockerfile.production).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Есть docker-compose-файлы для сервиса (dev.docker-compose.yaml, test.docker-compose.yaml) с несколькими сервисами.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Проект использует модульную структуру папок и не хранит весь код в одном файле.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Бизнес-логика отделена от API: сервисы/домены разделяют ответственность от эндпоинтов.",
+    "is_passed": true
+  }
+]

@@ -1,0 +1,109 @@
+```json
+[
+  {
+    "id": 1,
+    "comment": "В проекте присутствует директория migrations/ с env.py, script.py.mako и версиями миграций (1961c6ce7d4b_add_uniq_field.py, 2105cf88eb29_init_db.py, 3fca20419c7f_make_nullable_logout_at.py), используется Alembic для управления миграциями БД.",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "В pyproject.toml в секции [tool.poetry.group.dev.dependencies] указан ruff = \"^0.3.2\", присутствует конфигурация [tool.ruff] и [tool.ruff.lint] с настройками линтера.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "В docker-compose.yaml и docker-compose.test.yaml используется образ postgres:13.3, в src/config.py формируется URL postgresql+asyncpg://. Проект использует PostgreSQL, а не MySQL.",
+    "is_passed": false
+  },
+  {
+    "id": 4,
+    "comment": "В src/constants.py определена константа PASSWORD_MIN_LENGTH = 8, которая используется в src/services/password.py в методе validate_password для проверки длины пароля.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "В src/constants.py установлено AUTH_TOKEN_TTL = 60 * 60 * 24 (86400 секунд = 24 часа), что соответствует суткам. Это значение используется в src/cache/repositories/session.py при установке токена.",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "В src/app.py реализованы функции add_service_exceptions и add_other_exceptions, которые регистрируют централизованные обработчики исключений ServiceException и ApplicationException через @application.exception_handler.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "В src/app.py при создании FastAPI-приложения указан title=\"Shop Placement Platform\", а не 'Pasta Bean Auth Service' как требуется критерием.",
+    "is_passed": false
+  },
+  {
+    "id": 8,
+    "comment": "В src/app.py в зависимости от режима (app_config.is_debug) параметры docs_url и redoc_url устанавливаются в None при production-режиме, что отключает доступ к Swagger.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "В src/cache/repositories/session.py даты (user_created_at, password_updated_at) преобразуются в строки через str() (ISO-формат) и обратно через fromisoformat(), а не хранятся как timestamp (число/Unix time).",
+    "is_passed": false
+  },
+  {
+    "id": 10,
+    "comment": "В src/database/session.py при создании async_session_factory явно указан autocommit=False. Аналогично в integration_tests/conftest.py для тестовой сессии также установлен autocommit=False.",
+    "is_passed": true
+  },
+  {
+    "id": 11,
+    "comment": "В таблице sign_ins (модель SignIn в src/database/models.py) присутствует поле logout_at, которое обновляется при выходе пользователя (метод update_logout_status в src/database/repositories/signin.py), позволяя SQL-запросом определить время разлогина.",
+    "is_passed": true
+  },
+  {
+    "id": 12,
+    "comment": "В миграции 1961c6ce7d4b_add_uniq_field.py создано уникальное ограничение uq_users_email для поля email таблицы users. В модели src/database/models.py также указано unique=True для поля email.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Информация о пароле (hashed_password, salt) хранится в отдельной таблице secure_user_infos (модель SecureUserInfo), а не в таблице users. Таблица users содержит только id, name, email, created_at.",
+    "is_passed": false
+  },
+  {
+    "id": 14,
+    "comment": "Валидация пароля выполняется в src/services/password.py в методе validate_password класса PasswordService, а не в Pydantic-модели (src/dto/user.py).",
+    "is_passed": false
+  },
+  {
+    "id": 15,
+    "comment": "Бизнес-логика (регистрация, авторизация, изменение данных) реализована в src/services/auth.py. Эндпоинты в src/endpoints/routers/ являются тонкими и делегируют работу сервисам.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "В src/services/password.py метод create_hashed_password_and_salt генерирует случайную соль (os.urandom(32)) и использует pbkdf2_hmac для хеширования пароля с солью. Соль сохраняется в БД.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "В src/endpoints/routers/auth.py реализованы эндпоинты: @router.post(\"/register\"), @router.post(\"/login\"), @router.post(\"/logout\") с префиксом /auth.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "В системе отсутствует эндпоинт PUT /users/me. Изменение данных пользователя реализовано через отдельные POST-эндпоинты: /user/change_name, /user/change_email, /user/change_password.",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "В проекте присутствуют интеграционные тесты (директория integration_tests/tests/) и юнит-тесты (директория tests/services/).",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "В коде отсутствует проверка email через внешний сервис на предмет временности/одноразовости. Проверяется только уникальность email в БД.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "В integration_tests/conftest.py используются подключения к PostgreSQL (engine_test с asyncpg) и Redis (aioredis.Redis) через docker-compose.test.yaml, где подняты соответствующие инстансы.",
+    "is_passed": true
+  }
+]
+```

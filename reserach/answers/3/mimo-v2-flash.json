@@ -1,0 +1,167 @@
+[
+  {
+    "id": 2,
+    "comment": "Валидация запросов и ответов выполняется через Pydantic модели: в src/api/admin/course_run/schemas.py, src/api/admin/courses/schemas.py, src/api/auth/schemas.py и других файлах определены Pydantic-модели для запросов и ответов (например, CreateCourseRunRequest, CreateCourseRequest, LoginRequest).",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Настроены Alembic-миграции: в папке alembic/versions/ присутствуют файлы миграций (например, 2504c51722b5_course.py, e967288e19c5_user.py), а в alembic/env.py настроена работа с SQLAlchemy и метаданными моделей.",
+    "is_passed": true
+  },
+  {
+    "id": 4,
+    "comment": "Глобальный обработчик исключений добавлен в src/app.py: функция add_exception_handler регистрирует обработчики для ApplicationError и IncorrectUUIDError с кастомными ответами.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "Используется Depends для инъекции зависимостей: в src/api/admin/course_run/dependencies.py, src/api/auth/dependencies.py и других файлах определены функции-зависимости (например, get_admin_course_run_command_service, get_user).",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "Middleware не обнаружен в предоставленном коде: в src/app.py добавлен CORSMiddleware, но это не middleware для операций до/после обработки в общем смысле. Критерий не выполнен явно.",
+    "is_passed": false
+  },
+  {
+    "id": 8,
+    "comment": "Пагинация реализована для списков: в src/api/courses/router.py используется Paginator из src/api/base_pagination.py для эндпоинта get_courses, возвращающего список курсов.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "Проект использует линтеры: в pyproject.toml настроен ruff (группа dev.dependencies), и в readme.md указаны команды для запуска линтеров.",
+    "is_passed": true
+  },
+  {
+    "id": 10,
+    "comment": "В проекте есть тесты: в папках unit_tests и integration_tests присутствуют тесты (например, unit_tests/domain/auth/test_entity.py, integration_tests/auth/test_repositories.py).",
+    "is_passed": true
+  },
+  {
+    "id": 14,
+    "comment": "Поля Pydantic-моделей имеют описания или примеры: в src/api/base_schemas.py, src/api/auth/schemas.py и других файлах используются Field с примерами (например, examples=[\"Произошла ошибка\"]).",
+    "is_passed": true
+  },
+  {
+    "id": 15,
+    "comment": "Пароль хэшируется при аутентификации: в src/infrastructure/security/password_service.py используется hashlib.pbkdf2_hmac для хэширования паролей.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "Работа с БД вынесена в репозитории: в src/infrastructure/sqlalchemy/... определены классы репозиториев (например, SQLAlchemyUserRepository, SQLAlchemyCourseRepository) для абстракции доступа к данным.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "CORS политика настроена: в src/app.py в функции add_cors добавлен CORSMiddleware с allow_origins=[\"*\"].",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "Длительные операции не вынесены в фоновые задачи: в коде не обнаружено использование background tasks или библиотек для фоновых задач (например, Celery).",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "Для отладки используется библиотека логирования: в src/config.py настроен echo режим для SQLAlchemy, но явное использование logging не обнаружено. Критерий не выполнен явно.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "Функции именуются согласно логике: имена функций и методов (например, get_admin_course_run_command_service, create_course) отражают их назначение.",
+    "is_passed": true
+  },
+  {
+    "id": 22,
+    "comment": "Все публичные функции и классы имеют аннотации типов: в коде широко используются аннотации типов для аргументов и возвращаемых значений (например, в src/api/auth/dependencies.py).",
+    "is_passed": true
+  },
+  {
+    "id": 24,
+    "comment": "Избегается мутация глобальных переменных: состояние инкапсулировано в классах (например, Unit of Work, репозитории), глобальные переменные не изменяются.",
+    "is_passed": true
+  },
+  {
+    "id": 25,
+    "comment": "Генераторы (yield) используются для обработки больших последовательностей: в src/infrastructure/sqlalchemy/session.py функция get_async_session использует yield для получения сессии.",
+    "is_passed": true
+  },
+  {
+    "id": 28,
+    "comment": "Логические выражения без избыточных сравнений: в коде используется if is_valid: вместо if is_valid == True (например, в src/domain/courses/entities.py).",
+    "is_passed": true
+  },
+  {
+    "id": 31,
+    "comment": "Применяются list/dict/set comprehensions: в коде используются comprehensions (например, в src/infrastructure/redis/courses/course_cache_service.py для преобразования курсов).",
+    "is_passed": true
+  },
+  {
+    "id": 32,
+    "comment": "Магические числа и строки вынесены в константы: в src/domain/auth/constants.py, src/domain/courses/constants.py определены константы (например, PASSWORD_MIN_LENGTH, IMPLEMENTERS).",
+    "is_passed": true
+  },
+  {
+    "id": 33,
+    "comment": "Сложные условные выражения разбиты на именованные булевы функции: в коде используются понятные условия (например, в src/domain/courses/entities.py метод publish проверяет несколько условий).",
+    "is_passed": true
+  },
+  {
+    "id": 35,
+    "comment": "Функции не имеют необязательных мутабельных аргументов: в коде нет примеров def func(array=[]), вместо этого используется None (например, в src/api/admin/courses/schemas.py).",
+    "is_passed": true
+  },
+  {
+    "id": 37,
+    "comment": "Созданы декораторы или утилитарные функции для повторно используемых операций: в src/api/base_pagination.py определен класс Paginator для пагинации, который используется в нескольких местах.",
+    "is_passed": true
+  },
+  {
+    "id": 40,
+    "comment": "Используются pytest-фикстуры и параметризация: в integration_tests/conftest.py определены фикстуры, в unit_tests/domain/auth/test_value_objects.py используется параметризация.",
+    "is_passed": true
+  },
+  {
+    "id": 41,
+    "comment": "Асинхронные функции не вызывают синхронный блокирующий код: в коде нет явных вызовов time.sleep или requests.get без run_in_executor.",
+    "is_passed": true
+  },
+  {
+    "id": 42,
+    "comment": "Для параллельного выполнения асинхронных задач используется asyncio.gather или create_task: в коде не обнаружено явного использования этих методов.",
+    "is_passed": false
+  },
+  {
+    "id": 43,
+    "comment": "Таймауты для внешних вызовов не настроены: в коде нет явных таймаутов для HTTP или БД вызовов через asyncio.timeout или параметры клиентов.",
+    "is_passed": false
+  },
+  {
+    "id": 49,
+    "comment": "Сecrets не захардкожены: в src/config.py используется pydantic-settings для загрузки переменных окружения (например, POSTGRES_PASSWORD).",
+    "is_passed": true
+  },
+  {
+    "id": 54,
+    "comment": "Dockerfile с корректной сборкой: в проекте есть Dockerfile.production и entrypoint.sh для запуска приложения.",
+    "is_passed": true
+  },
+  {
+    "id": 55,
+    "comment": "Зависимости описаны в docker-compose: в dev.docker-compose.yaml и test.docker-compose.yaml описаны сервисы postgres и redis.",
+    "is_passed": true
+  },
+  {
+    "id": 65,
+    "comment": "Модульная структура папок: проект разделен на модули (src/api, src/domain, src/infrastructure и т.д.), код не хранится в одном файле.",
+    "is_passed": true
+  },
+  {
+    "id": 66,
+    "comment": "Бизнес-логика отделена от эндпоинтов: в src/services/ определены сервисные классы (например, CourseCommandService), которые используются в эндпоинтах.",
+    "is_passed": true
+  }
+]

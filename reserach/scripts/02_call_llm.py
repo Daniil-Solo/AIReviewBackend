@@ -32,7 +32,7 @@ $criteria_section
 {
   "id": 534,
   "comment": "строка с аргументированным выводом",
-  "is_passed": true | false | null
+  "is_passed": true | false | null (если критерий не применим в рамках данного кода)
 }
 """)
 

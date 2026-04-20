@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "comment": "В проекте присутствует директория migrations с файлами миграций (например, migrations/versions/2105cf88eb29_init_db.py), что указывает на использование Alembic.",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "В pyproject.toml указаны линтеры ruff и pytest, а также конфигурация для ruff, что подтверждает использование линтеров.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "В docker-compose.yaml и docker-compose.test.yaml используется образ postgres, а в src/config.py настраивается URL для PostgreSQL (postgresql+asyncpg://...), что указывает на использование MySQL. Однако в коде явно используется PostgreSQL, а не MySQL.",
+    "is_passed": false
+  },
+  {
+    "id": 4,
+    "comment": "В src/constants.py определена PASSWORD_MIN_LENGTH = 8, и в src/services/password.py метод validate_password проверяет длину пароля на соответствие этому значению.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "В src/constants.py AUTH_TOKEN_TTL = 60 * 60 * 24 (сутки), и в src/cache/repositories/session.py метод set использует это значение для установки TTL токена.",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "В src/app.py функция add_service_exceptions и add_other_exceptions добавляет централизованные обработчики для ServiceException и ApplicationException.",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "В src/app.py при создании FastAPI указан title='Shop Placement Platform', а не 'Pasta Bean Auth Service'. Swagger-документация будет иметь заголовок 'Shop Placement Platform'.",
+    "is_passed": false
+  },
+  {
+    "id": 8,
+    "comment": "В src/app.py docs_url и redoc_url устанавливаются в None, если app_config.is_debug равно False (режим Production), что отключает доступ к Swagger-документации.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "В src/cache/repositories/session.py метод __from_user_dto_to_json_string преобразует даты в строки (timestamp-подобный формат) при сохранении в Redis, что соответствует хранению в виде timestamp.",
+    "is_passed": true
+  },
+  {
+    "id": 10,
+    "comment": "В src/database/session.py async_session_factory создается с autocommit=False, что отключает автокоммит при работе с SQLAlchemy.",
+    "is_passed": true
+  },
+  {
+    "id": 11,
+    "comment": "В миграции migrations/versions/3fca20419c7f_make_nullable_logout_at.py добавлено поле logout_at в таблицу sign_ins, которое хранит время разлогина. SQL-запросы могут использовать это поле для поиска информации о разлогине.",
+    "is_passed": true
+  },
+  {
+    "id": 12,
+    "comment": "В миграции migrations/versions/1961c6ce7d4b_add_uniq_field.py добавлен уникальный индекс на поле email в таблице users, что предотвращает существование двух пользователей с одинаковыми email.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "В таблице users нет поля для хранения пароля; пароль хранится в связанной таблице secure_user_infos (поле hashed_password). Это нарушает критерий, так как информация о пароле должна быть в таблице users.",
+    "is_passed": false
+  },
+  {
+    "id": 14,
+    "comment": "Валидация пароля выполняется в методе validate_password класса PasswordService, который вызывается в AuthService, но не является частью Pydantic-модели (например, UserRegisterDTO).",
+    "is_passed": false
+  },
+  {
+    "id": 15,
+    "comment": "Бизнес-логика (регистрация, логин, логаут, изменение данных) находится в классе AuthService в src/services/auth.py, что соответствует критерию.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "В src/services/password.py метод create_hashed_password_and_salt использует hashlib.pbkdf2_hmac с солью, что обеспечивает просаливание пароля.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "В src/endpoints/routers/auth.py реализованы эндпоинты /auth/register, /auth/login, /auth/logout.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "В проекте нет эндпоинта PUT /users/me; вместо этого есть POST-эндпоинты для изменения пароля, имени и email в /user/change_password, /user/change_name, /user/change_email.",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "В директориях tests и integration_tests присутствуют юнит-тесты (например, tests/services/test_auth.py) и интеграционные тесты (например, integration_tests/tests/test_auth.py).",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "В коде нет проверки почты через внешний сервис на временный email; валидация email отсутствует.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "В integration_tests/conftest.py используются PostgreSQL (engine_test) и Redis (aioredis) для интеграционных тестов, что соответствует критерию.",
+    "is_passed": true
+  }
+]

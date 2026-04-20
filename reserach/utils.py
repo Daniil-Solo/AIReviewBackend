@@ -3,7 +3,7 @@ import datetime
 from pathlib import Path
 
 from reserach.constants import INPUT_PRICE_MAP, OUTPUT_PRICE_MAP
-from reserach.schemas import DatasetRecord
+from reserach.schemas import DatasetRecord, ModelProjectLog
 from reserach.settings import RESEARCH_DIR
 
 
@@ -51,6 +51,24 @@ def log_llm_calling(model: str, project_id: int, input_tokens: int, output_token
     log_filepath = RESEARCH_DIR / "log.csv"
     with open(log_filepath, "a+") as f:
         f.write(f"{model},{project_id},{input_tokens},{output_tokens},{duration}\n")
+
+
+def get_logs() -> list[ModelProjectLog]:
+    records = []
+    log_filepath = RESEARCH_DIR / "log.csv"
+    with open(log_filepath, mode='r', newline='') as f:
+        csv_reader = csv.reader(f)
+        next(csv_reader)
+        for row in csv_reader:
+            new_record = ModelProjectLog(
+                model=row[0],
+                project_id=int(row[1]),
+                input_tokens=int(row[2]),
+                output_tokens=int(row[3]),
+                duration=float(row[4]),
+            )
+            records.append(new_record)
+    return records
 
 
 def calculate_cost(model_name: str, input_tokens: int, output_tokens: int) -> float:

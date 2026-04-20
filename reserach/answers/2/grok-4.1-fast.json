@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "comment": "Проект использует alembic-миграции: присутствует папка migrations с файлами env.py, script.py.mako и версиями миграций (2105cf88eb29_init_db.py, 1961c6ce7d4b_add_uniq_field.py, 3fca20419c7f_make_nullable_logout_at.py), alembic.ini в корне.",
+    "is_passed": true
+  },
+  {
+    "id": 2,
+    "comment": "В pyproject.toml настроен ruff в [tool.ruff.lint] и [tool.ruff.format] с правилами линтинга и форматирования.",
+    "is_passed": true
+  },
+  {
+    "id": 3,
+    "comment": "Используется PostgreSQL: docker-compose.yaml и docker-compose.test.yaml указывают image: postgres:13.3, config.py генерирует postgresql+asyncpg URL, infrastructure/postgresql.env для Postgres.",
+    "is_passed": false
+  },
+  {
+    "id": 4,
+    "comment": "src/constants.py: PASSWORD_MIN_LENGTH = 8, src/services/password.py: validate_password проверяет if len(password) < PASSWORD_MIN_LENGTH.",
+    "is_passed": true
+  },
+  {
+    "id": 5,
+    "comment": "src/constants.py: AUTH_TOKEN_TTL = 60 * 60 * 24 (86400 секунд = 24 часа), используется в src/cache/repositories/session.py при set(..., keepttl=AUTH_TOKEN_TTL).",
+    "is_passed": true
+  },
+  {
+    "id": 6,
+    "comment": "src/app.py: add_service_exceptions добавляет @application.exception_handler(ServiceException) и подклассы (NeedAuthException -> 401, SuchUserDoesntExistException -> 404).",
+    "is_passed": true
+  },
+  {
+    "id": 7,
+    "comment": "src/app.py: FastAPI(title=\"Shop Placement Platform\"), не 'Pasta Bean Auth Service'.",
+    "is_passed": false
+  },
+  {
+    "id": 8,
+    "comment": "src/app.py: docs_url=\"/docs\" if app_config.is_debug else None, redoc_url аналогично, в production (не debug) отключено.",
+    "is_passed": true
+  },
+  {
+    "id": 9,
+    "comment": "src/cache/repositories/session.py: даты сериализуются как str(user_dict[\"user_created_at\"] = str(...)) в JSON, десериализуются datetime.fromisoformat, не timestamp (int/float).",
+    "is_passed": false
+  },
+  {
+    "id": 10,
+    "comment": "src/database/session.py: async_sessionmaker(bind=async_engine, autocommit=False, autoflush=False).",
+    "is_passed": true
+  },
+  {
+    "id": 11,
+    "comment": "Таблица sign_ins (migrations/2105cf88eb29_init_db.py, models.py) имеет поле logout_at (nullable=True после 3fca20419c7f_make_nullable_logout_at.py), обновляется в src/database/repositories/signin.py update_logout_status, можно SELECT logout_at FROM sign_ins WHERE auth_token = ?.",
+    "is_passed": true
+  },
+  {
+    "id": 12,
+    "comment": "migrations/1961c6ce7d4b_add_uniq_field.py: op.create_unique_constraint('uq_users_email', 'users', ['email']), src/database/models.py: email unique=True.",
+    "is_passed": true
+  },
+  {
+    "id": 13,
+    "comment": "Пароль в отдельной таблице secure_user_infos (migrations/2105cf88eb29_init_db.py, models.py), таблица users не содержит hashed_password или salt.",
+    "is_passed": false
+  },
+  {
+    "id": 14,
+    "comment": "Валидация в src/services/password.py PasswordService.validate_password, вызывается в src/services/auth.py register_user и change_password, UserRegisterDTO в src/dto/user.py без validator.",
+    "is_passed": false
+  },
+  {
+    "id": 15,
+    "comment": "Бизнес-логика в src/services/auth.py (register_user, login, logout, get_user, change_*), endpoints в src/endpoints/routers/*.py делегируют вызовы AuthService.",
+    "is_passed": true
+  },
+  {
+    "id": 16,
+    "comment": "src/services/password.py: salt = os.urandom(32), hashlib.pbkdf2_hmac(..., salt, ...), сохраняется в secure_user_infos.salt.",
+    "is_passed": true
+  },
+  {
+    "id": 17,
+    "comment": "src/endpoints/routers/auth.py: POST /auth/register, /auth/login, /auth/logout.",
+    "is_passed": true
+  },
+  {
+    "id": 18,
+    "comment": "Нет PUT /users/me, есть GET /user/, POST /user/change_* в src/endpoints/routers/user.py.",
+    "is_passed": false
+  },
+  {
+    "id": 19,
+    "comment": "Юнит-тесты: tests/services/test_*.py, tests/conftest.py. Интеграционные: integration_tests/tests/test_*.py, conftest.py с async_client.",
+    "is_passed": true
+  },
+  {
+    "id": 20,
+    "comment": "Нет проверки email через внешний сервис, валидация только на уникальность в auth.py register_user.",
+    "is_passed": false
+  },
+  {
+    "id": 21,
+    "comment": "docker-compose.test.yaml: auth_db (postgres:13.3), auth_cache (redis:alpine); integration_tests/conftest.py: override_get_async_session с test_db_url (PostgreSQL), override_get_redis_session с TEST_CACHE_HOST:PORT (Redis), prepare_storages создает/дропает таблицы и flushall Redis.",
+    "is_passed": true
+  }
+]

@@ -1,0 +1,107 @@
+[
+  {
+    "id": 534,
+    "comment": "Используются Alembic миграции: наличие migrations (versions), файл alembic.ini и миграционная логика в migrations/env.py реализующая онлайн/offiline миграции.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Проект использует линтеры: зависимость и конфигурация Ruff присутствуют в pyproject.toml ([tool.ruff] и dev dependencies).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "База данных по умолчанию не MySQL, используется PostgreSQL: формирование DSN через postgrespl+asyncpg в src/config.py и доставка Postgres образов в docker-compose (postgres:13.3).",
+    "is_passed": false
+  },
+  {
+    "id": 534,
+    "comment": "Минимальная длина пароля составляет 8 символов: константа PASSWORD_MIN_LENGTH = 8 в src/constants.py и проверка в PasswordService.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Токен доступен в течение суток: AUTH_TOKEN_TTL = 60*60*24 в src/constants.py; хранение в Redis через keepttl=AUTH_TOKEN_TTL в src/cache/repositories/session.py.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "FastAPI имеет централизованный обработчик сервисных ошибок: обработчики ServiceException и ApplicationException объявлены в src/app.py.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Swagger-документация имеет заголовок 'Pasta Bean Auth Service': в create_application заголовок установлен как 'Shop Placement Platform' (несоответствие).",
+    "is_passed": false
+  },
+  {
+    "id": 534,
+    "comment": "В режиме Production доступ к Swagger-документации отключён: docs_url формируется как None, если не debug (src/app.py).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Даты в кэше хранятся в виде строковых значений дат и восстанавливаются через fromisoformat (серийное представление дат в JSON-строке).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Автокоммит при работе с SQLAlchemy отключён: async_sessionmaker(..., autocommit=False) в src/database/session.py.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "С помощью SQL и реализованных таблиц можно найти информацию о logout_at: поле logout_at в SignIn и обновление статуса через SignInSQLARepository; миграции под это поле обновлялись.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Не допускается существование двух пользователей с одинаковым email: уникальные ограничения на email (миграции) и уникальность поля в модели User.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Информация о пароле хранится в таблице SecureUserInfo (hashed_password, salt) через связь с User, а не в таблице users.",
+    "is_passed": false
+  },
+  {
+    "id": 534,
+    "comment": "Валидация пароля реализована через PasswordService в сервисах, а не как часть Pydantic-модели UserRegisterDTO.",
+    "is_passed": false
+  },
+  {
+    "id": 534,
+    "comment": "Бизнес-логика находится в сервисах: AuthService реализует регистрацию, авторизацию, изменение данных и пр. (src/services/auth.py).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Пароль дополнительно просаливается: salt генерируется в PasswordService.create_hashed_password_and_salt и включается в результаты хеширования.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Реализованы эндпоинты /auth/register, /auth/login, /auth/logout в src/endpoints/routers/auth.py.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Нет эндпоинта PUT /users/me; изменение пользователя реализовано только через POST на /user/change_*, без PUT /users/me.",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "В проекте есть интеграционные и юнит-тесты: директории tests и integration_tests с тестами (test_auth.py, test_user.py и т.д.).",
+    "is_passed": true
+  },
+  {
+    "id": 534,
+    "comment": "Почта не проверяется через внешний сервис на временность: в коде отсутствуют вызовы внешних почтовых сервисов; проверка почты не реализована на внешнем API.",
+    "is_passed": false
+  },
+  {
+    "id": 534,
+    "comment": "Интеграционные тесты используют запущенные PostgreSQL и Redis (docker-compose.yaml и docker-compose.test.yaml говорят о сервисах auth_db и auth_cache).",
+    "is_passed": true
+  }
+]

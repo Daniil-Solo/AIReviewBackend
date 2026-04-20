@@ -62,7 +62,7 @@ def load_repository(repo_url: str, branch: str) -> bytes:
         return response.content
 
 
-def count_tokens(text: str, model: str = "gpt-4") -> int:
+def count_tokens(text: str, model: str = "gpt-5") -> int:
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(text))
 
