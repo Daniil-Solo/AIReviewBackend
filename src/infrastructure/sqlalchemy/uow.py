@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.dao.criteria.interface import CriteriaDAO
 from src.infrastructure.dao.pipeline_tasks.interface import PipelineTasksDAO
+from src.infrastructure.dao.solution_criteria_checks.interface import SolutionCriteriaChecksDAO
 from src.infrastructure.dao.solutions.interface import SolutionsDAO
 from src.infrastructure.dao.task_criteria.interface import TaskCriteriaDAO
 from src.infrastructure.dao.tasks.interface import TasksDAO
@@ -37,6 +38,7 @@ class UnitOfWork:
         tasks_dao_factory: Callable[[AsyncSession], TasksDAO],
         task_criteria_dao_factory: Callable[[AsyncSession], TaskCriteriaDAO],
         solutions_dao_factory: Callable[[AsyncSession], SolutionsDAO],
+        solution_criteria_checks_dao_factory: Callable[[AsyncSession], SolutionCriteriaChecksDAO],
         pipeline_tasks_dao_factory: Callable[[AsyncSession], PipelineTasksDAO],
         transactions_dao_factory: Callable[[AsyncSession], TransactionsDAO],
     ) -> None:
@@ -51,6 +53,7 @@ class UnitOfWork:
         self._tasks_dao_factory = tasks_dao_factory
         self._task_criteria_dao_factory = task_criteria_dao_factory
         self._solutions_dao_factory = solutions_dao_factory
+        self._solution_criteria_checks_dao_factory = solution_criteria_checks_dao_factory
         self._pipeline_tasks_dao_factory = pipeline_tasks_dao_factory
         self._transactions_dao_factory = transactions_dao_factory
         # dao
@@ -62,6 +65,7 @@ class UnitOfWork:
         self._tasks: TasksDAO | None = None
         self._task_criteria: TaskCriteriaDAO | None = None
         self._solutions: SolutionsDAO | None = None
+        self._solution_criteria_checks: SolutionCriteriaChecksDAO | None = None
         self._pipeline_tasks: PipelineTasksDAO | None = None
         self._transactions: TransactionsDAO | None = None
 
@@ -88,6 +92,7 @@ class UnitOfWork:
                 self._tasks = None
                 self._task_criteria = None
                 self._solutions = None
+                self._solution_criteria_checks = None
                 self._pipeline_tasks = None
                 self._transactions = None
 
@@ -144,6 +149,12 @@ class UnitOfWork:
         if self._solutions is None:
             self._solutions = self._solutions_dao_factory(self._session)  # type: ignore[assignment]
         return self._solutions
+
+    @property
+    def solution_criteria_checks(self) -> SolutionCriteriaChecksDAO:
+        if self._solution_criteria_checks is None:
+            self._solution_criteria_checks = self._solution_criteria_checks_dao_factory(self._session)  # type: ignore[assignment]
+        return self._solution_criteria_checks
 
     @property
     def pipeline_tasks(self) -> PipelineTasksDAO:

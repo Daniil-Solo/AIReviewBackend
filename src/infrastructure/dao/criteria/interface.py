@@ -18,7 +18,13 @@ class CriteriaDAO(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list(self, filters: CriterionFiltersDTO, created_by: int) -> list[CriterionResponseDTO]:
+    async def get_list(self, filters: CriterionFiltersDTO) -> list[CriterionResponseDTO]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_workspace_criteria(
+        self, workspace_id: int, filters: CriterionFiltersDTO
+    ) -> list[CriterionResponseDTO]:
         raise NotImplementedError
 
     @abstractmethod
@@ -30,5 +36,5 @@ class CriteriaDAO(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_available_tags(self, created_by: int) -> list[str]:
+    async def get_available_tags(self) -> list[str]:
         raise NotImplementedError
