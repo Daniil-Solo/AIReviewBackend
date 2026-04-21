@@ -15,6 +15,7 @@ from src.application.ai_review.project_doc import (
     improve_doc,
     resolve_gaps,
 )
+from src.application.ai_review.criteria_grading import grade_by_codebase, grade_by_project_doc
 from src.application.ai_review.task_graph import is_step_ready
 from src.constants.ai_pipeline import PipelineStepEnum, PipelineTaskStatusEnum
 from src.constants.ai_review import SolutionStatusEnum
@@ -34,6 +35,8 @@ STEP_HANDLER_MAP: dict[PipelineStepEnum, Callable[[int], Awaitable[None]]] = {
     PipelineStepEnum.GENERATE_CRITIC: generate_critic,
     PipelineStepEnum.RESOLVE_GAPS: resolve_gaps,
     PipelineStepEnum.IMPROVE_DOC: improve_doc,
+    PipelineStepEnum.GRADE_BY_PROJECT_DOC: grade_by_project_doc,
+    PipelineStepEnum.GRADE_BY_CODEBASE: grade_by_codebase,
 }
 
 

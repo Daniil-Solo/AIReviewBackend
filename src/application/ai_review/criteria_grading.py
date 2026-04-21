@@ -40,15 +40,20 @@ async def grade_by_project_doc(
                 task_criterion_id=task_criterion.id,
                 solution_id=solution.id,
             ))
-            is_checking_stage = criterion.stage != CriterionStageEnum.PROJECT_DOC and criterion.stage is not None
+            is_checking_stage = criterion.stage == CriterionStageEnum.PROJECT_DOC
+            is_empty_stage = criterion.stage is None
             need_checking_from_other_stage = False
-            if is_checking_stage or need_checking_from_other_stage:
+            if is_checking_stage or is_empty_stage or need_checking_from_other_stage:
                 criterion_for_review = CriterionWithCommentsDTO(
                     id=task_criterion.id,
                     description=criterion.description,
                     comments=[check.comment for check in criterion_checks]
                 )
                 criteria.append(criterion_for_review)
+    logger.error("criteria", criteria=criteria)
+    if not criteria:
+        await artifact_storage.save_artifact(solution_id, PipelineStepEnum.GRADE_BY_PROJECT_DOC, "Нет подходящих критериев")
+        return
 
     system_content = prompt_builder.build(
         prompt_path="criteria_checks/projectdoc_grading/system.tpl", criteria=criteria
@@ -92,7 +97,7 @@ async def grade_by_codebase(
     prompt_builder: PromptBuilderInterface = Provide[Container.prompt_builder],
     default_model: LLMInterface = Provide[Container.default_model],
     artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
-) -> None:  # list[CriterionCheckDTO]
+) -> None:
     project_tree_doc = await artifact_storage.get_artifact(solution_id, PipelineStepEnum.PREPARE_PROJECT_TREE)
     project_content_doc = await artifact_storage.get_artifact(solution_id, PipelineStepEnum.PREPARE_PROJECT_CONTENT)
 
@@ -107,8 +112,8 @@ async def grade_by_codebase(
                 task_criterion_id=task_criterion.id,
                 solution_id=solution.id,
             ))
-            is_checking_stage = criterion.stage != CriterionStageEnum.CODEBASE and criterion.stage is not None
-            need_checking_from_other_stage = False if not criterion_checks else criterion_checks[-1].status == CriterionCheckStatusEnum.NEEDS_CODE
+            is_checking_stage = criterion.stage == CriterionStageEnum.CODEBASE
+            need_checking_from_other_stage = criterion_checks and criterion_checks[-1].status == CriterionCheckStatusEnum.NEEDS_CODE
             if is_checking_stage or need_checking_from_other_stage:
                 criterion_for_review = CriterionWithCommentsDTO(
                     id=task_criterion.id,
@@ -116,6 +121,10 @@ async def grade_by_codebase(
                     comments=[check.comment for check in criterion_checks]
                 )
                 criteria.append(criterion_for_review)
+    logger.error("criteria", criteria=criteria)
+    if not criteria:
+        await artifact_storage.save_artifact(solution_id, PipelineStepEnum.GRADE_BY_CODEBASE,"Нет подходящих критериев")
+        return
 
     system_content = prompt_builder.build(prompt_path="criteria_checks/codebase_grading/system.tpl", criteria=criteria)
     user_content = prompt_builder.build(
@@ -145,7 +154,7 @@ async def grade_by_codebase(
                 task_criterion_id=criterion_check.id,
                 solution_id=solution_id,
                 comment=criterion_check.comment,
-                stage=CriterionStageEnum.PROJECT_DOC,
+                stage=CriterionStageEnum.CODEBASE,
                 status=criterion_check.status,
                 is_passed=criterion_check.is_passed
             )
