@@ -18,6 +18,7 @@ class SolutionCriteriaCheckCreateDTO(BaseDTO):
 class SolutionCriteriaCheckFiltersDTO(BaseDTO):
     task_criterion_id: int | None = Field(default=None, description="ID связки задачи и критерия")
     solution_id: int | None = Field(default=None, description="ID решения")
+    statuses: list[CriterionCheckStatusEnum] | None = Field(default=None, description="Статусы решения")
 
 
 class SolutionCriteriaCheckCreateRequestDTO(BaseDTO):
