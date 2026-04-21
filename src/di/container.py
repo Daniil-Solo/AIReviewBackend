@@ -9,6 +9,7 @@ from src.infrastructure.dao.criteria.sqlalchemy import SQLAlchemyCriteriaDAO
 from src.infrastructure.dao.pipeline_tasks.sqlalchemy import SQLAlchemyPipelineTasksDAO
 from src.infrastructure.dao.registrations.interface import RegistrationsFlow
 from src.infrastructure.dao.registrations.redis import RedisRegistrationsFlow
+from src.infrastructure.dao.solution_criteria_checks.sqlalchemy import SQLAlchemySolutionCriteriaChecksDAO
 from src.infrastructure.dao.solutions.sqlalchemy import SQLAlchemySolutionsDAO
 from src.infrastructure.dao.task_criteria.sqlalchemy import SQLAlchemyTaskCriteriaDAO
 from src.infrastructure.dao.tasks.sqlalchemy import SQLAlchemyTasksDAO
@@ -35,9 +36,7 @@ from src.settings import ROOT_DIR, settings
 
 class Container(containers.DeclarativeContainer):
     engine = providers.Singleton(
-        create_engine,
-        url=providers.Callable(lambda: settings.db.url),
-        echo=settings.db.SQL_ECHO
+        create_engine, url=providers.Callable(lambda: settings.db.url), echo=settings.db.SQL_ECHO
     )
 
     session_factory = providers.Singleton(
@@ -53,6 +52,7 @@ class Container(containers.DeclarativeContainer):
     tasks_dao = providers.Factory(lambda: SQLAlchemyTasksDAO)
     task_criteria_dao = providers.Factory(lambda: SQLAlchemyTaskCriteriaDAO)
     solutions_dao = providers.Factory(lambda: SQLAlchemySolutionsDAO)
+    solution_criteria_checks_dao = providers.Factory(lambda: SQLAlchemySolutionCriteriaChecksDAO)
     pipeline_tasks_dao = providers.Factory(lambda: SQLAlchemyPipelineTasksDAO)
     transactions_dao = providers.Factory(lambda: SQLAlchemyTransactionsDAO)
 
@@ -83,6 +83,7 @@ class Container(containers.DeclarativeContainer):
         tasks_dao_factory=tasks_dao,
         task_criteria_dao_factory=task_criteria_dao,
         solutions_dao_factory=solutions_dao,
+        solution_criteria_checks_dao_factory=solution_criteria_checks_dao,
         pipeline_tasks_dao_factory=pipeline_tasks_dao,
         transactions_dao_factory=transactions_dao,
     )
