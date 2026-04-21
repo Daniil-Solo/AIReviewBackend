@@ -52,25 +52,26 @@ async def run_worker() -> None:
 
             start_time = time.perf_counter()
             try:
-                solution = await uow.solutions.get_by_id(task.solution_id)
-                if not is_step_ready(task.step, solution.steps):
-                    await uow.pipeline_tasks.update_last_checked_at(task.id)
-                    logger.debug(f"Task {task.id} not ready, skipping")
-                    continue
+                async with uow.connection():
+                    solution = await uow.solutions.get_by_id(task.solution_id)
+                    if not is_step_ready(task.step, solution.steps):
+                        await uow.pipeline_tasks.update_last_checked_at(task.id)
+                        logger.debug(f"Task {task.id} not ready, skipping")
+                        continue
 
-                logger.info(f"Processing task {task.id}: solution_id={task.solution_id}, step={task.step}")
+                    logger.info(f"Processing task {task.id}: solution_id={task.solution_id}, step={task.step}")
 
-                if solution.status == SolutionStatusEnum.CANCELLED:
-                    await uow.pipeline_tasks.update_last_checked_at(task.id)
-                    logger.debug(f"Solution {solution.id} is CANCELLED, skipping task {task.id}")
-                    continue
+                    if solution.status == SolutionStatusEnum.CANCELLED:
+                        await uow.pipeline_tasks.update_last_checked_at(task.id)
+                        logger.debug(f"Solution {solution.id} is CANCELLED, skipping task {task.id}")
+                        continue
 
-                await uow.pipeline_tasks.update(
-                    task.id,
-                    PipelineTaskUpdateDTO(
-                        status=PipelineTaskStatusEnum.RUNNING, ran_at=datetime.datetime.now(datetime.UTC)
-                    ),
-                )
+                    await uow.pipeline_tasks.update(
+                        task.id,
+                        PipelineTaskUpdateDTO(
+                            status=PipelineTaskStatusEnum.RUNNING, ran_at=datetime.datetime.now(datetime.UTC)
+                        ),
+                    )
 
                 handler = STEP_HANDLER_MAP.get(task.step)
                 if not handler:
