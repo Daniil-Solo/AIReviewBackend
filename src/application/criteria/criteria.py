@@ -67,6 +67,25 @@ async def get_list(
 
 
 @inject
+async def get_list_for_task(
+    task_id: int,
+    filters: CriterionFiltersDTO,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> list[CriterionResponseDTO]:
+    async with uow.connection():
+        task = await uow.tasks.get_by_id(task_id)
+        await check_member_role(
+            uow, user.id, task.workspace_id,
+            allowed_roles={WorkspaceMemberRoleEnum.TEACHER, WorkspaceMemberRoleEnum.OWNER}
+        )
+        filters.task_id = task_id
+        filters.workspace_id = task.workspace_id
+        return await uow.criteria.get_list(filters)
+
+
+
+@inject
 async def get_workspace_criteria(
     workspace_id: int,
     filters: CriterionFiltersDTO,

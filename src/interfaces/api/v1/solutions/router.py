@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 from fastapi.responses import StreamingResponse
 
 import src.application.ai_review.pipeline as pipeline_service
-import src.application.solutions.solution_criteria_checks as solution_criteria_checks_service
+import src.application.solutions.review_by_criteria as solution_criteria_checks_service
 import src.application.solutions.solutions as solution_service
 from src.constants.ai_pipeline import PipelineStepEnum
 from src.constants.ai_review import SolutionFormatEnum
 from src.dto.ai_review.pipeline import PipelineInfoDTO
 from src.dto.common import SuccessOperationDTO
+from src.dto.solutions.human_grading import CriteriaGradingReviewResponseDTO
 from src.dto.solutions.solution_criteria_checks import SolutionCriteriaCheckCreateRequestDTO
 from src.dto.solutions.solutions import (
     SolutionCreateRequestDTO,
@@ -96,3 +97,11 @@ async def create_criteria_check_endpoint(
 ) -> SuccessOperationDTO:
     await solution_criteria_checks_service.create_criteria_check(solution_id, data, user)
     return SuccessOperationDTO(message="Фидбек оставлен")
+
+
+@router.get("/{solution_id}/criteria-checks", response_model=CriteriaGradingReviewResponseDTO)
+async def get_criteria_check_endpoint(
+    solution_id: int,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> CriteriaGradingReviewResponseDTO:
+    return await solution_criteria_checks_service.get_criteria_review(solution_id, user)

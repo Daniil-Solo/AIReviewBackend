@@ -21,6 +21,7 @@ class SQLAlchemySolutionCriteriaChecksDAO(SolutionCriteriaChecksDAO):
             query = query.where(solution_criteria_checks_table.c.task_criterion_id == filters.task_criterion_id)
         if filters.solution_id is not None:
             query = query.where(solution_criteria_checks_table.c.solution_id == filters.solution_id)
+        query = query.order_by(solution_criteria_checks_table.c.created_at.asc())
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [SolutionCriteriaCheckResponseDTO.model_validate(row) for row in rows]

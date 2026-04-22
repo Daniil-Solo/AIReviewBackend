@@ -43,6 +43,8 @@ class CriterionResponseDTO(BaseDTO):
 class CriterionFiltersDTO(BaseDTO):
     search: str | None = Field(default=None, description="Поисковой запрос")
     tags: list[str] | None = Field(default=None, description="Теги")
+    workspace_id: int | None = Field(default=None, description="ID workspace для workspace-level критерия")
+    task_id: int | None = Field(default=None, description="ID задачи для task-level критерия")
 
     @field_validator("tags", mode="before")
     @classmethod

@@ -40,15 +40,29 @@ class SQLAlchemyCriteriaDAO(CriteriaDAO):
         return CriterionResponseDTO.model_validate(row)
 
     async def get_list(self, filters: CriterionFiltersDTO) -> list[CriterionResponseDTO]:
-        query = sa.select(criteria_table).where(
-            criteria_table.c.workspace_id.is_(None),
-            criteria_table.c.task_id.is_(None),
-        )
+        query = sa.select(criteria_table)
+
         if filters.tags is not None:
             tag_conditions = [criteria_table.c.tags.any(tag) for tag in filters.tags]
             query = query.where(sa.or_(*tag_conditions))
         if filters.search is not None:
             query = query.where(criteria_table.c.description.ilike(f"%{filters.search}%"))
+
+        level_conditions = []
+
+        if filters.workspace_id is not None:
+            level_conditions.append(criteria_table.c.workspace_id == filters.workspace_id)
+        if filters.task_id is not None:
+            level_conditions.append(criteria_table.c.task_id == filters.task_id)
+
+        level_conditions.append(
+            sa.and_(
+                criteria_table.c.workspace_id.is_(None),
+                criteria_table.c.task_id.is_(None),
+            )
+        )
+
+        query = query.where(sa.or_(*level_conditions))
 
         result = await self.session.execute(query)
         rows = result.fetchall()
