@@ -1,6 +1,7 @@
 import datetime
 from typing import Any
 
+from fastapi import UploadFile
 from pydantic import Field, field_validator
 
 from src.constants.ai_pipeline import PipelineStepEnum
@@ -11,11 +12,12 @@ from src.dto.users.user import ShortUserDTO
 
 class SolutionCreateRequestDTO(BaseDTO):
     task_id: int = Field(description="ID задачи")
-    format: SolutionFormatEnum = Field(description="Формат решения (ZIP/GITHUB)")
-
+    format: SolutionFormatEnum = Field(description="Формат решения")
+    github_repo_link: str | None = Field(description="Ссылка на GitHub-репозиторий")
+    github_repo_branch: str | None = Field(description="Ветка GitHub-репозитория")
 
 class SolutionCreateDTO(SolutionCreateRequestDTO):
-    link: str = Field(description="Ссылка на решение (для GITHUB)")
+    artifact_path: str = Field(description="Путь до артефакта решения")
 
 
 class SolutionUpdateDTO(BaseDTO):
@@ -30,7 +32,9 @@ class SolutionResponseDTO(BaseDTO):
     id: int = Field(description="ID решения")
     task_id: int = Field(description="ID задачи")
     format: SolutionFormatEnum = Field(description="Формат решения")
-    link: str = Field(description="Ссылка на решение")
+    github_repo_link: str | None = Field(description="Ссылка на GitHub-репозиторий")
+    github_repo_branch: str | None = Field(description="Ветка GitHub-репозитория")
+    artifact_path: str = Field(description="Путь до артефакта решения")
     status: SolutionStatusEnum = Field(description="Статус решения")
     steps: list[PipelineStepEnum] = Field(description="Шаги проверки")
     human_grade: int | None = Field(description="Оценка преподавателя")
@@ -51,7 +55,8 @@ class SolutionShortResponseDTO(BaseDTO):
     id: int = Field(description="ID решения")
     task_id: int = Field(description="ID задачи")
     format: SolutionFormatEnum = Field(description="Формат решения")
-    link: str = Field(description="Ссылка на решение")
+    github_repo_link: str | None = Field(description="Ссылка на GitHub-репозиторий")
+    github_repo_branch: str | None = Field(description="Ветка GitHub-репозитория")
     status: SolutionStatusEnum = Field(description="Статус решения")
     steps: list[PipelineStepEnum] = Field(description="Шаги проверки")
     human_grade: int | None = Field(description="Оценка преподавателя")

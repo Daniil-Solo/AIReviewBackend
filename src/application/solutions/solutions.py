@@ -1,9 +1,11 @@
+import io
 import re
+from typing import IO, Any
 
 from botocore.exceptions import ClientError
 from dependency_injector.wiring import Provide, inject
-from fastapi import UploadFile
 import httpx
+from fastapi import UploadFile
 
 from src.application.exceptions import ApplicationError, EntityNotFoundError, ForbiddenError
 from src.application.solutions.common import check_solution_permissions
@@ -27,23 +29,20 @@ from src.infrastructure.storage.artifact import SolutionArtifactStorage
 from src.infrastructure.storage.interface import SolutionStorage
 
 
-async def validate_github_link(link: str) -> None:
-    url = link.strip().rstrip("/")
+async def get_repo_zip(github_repo_link: str, github_repo_branch: str) -> IO[Any]:
+    url = github_repo_link.strip().rstrip("/")
 
     match = re.search(r"github\.com/([^/]+)/([^/]+)/?$", url, re.IGNORECASE)
-    if match:
-        owner, repo = match.group(1), match.group(2)
-    else:
+    if not match:
         raise ApplicationError(message="Cсылка невалидная", code="github_link_invalid")
 
-    api_url = f"https://api.github.com/repos/{owner}/{repo}"
+    zip_url = url.replace("github.com", "codeload.github.com") + f"/zip/refs/heads/{github_repo_branch}"
 
     async with httpx.AsyncClient() as client:
-        response = await client.get(api_url)
-
+        response = await client.get(zip_url)
         if response.status_code == 200:
-            return
-        if response.status_code == 404:
+            return io.BytesIO(response.content)
+        elif response.status_code == 404:
             raise ApplicationError(message="Репозиторий не найден", code="github_repo_not_found")
         raise ApplicationError(
             message="Возникла непредвиденная ошибка обращения к GitHub", code="github_unexpected_error"
@@ -54,25 +53,29 @@ async def validate_github_link(link: str) -> None:
 async def create(
     data: SolutionCreateRequestDTO,
     file: UploadFile | None,
-    link: str | None,
     user: ShortUserDTO,
     uow: UnitOfWork = Provide[Container.uow],
     solution_storage: SolutionStorage = Provide[Container.solution_storage],
 ) -> SolutionShortResponseDTO:
-    if data.format == SolutionFormatEnum.ZIP:
+    if data.format == SolutionFormatEnum.GITHUB:
+        if data.github_repo_branch is None or data.github_repo_link is None:
+            raise ApplicationError(message="Не указана ссылка или ветка на GitHub", code="repo_link_branch_not_received")
+        file_content = await get_repo_zip(data.github_repo_link, data.github_repo_branch)
+        filename = "solution.zip"
+    elif data.format == SolutionFormatEnum.ZIP:
         if file is None:
             raise ApplicationError(message="Файл обязателен для ZIP формата", code="zip_file_not_received")
-        link = await solution_storage.upload_solution(
-            file.file,
-            file.filename or "solution.zip",
-            data.task_id,
-            user.id,
-        )
-    elif data.format == SolutionFormatEnum.GITHUB:
-        if link is None:
-            raise ApplicationError(message="Не передана ссылка на github", code="github_link_not_received")
+        file_content = file.file
+        filename = file.filename or "solution.zip"
+    else:
+        raise ApplicationError(message=f"Неожиданный формат решения: {data.format}", code="unexpected_format")
 
-        await validate_github_link(link)
+    artifact_path = await solution_storage.upload_solution(
+        file_content,
+        filename,
+        data.task_id,
+        user.id,
+    )
 
     async with uow.connection() as conn, conn.transaction():
         task = await uow.tasks.get_by_id(data.task_id)
@@ -87,7 +90,7 @@ async def create(
         balance = await uow.transactions.get_balance_by_user_id(owner_member.user_id)
         initial_status = SolutionStatusEnum.ERROR if balance < 0 else SolutionStatusEnum.AI_REVIEW
 
-        solution = await uow.solutions.create(SolutionCreateDTO(**data.model_dump(), link=link), user.id)
+        solution = await uow.solutions.create(SolutionCreateDTO(**data.model_dump(), artifact_path=artifact_path), user.id)
         solution = await uow.solutions.update(
             solution.id,
             SolutionUpdateDTO(status=initial_status, steps=[]),

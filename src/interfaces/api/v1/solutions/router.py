@@ -25,13 +25,17 @@ router = APIRouter(prefix="/solutions", tags=["solutions"])
 @router.post("", response_model=SolutionShortResponseDTO)
 async def create_endpoint(
     task_id: int = Form(),
-    format: SolutionFormatEnum = Form(),
-    link: str | None = Form(default=None),
+    solution_format: SolutionFormatEnum = Form(),
+    github_repo_link: str | None = Form(default=None),
+    github_repo_branch: str | None = Form(default=None),
     file: UploadFile | None = File(default=None),
     user: ShortUserDTO = Depends(get_current_user),
 ) -> SolutionShortResponseDTO:
-    data = SolutionCreateRequestDTO(task_id=task_id, format=format)
-    return await solution_service.create(data, file, link, user)
+    data = SolutionCreateRequestDTO(
+        task_id=task_id, format=solution_format,
+        github_repo_link=github_repo_link, github_repo_branch=github_repo_branch
+    )
+    return await solution_service.create(data, file, user)
 
 
 @router.get("/my", response_model=list[SolutionShortResponseDTO])
