@@ -37,8 +37,10 @@ async def create_project_doc(
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.CREATE_PROJECT_DOC, project_doc)
 
     metadata = LLMCallTransactionMetadataDTO(
-        solution_id=solution_id, task=PipelineStepEnum.CREATE_PROJECT_DOC,
-        input_tokens=answer.input_tokens, output_tokens=answer.output_tokens,
+        solution_id=solution_id,
+        task=PipelineStepEnum.CREATE_PROJECT_DOC,
+        input_tokens=answer.input_tokens,
+        output_tokens=answer.output_tokens,
     )
     async with uow.connection():
         workspace_id = await get_workspace_id(uow, solution_id)
@@ -65,8 +67,10 @@ async def generate_critic(
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.GENERATE_CRITIC, critic_doc)
 
     metadata = LLMCallTransactionMetadataDTO(
-        solution_id=solution_id, task=PipelineStepEnum.GENERATE_CRITIC,
-        input_tokens=answer.input_tokens, output_tokens=answer.output_tokens,
+        solution_id=solution_id,
+        task=PipelineStepEnum.GENERATE_CRITIC,
+        input_tokens=answer.input_tokens,
+        output_tokens=answer.output_tokens,
     )
     async with uow.connection():
         workspace_id = await get_workspace_id(uow, solution_id)
@@ -99,8 +103,10 @@ async def resolve_gaps(
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.RESOLVE_GAPS, resolve_doc)
 
     metadata = LLMCallTransactionMetadataDTO(
-        solution_id=solution_id, task=PipelineStepEnum.RESOLVE_GAPS,
-        input_tokens=answer.input_tokens, output_tokens=answer.output_tokens,
+        solution_id=solution_id,
+        task=PipelineStepEnum.RESOLVE_GAPS,
+        input_tokens=answer.input_tokens,
+        output_tokens=answer.output_tokens,
     )
     async with uow.connection():
         workspace_id = await get_workspace_id(uow, solution_id)
@@ -129,13 +135,11 @@ async def improve_doc(
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.IMPROVE_DOC, final_doc)
 
     metadata = LLMCallTransactionMetadataDTO(
-        solution_id=solution_id, task=PipelineStepEnum.IMPROVE_DOC,
-        input_tokens=answer.input_tokens, output_tokens=answer.output_tokens,
+        solution_id=solution_id,
+        task=PipelineStepEnum.IMPROVE_DOC,
+        input_tokens=answer.input_tokens,
+        output_tokens=answer.output_tokens,
     )
     async with uow.connection() as conn, conn.transaction():
         workspace_id = await get_workspace_id(uow, solution_id)
         await charge_for_llm_call(uow, workspace_id, metadata)
-        await uow.solutions.update(
-            solution_id,
-            SolutionUpdateDTO(status=SolutionStatusEnum.REVIEWED),
-        )

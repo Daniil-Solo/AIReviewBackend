@@ -1,17 +1,19 @@
 from fastapi import APIRouter, Depends, Query
 
+import src.application.criteria.criteria as criteria_service
 import src.application.solutions.solutions as solution_service
 import src.application.tasks as task_service
 import src.application.tasks.task_criteria as task_criteria_service
-import src.application.criteria.criteria as criteria_service
 from src.dto.common import SuccessOperationDTO
-from src.dto.criteria import CriterionResponseDTO, CriterionFiltersDTO
+from src.dto.criteria import CriterionFiltersDTO, CriterionResponseDTO
 from src.dto.solutions.solutions import SolutionShortResponseDTO
 from src.dto.tasks.task_criteria import (
+    TaskCriteriaCreateBatchDTO,
     TaskCriteriaCreateDTO,
+    TaskCriteriaCreateRequestDTO,
+    TaskCriteriaFullResponseDTO,
     TaskCriteriaResponseDTO,
     TaskCriteriaUpdateWeightDTO,
-    TaskCriteriaCreateRequestDTO, TaskCriteriaFullResponseDTO, TaskCriteriaCreateBatchDTO,
 )
 from src.dto.tasks.tasks import TaskCreateDTO, TaskResponseDTO, TaskUpdateDTO
 from src.dto.users.user import ShortUserDTO
@@ -117,7 +119,6 @@ async def get_list_by_task_endpoint(
     user: ShortUserDTO = Depends(get_current_user),
 ) -> list[SolutionShortResponseDTO]:
     return await solution_service.get_list_by_task(task_id, user)
-
 
 
 @router.get("/{task_id}/available_criteria", response_model=list[CriterionResponseDTO])

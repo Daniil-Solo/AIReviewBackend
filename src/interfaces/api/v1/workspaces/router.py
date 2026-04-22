@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from fastapi.params import Query
 
+import src.application.criteria as criteria_service
 from src.application.workspaces import (
     archive_workspace,
     change_workspace_owner,
@@ -17,7 +18,6 @@ from src.application.workspaces import (
     update_member,
     update_workspace,
 )
-import src.application.criteria as criteria_service
 from src.dto.common import SuccessOperationDTO
 from src.dto.criteria.criteria import CriterionFiltersDTO, CriterionResponseDTO
 from src.dto.tasks.tasks import TaskResponseDTO

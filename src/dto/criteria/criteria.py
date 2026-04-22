@@ -1,6 +1,6 @@
 import datetime
 
-from pydantic import Field, field_validator, computed_field
+from pydantic import Field, computed_field, field_validator
 
 from src.constants.ai_review import CriterionStageEnum
 from src.dto.common import BaseDTO

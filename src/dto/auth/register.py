@@ -1,4 +1,3 @@
-
 from pydantic import Field
 
 from src.dto.common import BaseDTO

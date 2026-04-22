@@ -13,6 +13,7 @@ from src.dto.solutions.solution_criteria_checks import SolutionCriteriaCheckCrea
 from src.dto.solutions.solutions import (
     SolutionCreateRequestDTO,
     SolutionFiltersRequestDTO,
+    SolutionFinalReviewDTO,
     SolutionShortResponseDTO,
 )
 from src.dto.users.user import ShortUserDTO
@@ -32,8 +33,10 @@ async def create_endpoint(
     user: ShortUserDTO = Depends(get_current_user),
 ) -> SolutionShortResponseDTO:
     data = SolutionCreateRequestDTO(
-        task_id=task_id, format=solution_format,
-        github_repo_link=github_repo_link, github_repo_branch=github_repo_branch
+        task_id=task_id,
+        format=solution_format,
+        github_repo_link=github_repo_link,
+        github_repo_branch=github_repo_branch,
     )
     return await solution_service.create(data, file, user)
 
@@ -109,3 +112,12 @@ async def get_criteria_check_endpoint(
     user: ShortUserDTO = Depends(get_current_user),
 ) -> CriteriaGradingReviewResponseDTO:
     return await solution_criteria_checks_service.get_criteria_review(solution_id, user)
+
+
+@router.post("/{solution_id}/final-review", response_model=SolutionShortResponseDTO)
+async def final_review_endpoint(
+    solution_id: int,
+    data: SolutionFinalReviewDTO,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> SolutionShortResponseDTO:
+    return await solution_service.final_review(solution_id, data, user)

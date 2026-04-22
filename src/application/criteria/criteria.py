@@ -76,13 +76,14 @@ async def get_list_for_task(
     async with uow.connection():
         task = await uow.tasks.get_by_id(task_id)
         await check_member_role(
-            uow, user.id, task.workspace_id,
-            allowed_roles={WorkspaceMemberRoleEnum.TEACHER, WorkspaceMemberRoleEnum.OWNER}
+            uow,
+            user.id,
+            task.workspace_id,
+            allowed_roles={WorkspaceMemberRoleEnum.TEACHER, WorkspaceMemberRoleEnum.OWNER},
         )
         filters.task_id = task_id
         filters.workspace_id = task.workspace_id
         return await uow.criteria.get_list(filters)
-
 
 
 @inject

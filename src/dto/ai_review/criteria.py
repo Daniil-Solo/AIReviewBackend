@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from src.constants.ai_review import CriterionCheckStatusEnum, CriterionStageEnum
+from src.constants.ai_review import CriterionCheckStatusEnum
 from src.dto.common import BaseDTO
 
 

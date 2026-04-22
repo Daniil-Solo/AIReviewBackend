@@ -1,18 +1,19 @@
 import io
+from pathlib import Path
 import tempfile
 import zipfile
-from pathlib import Path
 
 from dependency_injector.wiring import Provide, inject
+from treeproject import path_content, path_tree
 
 from src.application.ai_review.task_graph import PipelineStepEnum
-from src.constants.preprocessing import IGNORED_DIRECTORIES, ALLOWED_EXTENSIONS
+from src.constants.preprocessing import ALLOWED_EXTENSIONS, IGNORED_DIRECTORIES
 from src.di.container import Container
 from src.infrastructure.logging import get_logger
-from src.infrastructure.storage.artifact import SolutionArtifactStorage
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
+from src.infrastructure.storage.artifact import SolutionArtifactStorage
 from src.infrastructure.storage.interface import SolutionStorage
-from treeproject import path_content, path_tree
+
 
 logger = get_logger()
 
@@ -32,6 +33,7 @@ def include_code_only(p: Path) -> bool:
         return True
     return p.is_file() and f".{p.name.split('.')[-1]}" in ALLOWED_EXTENSIONS
 
+
 def get_project_root_path(temp_dir: str) -> Path:
     temp_dir_path = Path(temp_dir)
     children = [p for p in temp_dir_path.iterdir()]
@@ -44,10 +46,10 @@ def get_project_root_path(temp_dir: str) -> Path:
 
 @inject
 async def prepare_project_tree(
-        solution_id: int,
-        solution_storage: SolutionStorage = Provide[Container.solution_storage],
-        artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
-        uow: UnitOfWork = Provide[Container.uow],
+    solution_id: int,
+    solution_storage: SolutionStorage = Provide[Container.solution_storage],
+    artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
+    uow: UnitOfWork = Provide[Container.uow],
 ) -> None:
     async with uow.connection():
         solution = await uow.solutions.get_by_id(solution_id)
@@ -65,10 +67,10 @@ async def prepare_project_tree(
 
 @inject
 async def prepare_project_content(
-        solution_id: int,
-        solution_storage: SolutionStorage = Provide[Container.solution_storage],
-        artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
-        uow: UnitOfWork = Provide[Container.uow],
+    solution_id: int,
+    solution_storage: SolutionStorage = Provide[Container.solution_storage],
+    artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
+    uow: UnitOfWork = Provide[Container.uow],
 ) -> None:
     async with uow.connection():
         solution = await uow.solutions.get_by_id(solution_id)

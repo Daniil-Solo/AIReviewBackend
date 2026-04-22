@@ -4,10 +4,11 @@ from pydantic import TypeAdapter
 from src.application.solutions.utils import get_workspace_id
 from src.application.transactions.utils import charge_for_llm_call
 from src.constants.ai_pipeline import PipelineStepEnum
-from src.constants.ai_review import CriterionStageEnum, CriterionCheckStatusEnum
+from src.constants.ai_review import CriterionCheckStatusEnum, CriterionStageEnum, SolutionStatusEnum
 from src.di.container import Container
 from src.dto.ai_review.criteria import CriterionCheckDTO, CriterionWithCommentsDTO
-from src.dto.solutions.solution_criteria_checks import SolutionCriteriaCheckFiltersDTO, SolutionCriteriaCheckCreateDTO
+from src.dto.solutions.solution_criteria_checks import SolutionCriteriaCheckCreateDTO, SolutionCriteriaCheckFiltersDTO
+from src.dto.solutions.solutions import SolutionUpdateDTO
 from src.dto.transactions.metadata import LLMCallTransactionMetadataDTO
 from src.infrastructure.ai.llm.interface import LLMInterface
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface
@@ -36,10 +37,12 @@ async def grade_by_project_doc(
 
         for task_criterion in task_criteria:
             criterion = await uow.criteria.get_by_id(task_criterion.criterion_id)
-            criterion_checks = await uow.solution_criteria_checks.get_list(SolutionCriteriaCheckFiltersDTO(
-                task_criterion_id=task_criterion.id,
-                solution_id=solution.id,
-            ))
+            criterion_checks = await uow.solution_criteria_checks.get_list(
+                SolutionCriteriaCheckFiltersDTO(
+                    task_criterion_id=task_criterion.id,
+                    solution_id=solution.id,
+                )
+            )
             is_checking_stage = criterion.stage == CriterionStageEnum.PROJECT_DOC
             is_empty_stage = criterion.stage is None
             need_checking_from_other_stage = False
@@ -47,12 +50,14 @@ async def grade_by_project_doc(
                 criterion_for_review = CriterionWithCommentsDTO(
                     id=task_criterion.id,
                     description=criterion.description,
-                    comments=[check.comment for check in criterion_checks]
+                    comments=[check.comment for check in criterion_checks],
                 )
                 criteria.append(criterion_for_review)
     logger.error("criteria", criteria=criteria)
     if not criteria:
-        await artifact_storage.save_artifact(solution_id, PipelineStepEnum.GRADE_BY_PROJECT_DOC, "Нет подходящих критериев")
+        await artifact_storage.save_artifact(
+            solution_id, PipelineStepEnum.GRADE_BY_PROJECT_DOC, "Нет подходящих критериев"
+        )
         return
 
     system_content = prompt_builder.build(
@@ -67,8 +72,10 @@ async def grade_by_project_doc(
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.GRADE_BY_PROJECT_DOC, grading_doc)
 
     metadata = LLMCallTransactionMetadataDTO(
-        solution_id=solution_id, task=PipelineStepEnum.GRADE_BY_PROJECT_DOC,
-        input_tokens=answer.input_tokens, output_tokens=answer.output_tokens,
+        solution_id=solution_id,
+        task=PipelineStepEnum.GRADE_BY_PROJECT_DOC,
+        input_tokens=answer.input_tokens,
+        output_tokens=answer.output_tokens,
     )
     async with uow.connection():
         workspace_id = await get_workspace_id(uow, solution_id)
@@ -85,7 +92,7 @@ async def grade_by_project_doc(
                 comment=criterion_check.comment,
                 stage=CriterionStageEnum.PROJECT_DOC,
                 status=criterion_check.status,
-                is_passed=criterion_check.is_passed
+                is_passed=criterion_check.is_passed,
             )
             await uow.solution_criteria_checks.create(data)
 
@@ -108,22 +115,28 @@ async def grade_by_codebase(
 
         for task_criterion in task_criteria:
             criterion = await uow.criteria.get_by_id(task_criterion.criterion_id)
-            criterion_checks = await uow.solution_criteria_checks.get_list(SolutionCriteriaCheckFiltersDTO(
-                task_criterion_id=task_criterion.id,
-                solution_id=solution.id,
-            ))
+            criterion_checks = await uow.solution_criteria_checks.get_list(
+                SolutionCriteriaCheckFiltersDTO(
+                    task_criterion_id=task_criterion.id,
+                    solution_id=solution.id,
+                )
+            )
             is_checking_stage = criterion.stage == CriterionStageEnum.CODEBASE
-            need_checking_from_other_stage = criterion_checks and criterion_checks[-1].status == CriterionCheckStatusEnum.NEEDS_CODE
+            need_checking_from_other_stage = (
+                criterion_checks and criterion_checks[-1].status == CriterionCheckStatusEnum.NEEDS_CODE
+            )
             if is_checking_stage or need_checking_from_other_stage:
                 criterion_for_review = CriterionWithCommentsDTO(
                     id=task_criterion.id,
                     description=criterion.description,
-                    comments=[check.comment for check in criterion_checks]
+                    comments=[check.comment for check in criterion_checks],
                 )
                 criteria.append(criterion_for_review)
     logger.error("criteria", criteria=criteria)
     if not criteria:
-        await artifact_storage.save_artifact(solution_id, PipelineStepEnum.GRADE_BY_CODEBASE,"Нет подходящих критериев")
+        await artifact_storage.save_artifact(
+            solution_id, PipelineStepEnum.GRADE_BY_CODEBASE, "Нет подходящих критериев"
+        )
         return
 
     system_content = prompt_builder.build(prompt_path="criteria_checks/codebase_grading/system.tpl", criteria=criteria)
@@ -138,8 +151,10 @@ async def grade_by_codebase(
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.GRADE_BY_CODEBASE, grading_doc)
 
     metadata = LLMCallTransactionMetadataDTO(
-        solution_id=solution_id, task=PipelineStepEnum.GRADE_BY_PROJECT_DOC,
-        input_tokens=answer.input_tokens, output_tokens=answer.output_tokens,
+        solution_id=solution_id,
+        task=PipelineStepEnum.GRADE_BY_CODEBASE,
+        input_tokens=answer.input_tokens,
+        output_tokens=answer.output_tokens,
     )
     async with uow.connection():
         workspace_id = await get_workspace_id(uow, solution_id)
@@ -156,6 +171,11 @@ async def grade_by_codebase(
                 comment=criterion_check.comment,
                 stage=CriterionStageEnum.CODEBASE,
                 status=criterion_check.status,
-                is_passed=criterion_check.is_passed
+                is_passed=criterion_check.is_passed,
             )
             await uow.solution_criteria_checks.create(data)
+
+        await uow.solutions.update(
+            solution_id,
+            SolutionUpdateDTO(status=SolutionStatusEnum.HUMAN_REVIEW),
+        )

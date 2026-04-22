@@ -4,10 +4,10 @@ from typing import IO, Any
 
 from botocore.exceptions import ClientError
 from dependency_injector.wiring import Provide, inject
-import httpx
 from fastapi import UploadFile
+import httpx
 
-from src.application.exceptions import ApplicationError, EntityNotFoundError, ForbiddenError
+from src.application.exceptions import ApplicationError, EntityNotFoundError
 from src.application.solutions.common import check_solution_permissions
 from src.application.workspaces.common import check_member_role
 from src.constants.ai_pipeline import ALL_STEPS, PipelineStepEnum
@@ -19,6 +19,7 @@ from src.dto.solutions.solutions import (
     SolutionCreateRequestDTO,
     SolutionFiltersDTO,
     SolutionFiltersRequestDTO,
+    SolutionFinalReviewDTO,
     SolutionShortResponseDTO,
     SolutionUpdateDTO,
 )
@@ -42,7 +43,7 @@ async def get_repo_zip(github_repo_link: str, github_repo_branch: str) -> IO[Any
         response = await client.get(zip_url)
         if response.status_code == 200:
             return io.BytesIO(response.content)
-        elif response.status_code == 404:
+        if response.status_code == 404:
             raise ApplicationError(message="Репозиторий не найден", code="github_repo_not_found")
         raise ApplicationError(
             message="Возникла непредвиденная ошибка обращения к GitHub", code="github_unexpected_error"
@@ -59,7 +60,9 @@ async def create(
 ) -> SolutionShortResponseDTO:
     if data.format == SolutionFormatEnum.GITHUB:
         if data.github_repo_branch is None or data.github_repo_link is None:
-            raise ApplicationError(message="Не указана ссылка или ветка на GitHub", code="repo_link_branch_not_received")
+            raise ApplicationError(
+                message="Не указана ссылка или ветка на GitHub", code="repo_link_branch_not_received"
+            )
         file_content = await get_repo_zip(data.github_repo_link, data.github_repo_branch)
         filename = "solution.zip"
     elif data.format == SolutionFormatEnum.ZIP:
@@ -90,7 +93,9 @@ async def create(
         balance = await uow.transactions.get_balance_by_user_id(owner_member.user_id)
         initial_status = SolutionStatusEnum.ERROR if balance < 0 else SolutionStatusEnum.AI_REVIEW
 
-        solution = await uow.solutions.create(SolutionCreateDTO(**data.model_dump(), artifact_path=artifact_path), user.id)
+        solution = await uow.solutions.create(
+            SolutionCreateDTO(**data.model_dump(), artifact_path=artifact_path), user.id
+        )
         solution = await uow.solutions.update(
             solution.id,
             SolutionUpdateDTO(status=initial_status, steps=[]),
@@ -188,3 +193,34 @@ async def get_artifact(
             if error_code == "NoSuchKey":
                 raise EntityNotFoundError(message="Артефакт не найден") from e
             raise
+
+
+@inject
+async def final_review(
+    solution_id: int,
+    data: SolutionFinalReviewDTO,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> SolutionShortResponseDTO:
+    async with uow.connection() as conn, conn.transaction():
+        solution = await uow.solutions.get_by_id(solution_id)
+
+        if solution.status not in (SolutionStatusEnum.HUMAN_REVIEW, SolutionStatusEnum.REVIEWED):
+            raise ApplicationError(
+                message="Вынесение финального вердикта в этом статусе невозможно",
+                code="solution_status_invalid",
+            )
+
+        await check_solution_permissions(uow, user.id, solution.id, allow_author=False)
+
+        updated_solution = await uow.solutions.update(
+            solution_id,
+            SolutionUpdateDTO(
+                status=SolutionStatusEnum.REVIEWED,
+                human_grade=data.human_grade,
+                human_feedback=data.human_feedback,
+                ai_feedback=data.ai_feedback,
+            ),
+        )
+
+        return SolutionShortResponseDTO.model_validate(updated_solution)

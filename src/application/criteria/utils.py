@@ -5,7 +5,9 @@ from src.dto.users.user import ShortUserDTO
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 
 
-async def check_criterion_level_permissions(uow: UnitOfWork, user: ShortUserDTO, workspace_id: int | None, task_id: int | None) -> None:
+async def check_criterion_level_permissions(
+    uow: UnitOfWork, user: ShortUserDTO, workspace_id: int | None, task_id: int | None
+) -> None:
     if workspace_id is None and task_id is None:
         if not user.is_admin:
             raise ForbiddenError(

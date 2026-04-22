@@ -1,7 +1,5 @@
 import datetime
-from typing import Any
 
-from fastapi import UploadFile
 from pydantic import Field, field_validator
 
 from src.constants.ai_pipeline import PipelineStepEnum
@@ -15,6 +13,7 @@ class SolutionCreateRequestDTO(BaseDTO):
     format: SolutionFormatEnum = Field(description="Формат решения")
     github_repo_link: str | None = Field(description="Ссылка на GitHub-репозиторий")
     github_repo_branch: str | None = Field(description="Ветка GitHub-репозитория")
+
 
 class SolutionCreateDTO(SolutionCreateRequestDTO):
     artifact_path: str = Field(description="Путь до артефакта решения")
@@ -76,6 +75,12 @@ class SolutionShortResponseDTO(BaseDTO):
 
 class SolutionFiltersRequestDTO(BaseDTO):
     task_id: int | None = Field(default=None, description="ID задачи для фильтрации")
+
+
+class SolutionFinalReviewDTO(BaseDTO):
+    human_grade: int = Field(description="Оценка преподавателя", ge=0, le=100)
+    human_feedback: str = Field(description="Отзыв преподавателя")
+    ai_feedback: str | None = Field(default=None, description="Отзыв от AI")
 
 
 class SolutionFiltersDTO(BaseDTO):

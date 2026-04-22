@@ -8,8 +8,10 @@ class TaskCriteriaCreateRequestDTO(BaseDTO):
     criterion_id: int = Field(description="ID критерия")
     weight: float = Field(ge=0.0, description="Вес критерия")
 
+
 class TaskCriteriaCreateBatchDTO(BaseDTO):
     criterion_ids: list[int] = Field(description="Список ID критериев")
+
 
 class TaskCriteriaCreateDTO(TaskCriteriaCreateRequestDTO):
     task_id: int = Field(description="ID задачи")
@@ -28,4 +30,3 @@ class TaskCriteriaResponseDTO(BaseDTO):
 
 class TaskCriteriaFullResponseDTO(TaskCriteriaResponseDTO):
     criterion: CriterionResponseDTO
-
