@@ -69,6 +69,7 @@ async def get_criteria_review(
             grading_criteria.append(
                 GradingCriterionDTO(
                     criterion=criterion,
+                    task_criterion_id=task_criterion.id,
                     weight=task_criterion.weight,
                     checks=checks,
                 )

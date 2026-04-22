@@ -7,6 +7,7 @@ from src.dto.tasks import TaskResponseDTO
 
 class GradingCriterionDTO(BaseDTO):
     criterion: CriterionResponseDTO
+    task_criterion_id: int
     weight: float
     checks: list[SolutionCriteriaCheckResponseDTO]
 
