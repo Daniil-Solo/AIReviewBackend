@@ -121,7 +121,7 @@ async def get_user_workspaces(
         result = []
         for member in members:
             workspace = await uow.workspaces.get_by_id(member.workspace_id)
-            if workspace.is_archived and member.role != WorkspaceMemberRoleEnum.OWNER:
+            if workspace.is_archived:
                 continue
             result.append(UserWorkspaceResponseDTO(workspace=workspace, role=member.role))
         return result

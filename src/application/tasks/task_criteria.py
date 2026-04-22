@@ -4,9 +4,11 @@ from src.application.workspaces.common import check_member_role
 from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.di.container import Container
 from src.dto.tasks.task_criteria import (
+    TaskCriteriaCreateBatchDTO,
     TaskCriteriaCreateDTO,
+    TaskCriteriaFullResponseDTO,
     TaskCriteriaResponseDTO,
-    TaskCriteriaUpdateWeightDTO, TaskCriteriaFullResponseDTO, TaskCriteriaCreateBatchDTO,
+    TaskCriteriaUpdateWeightDTO,
 )
 from src.dto.users.user import ShortUserDTO
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
@@ -27,7 +29,6 @@ async def create(
             allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER},
         )
         return await uow.task_criteria.create(data)
-
 
 
 @inject

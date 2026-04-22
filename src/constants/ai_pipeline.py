@@ -15,6 +15,8 @@ class PipelineStepEnum(StrEnum):
     GENERATE_CRITIC = "critic"
     RESOLVE_GAPS = "resolve_gaps"
     IMPROVE_DOC = "improve_doc"
+    GRADE_BY_PROJECT_DOC = "grade_by_project_doc"
+    GRADE_BY_CODEBASE = "grade_by_codebase"
 
 
 # шаг пайплайна: список шагов, от которых он зависит
@@ -31,6 +33,8 @@ TASK_DEPENDENCIES: dict[PipelineStepEnum, list[PipelineStepEnum]] = {
         PipelineStepEnum.CREATE_PROJECT_DOC,
         PipelineStepEnum.RESOLVE_GAPS,
     ],
+    PipelineStepEnum.GRADE_BY_PROJECT_DOC: [PipelineStepEnum.IMPROVE_DOC],
+    PipelineStepEnum.GRADE_BY_CODEBASE: [PipelineStepEnum.GRADE_BY_PROJECT_DOC],
 }
 
 

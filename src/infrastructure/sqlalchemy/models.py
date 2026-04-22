@@ -77,7 +77,18 @@ criteria_table = sa.Table(
     sa.Column("description", sa.Text, nullable=False),
     sa.Column("tags", sa.ARRAY(sa.String), nullable=False, server_default="{}"),
     sa.Column("stage", sa.Enum(CriterionStageEnum, name="criterion_stage"), nullable=True),
-    sa.Column("is_public", sa.Boolean, nullable=False, server_default=sa.true()),
+    sa.Column(
+        "workspace_id",
+        sa.Integer,
+        sa.ForeignKey("workspaces.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=True,
+    ),
+    sa.Column(
+        "task_id",
+        sa.Integer,
+        sa.ForeignKey("tasks.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=True,
+    ),
     sa.Column(
         "created_by", sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"), nullable=False
     ),
@@ -135,7 +146,9 @@ solutions_table = sa.Table(
         nullable=False,
     ),
     sa.Column("format", sa.Enum(SolutionFormatEnum, name="solution_format"), nullable=False),
-    sa.Column("link", sa.String, nullable=False),
+    sa.Column("github_repo_link", sa.String, nullable=True),
+    sa.Column("github_repo_branch", sa.String, nullable=True),
+    sa.Column("artifact_path", sa.String, nullable=False),
     sa.Column("status", sa.Enum(SolutionStatusEnum, name="solution_status"), nullable=False),
     sa.Column("steps", sa.JSON, nullable=False, server_default=sa.text("'{}'")),
     sa.Column("human_grade", sa.Integer, nullable=True),
@@ -201,7 +214,7 @@ transactions_table = sa.Table(
     sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
     sa.Column("user_id", sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"), nullable=False),
     sa.Column("amount", sa.Float, nullable=False),
-    sa.Column("type",  sa.String(100), nullable=False),
+    sa.Column("type", sa.String(100), nullable=False),
     sa.Column("metadata", sa.JSON, nullable=True),
     sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
 )

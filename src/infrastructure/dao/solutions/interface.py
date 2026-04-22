@@ -29,3 +29,7 @@ class SolutionsDAO(ABC):
     @abstractmethod
     async def delete(self, solution_id: int) -> None:
         raise NotImplementedError
+
+    @abstractmethod
+    async def delete_by_solution_id(self, solution_id: int) -> None:
+        raise NotImplementedError

@@ -5,6 +5,7 @@ import logging
 import time
 import traceback
 
+from src.application.ai_review.criteria_grading import grade_by_codebase, grade_by_project_doc
 from src.application.ai_review.preprocessing import (
     prepare_project_content,
     prepare_project_tree,
@@ -34,6 +35,8 @@ STEP_HANDLER_MAP: dict[PipelineStepEnum, Callable[[int], Awaitable[None]]] = {
     PipelineStepEnum.GENERATE_CRITIC: generate_critic,
     PipelineStepEnum.RESOLVE_GAPS: resolve_gaps,
     PipelineStepEnum.IMPROVE_DOC: improve_doc,
+    PipelineStepEnum.GRADE_BY_PROJECT_DOC: grade_by_project_doc,
+    PipelineStepEnum.GRADE_BY_CODEBASE: grade_by_codebase,
 }
 
 
@@ -52,25 +55,26 @@ async def run_worker() -> None:
 
             start_time = time.perf_counter()
             try:
-                solution = await uow.solutions.get_by_id(task.solution_id)
-                if not is_step_ready(task.step, solution.steps):
-                    await uow.pipeline_tasks.update_last_checked_at(task.id)
-                    logger.debug(f"Task {task.id} not ready, skipping")
-                    continue
+                async with uow.connection():
+                    solution = await uow.solutions.get_by_id(task.solution_id)
+                    if not is_step_ready(task.step, solution.steps):
+                        await uow.pipeline_tasks.update_last_checked_at(task.id)
+                        logger.debug(f"Task {task.id} not ready, skipping")
+                        continue
 
-                logger.info(f"Processing task {task.id}: solution_id={task.solution_id}, step={task.step}")
+                    logger.info(f"Processing task {task.id}: solution_id={task.solution_id}, step={task.step}")
 
-                if solution.status == SolutionStatusEnum.CANCELLED:
-                    await uow.pipeline_tasks.update_last_checked_at(task.id)
-                    logger.debug(f"Solution {solution.id} is CANCELLED, skipping task {task.id}")
-                    continue
+                    if solution.status == SolutionStatusEnum.CANCELLED:
+                        await uow.pipeline_tasks.update_last_checked_at(task.id)
+                        logger.debug(f"Solution {solution.id} is CANCELLED, skipping task {task.id}")
+                        continue
 
-                await uow.pipeline_tasks.update(
-                    task.id,
-                    PipelineTaskUpdateDTO(
-                        status=PipelineTaskStatusEnum.RUNNING, ran_at=datetime.datetime.now(datetime.UTC)
-                    ),
-                )
+                    await uow.pipeline_tasks.update(
+                        task.id,
+                        PipelineTaskUpdateDTO(
+                            status=PipelineTaskStatusEnum.RUNNING, ran_at=datetime.datetime.now(datetime.UTC)
+                        ),
+                    )
 
                 handler = STEP_HANDLER_MAP.get(task.step)
                 if not handler:

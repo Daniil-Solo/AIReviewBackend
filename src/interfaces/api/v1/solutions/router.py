@@ -2,14 +2,18 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 from fastapi.responses import StreamingResponse
 
 import src.application.ai_review.pipeline as pipeline_service
+import src.application.solutions.review_by_criteria as solution_criteria_checks_service
 import src.application.solutions.solutions as solution_service
 from src.constants.ai_pipeline import PipelineStepEnum
 from src.constants.ai_review import SolutionFormatEnum
 from src.dto.ai_review.pipeline import PipelineInfoDTO
 from src.dto.common import SuccessOperationDTO
+from src.dto.solutions.human_grading import CriteriaGradingReviewResponseDTO
+from src.dto.solutions.solution_criteria_checks import SolutionCriteriaCheckCreateRequestDTO
 from src.dto.solutions.solutions import (
     SolutionCreateRequestDTO,
     SolutionFiltersRequestDTO,
+    SolutionFinalReviewDTO,
     SolutionShortResponseDTO,
 )
 from src.dto.users.user import ShortUserDTO
@@ -22,13 +26,19 @@ router = APIRouter(prefix="/solutions", tags=["solutions"])
 @router.post("", response_model=SolutionShortResponseDTO)
 async def create_endpoint(
     task_id: int = Form(),
-    format: SolutionFormatEnum = Form(),
-    link: str | None = Form(default=None),
+    solution_format: SolutionFormatEnum = Form(),
+    github_repo_link: str | None = Form(default=None),
+    github_repo_branch: str | None = Form(default=None),
     file: UploadFile | None = File(default=None),
     user: ShortUserDTO = Depends(get_current_user),
 ) -> SolutionShortResponseDTO:
-    data = SolutionCreateRequestDTO(task_id=task_id, format=format)
-    return await solution_service.create(data, file, link, user)
+    data = SolutionCreateRequestDTO(
+        task_id=task_id,
+        format=solution_format,
+        github_repo_link=github_repo_link,
+        github_repo_branch=github_repo_branch,
+    )
+    return await solution_service.create(data, file, user)
 
 
 @router.get("/my", response_model=list[SolutionShortResponseDTO])
@@ -84,3 +94,30 @@ async def get_artefact_endpoint(
         content=iter([content]),
         media_type="text/plain; charset=utf-8",
     )
+
+
+@router.post("/{solution_id}/criteria-checks", response_model=SuccessOperationDTO)
+async def create_criteria_check_endpoint(
+    solution_id: int,
+    data: SolutionCriteriaCheckCreateRequestDTO,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> SuccessOperationDTO:
+    await solution_criteria_checks_service.create_criteria_check(solution_id, data, user)
+    return SuccessOperationDTO(message="Фидбек оставлен")
+
+
+@router.get("/{solution_id}/criteria-checks", response_model=CriteriaGradingReviewResponseDTO)
+async def get_criteria_check_endpoint(
+    solution_id: int,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> CriteriaGradingReviewResponseDTO:
+    return await solution_criteria_checks_service.get_criteria_review(solution_id, user)
+
+
+@router.post("/{solution_id}/final-review", response_model=SolutionShortResponseDTO)
+async def final_review_endpoint(
+    solution_id: int,
+    data: SolutionFinalReviewDTO,
+    user: ShortUserDTO = Depends(get_current_user),
+) -> SolutionShortResponseDTO:
+    return await solution_service.final_review(solution_id, data, user)

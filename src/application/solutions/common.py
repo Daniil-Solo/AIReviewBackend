@@ -6,10 +6,7 @@ from src.infrastructure.sqlalchemy.uow import UnitOfWork
 
 
 async def check_solution_permissions(
-    uow: UnitOfWork,
-    user_id: int,
-    solution_id: int,
-    allow_author: bool = True
+    uow: UnitOfWork, user_id: int, solution_id: int, allow_author: bool = True
 ) -> SolutionResponseDTO:
     solution = await uow.solutions.get_by_id(solution_id)
     task = await uow.tasks.get_by_id(solution.task_id)

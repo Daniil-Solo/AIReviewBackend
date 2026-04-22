@@ -11,7 +11,7 @@ from src.dto.solutions.solutions import (
     SolutionUpdateDTO,
 )
 from src.infrastructure.dao.solutions.interface import SolutionsDAO
-from src.infrastructure.sqlalchemy.models import solutions_table
+from src.infrastructure.sqlalchemy.models import solution_criteria_checks_table, solutions_table
 
 
 class SQLAlchemySolutionsDAO(SolutionsDAO):
@@ -72,4 +72,10 @@ class SQLAlchemySolutionsDAO(SolutionsDAO):
 
     async def delete(self, solution_id: int) -> None:
         query = sa.delete(solutions_table).where(solutions_table.c.id == solution_id)
+        await self.session.execute(query)
+
+    async def delete_by_solution_id(self, solution_id: int) -> None:
+        query = sa.delete(solution_criteria_checks_table).where(
+            solution_criteria_checks_table.c.solution_id == solution_id
+        )
         await self.session.execute(query)

@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from src.constants.ai_review import CriterionCheckStatusEnum, CriterionStageEnum
+from src.constants.ai_review import CriterionCheckStatusEnum
 from src.dto.common import BaseDTO
 
 
@@ -23,13 +23,3 @@ class CriterionCheckDTO(BaseDTO):
     is_passed: bool | None = Field(
         default=None, description="Факт выполнения критерия (имеет смысл только при status=SUFFICIENT)"
     )
-
-
-class CriterionCheckVersionDTO(BaseDTO):
-    """Хранится в БД"""
-
-    id: int = Field(description="Идентификатор критерия")
-    stage: CriterionStageEnum = Field(description="Стадия проверки")
-    comment: str = Field(description="Комментарий о соблюдении критерии по представленным сведениям")
-    status: CriterionCheckStatusEnum = Field(description="Статус проверки критерия")
-    is_passed: bool | None = Field(default=None, description="Факт выполнения критерия")

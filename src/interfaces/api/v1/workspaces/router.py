@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.params import Query
 
+import src.application.criteria as criteria_service
 from src.application.workspaces import (
     archive_workspace,
     change_workspace_owner,
@@ -18,6 +19,7 @@ from src.application.workspaces import (
     update_workspace,
 )
 from src.dto.common import SuccessOperationDTO
+from src.dto.criteria.criteria import CriterionFiltersDTO, CriterionResponseDTO
 from src.dto.tasks.tasks import TaskResponseDTO
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces import (
@@ -160,3 +162,17 @@ async def check_slug_endpoint(
     slug: str = Query(),
 ) -> SlugCheckResponseDTO:
     return await check_slug_available(slug)
+
+
+@router.get("/{workspace_id}/criteria", response_model=list[CriterionResponseDTO])
+async def get_workspace_criteria_endpoint(
+    workspace_id: int,
+    tags: list[str] | None = Query(default=None),
+    search: str | None = Query(default=None),
+    user: ShortUserDTO = Depends(get_current_user),
+) -> list[CriterionResponseDTO]:
+    filters = CriterionFiltersDTO(
+        tags=tags,
+        search=search,
+    )
+    return await criteria_service.get_workspace_criteria(workspace_id, filters, user)

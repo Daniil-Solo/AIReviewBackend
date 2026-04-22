@@ -42,6 +42,7 @@ async def restart(
         )
 
         await uow.pipeline_tasks.delete_many(solution.id)
+        await uow.solutions.delete_by_solution_id(solution.id)
         await uow.solutions.update(
             solution.id,
             SolutionUpdateDTO(status=SolutionStatusEnum.AI_REVIEW, steps=[]),

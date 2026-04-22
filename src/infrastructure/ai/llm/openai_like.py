@@ -1,7 +1,6 @@
 from typing import Any
 
 from openai import AsyncOpenAI
-from sqlalchemy.util import await_only
 
 from src.dto.ai_review.message import AIAnswerDTO, InputMessageDTO
 from src.infrastructure.ai.llm.interface import LLMInterface
@@ -36,7 +35,7 @@ class OpenAILikeLLM(LLMInterface):
         if answer.output_tokens == 4096:
             logger.info("llm_calling_retry", retry=retry)
             if retry < 3:
-                return await self.answer(messages, retry=retry+1, **kwargs)
+                return await self.answer(messages, retry=retry + 1, **kwargs)
 
         return answer
 
