@@ -146,9 +146,6 @@ async def test__success__with_tasks_and_grades(uow, get_grades, get_grades_csv):
     grades = await get_grades(workspace.id, token)
     assert len(grades) == 2
 
-    with open("txt.tx", "a+") as f:
-        f.write(str(grades) + "\n")
-
     owner_grades = next(g for g in grades if g.user.id == owner.id)
     assert len(owner_grades.tasks) == 2
 
