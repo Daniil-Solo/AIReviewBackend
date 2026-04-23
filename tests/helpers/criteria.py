@@ -8,7 +8,8 @@ async def create_criteria(
     user_id: int,
     description: str | None = None,
     tags: list[str] | None = None,
-    is_public: bool | None = None,
+    workspace_id: int | None = None,
+    task_id: int | None = None,
     size: int = 1,
 ) -> list[CriterionResponseDTO]:
     initial_data = dict()
@@ -16,8 +17,10 @@ async def create_criteria(
         initial_data["description"] = description
     if tags is not None:
         initial_data["tags"] = tags
-    if is_public is not None:
-        initial_data["is_public"] = is_public
+    if workspace_id is not None:
+        initial_data["workspace_id"] = workspace_id
+    if task_id is not None:
+        initial_data["task_id"] = task_id
     data_list = CriterionFactory.build_batch(size=size, **initial_data)
     async with uow.connection():
         return [await uow.criteria.create(data, user_id) for data in data_list]

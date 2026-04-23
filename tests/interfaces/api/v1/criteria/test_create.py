@@ -31,14 +31,13 @@ def create_criterion(request_create_criterion):
 
 
 async def test__success(uow, create_criterion):
-    user = (await create_users(uow))[0]
+    user = (await create_users(uow, is_admin=True))[0]
     token = create_access_token(user.as_short())
     data: CriterionCreateDTO = CriterionFactory.build()
 
     criterion = await create_criterion(data, token)
     assert criterion.description == data.description
     assert criterion.tags == data.tags
-    assert criterion.is_public == data.is_public
     assert criterion.created_by == user.id
 
 

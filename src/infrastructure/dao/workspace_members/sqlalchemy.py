@@ -40,6 +40,9 @@ class SQLAlchemyWorkspaceMembersDAO(WorkspaceMembersDAO):
         if filters.roles:
             query = query.where(workspace_members_table.c.role.in_(filters.roles))
 
+        if filters.ids:
+            query = query.where(workspace_members_table.c.user_id.in_(filters.ids))
+
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [WorkspaceMemberResponseDTO.model_validate(row) for row in rows]

@@ -36,32 +36,17 @@ async def test__success__public_criteria(uow, get_list_criteria):
     user = (await create_users(uow))[0]
     token = create_access_token(user.as_short())
 
-    await create_criteria(uow, user.id, is_public=True, size=2)
+    await create_criteria(uow, user.id, size=2)
 
     criteria = await get_list_criteria(token)
     assert len(criteria) == 2
-
-
-async def test__success__private_criteria_visible_only_to_creator(uow, get_list_criteria):
-    user, other_user = await create_users(uow, size=2)
-    token = create_access_token(user.as_short())
-    other_token = create_access_token(other_user.as_short())
-
-    criterion = (await create_criteria(uow, user.id, description="Private criterion", is_public=False))[0]
-
-    user_criteria = await get_list_criteria(token)
-    assert len(user_criteria) == 1
-    assert user_criteria[0].description == criterion.description
-
-    other_criteria = await get_list_criteria(other_token)
-    assert len(other_criteria) == 0
 
 
 async def test__success__filter_by_tags(uow, get_list_criteria):
     user = (await create_users(uow))[0]
     token = create_access_token(user.as_short())
 
-    await create_criteria(uow, user.id, description="Criterion with tag", tags=["python"], is_public=True)
+    await create_criteria(uow, user.id, description="Criterion with tag", tags=["python"])
 
     criteria = await get_list_criteria(token, tags=["python"])
     assert len(criteria) == 1
@@ -72,8 +57,8 @@ async def test__success__filter_by_search_query(uow, get_list_criteria):
     user = (await create_users(uow))[0]
     token = create_access_token(user.as_short())
 
-    await create_criteria(uow, user.id, description="This is a Python test criterion", is_public=True)
-    await create_criteria(uow, user.id, is_public=True)
+    await create_criteria(uow, user.id, description="This is a Python test criterion")
+    await create_criteria(uow, user.id)
 
     criteria = await get_list_criteria(token, search="Python")
     assert len(criteria) == 1

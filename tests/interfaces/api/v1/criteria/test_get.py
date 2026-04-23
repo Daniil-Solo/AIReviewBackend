@@ -6,6 +6,7 @@ from src.dto.criteria.criteria import CriterionResponseDTO
 from src.infrastructure.auth import create_access_token
 from tests.helpers.criteria import create_criteria
 from tests.helpers.users import create_users
+from tests.helpers.workspaces import create_workspace
 
 
 @pytest_asyncio.fixture()
@@ -33,33 +34,11 @@ async def test__success__public_criterion(uow, get_criterion):
     user = (await create_users(uow))[0]
     token = create_access_token(user.as_short())
 
-    criterion = (await create_criteria(uow, user.id, description="Public criterion", is_public=True))[0]
+    criterion = (await create_criteria(uow, user.id, description="Public criterion"))[0]
 
     result = await get_criterion(criterion.id, token)
     assert result.description == "Public criterion"
     assert result.is_public
-
-
-async def test__success__private_criterion_by_creator(uow, get_criterion):
-    user = (await create_users(uow))[0]
-    token = create_access_token(user.as_short())
-
-    criterion = (await create_criteria(uow, user.id, description="Private criterion", is_public=False))[0]
-
-    result = await get_criterion(criterion.id, token)
-    assert result.description == "Private criterion"
-
-
-async def test__failed__private_criterion_by_other_user(uow, request_get_criterion):
-    user = (await create_users(uow))[0]
-    other_user = (await create_users(uow))[0]
-    other_token = create_access_token(other_user.as_short())
-
-    criterion = (await create_criteria(uow, user.id, description="Private criterion", is_public=False))[0]
-
-    response = await request_get_criterion(criterion.id, other_token)
-    assert response.status_code == status.HTTP_403_FORBIDDEN
-    assert response.json()["code"] == "criterion_access_denied"
 
 
 async def test__failed__not_found(uow, request_get_criterion):

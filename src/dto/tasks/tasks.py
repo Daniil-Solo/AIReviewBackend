@@ -31,6 +31,7 @@ class TaskResponseDTO(BaseDTO):
 class TaskFiltersDTO(BaseDTO):
     workspace_id: int | None = Field(default=None, description="Идентификатор рабочего пространства")
     is_active: bool | None = Field(default=None, description="Фильтр по активности")
+    ids: list[int] | None = Field(default=None, description="Фильтр по ID задач")
 
 
 class TaskPublicResponseDTO(BaseDTO):

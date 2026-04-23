@@ -10,6 +10,10 @@ from src.application.workspaces.members import (
     leave_workspace,
     update_member,
 )
+from src.application.workspaces.grades_export import (
+    get_student_grades,
+    get_student_grades_csv,
+)
 from src.application.workspaces.workspaces import (
     archive_workspace,
     create_workspace,
@@ -39,4 +43,6 @@ __all__ = (
     "change_workspace_owner",
     "get_workspace_tasks",
     "get_user_workspaces",
+    "get_student_grades",
+    "get_student_grades_csv",
 )

@@ -43,7 +43,7 @@ class SQLAlchemySolutionsDAO(SolutionsDAO):
         return SolutionResponseDTO.model_validate(row)
 
     async def update(self, solution_id: int, data: SolutionUpdateDTO) -> SolutionResponseDTO:
-        update_values = {k: v for k, v in data.model_dump(by_alias=True).items() if v is not None}
+        update_values = data.model_dump(by_alias=True, exclude_unset=True)
         if not update_values:
             return await self.get_by_id(solution_id)
 
@@ -79,3 +79,42 @@ class SQLAlchemySolutionsDAO(SolutionsDAO):
             solution_criteria_checks_table.c.solution_id == solution_id
         )
         await self.session.execute(query)
+
+    async def get_best_grades(self, task_ids: list[int], user_ids: list[int]) -> dict[tuple[int, int], tuple[int, int]]:
+        if not task_ids:
+            return {}
+
+        subquery = (
+            sa.select(
+                solutions_table.c.created_by,
+                solutions_table.c.task_id,
+                solutions_table.c.human_grade,
+                solutions_table.c.id,
+                sa.func.row_number()
+                .over(
+                    partition_by=[solutions_table.c.created_by, solutions_table.c.task_id],
+                    order_by=[
+                        solutions_table.c.human_grade.desc(),
+                        solutions_table.c.id.desc(),
+                    ]
+                )
+                .label("rn")
+            )
+            .where(
+                solutions_table.c.task_id.in_(task_ids),
+                solutions_table.c.created_by.in_(user_ids),
+                solutions_table.c.human_grade.is_not(None),
+            )
+            .subquery()
+        )
+
+        query = sa.select(
+            subquery.c.created_by,
+            subquery.c.task_id,
+            subquery.c.human_grade.label("best_grade"),
+            subquery.c.id.label("best_solution_id"),
+        ).where(subquery.c.rn == 1)
+
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+        return {(row.created_by, row.task_id): (row.best_grade, row.best_solution_id) for row in rows}

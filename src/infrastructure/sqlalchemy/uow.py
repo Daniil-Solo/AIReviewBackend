@@ -68,12 +68,15 @@ class UnitOfWork:
         self._solution_criteria_checks: SolutionCriteriaChecksDAO | None = None
         self._pipeline_tasks: PipelineTasksDAO | None = None
         self._transactions: TransactionsDAO | None = None
+        # system
+        self.level = 0
 
     @asynccontextmanager
     async def connection(self) -> AsyncGenerator[Connection, None]:
         if self._session is None:
             self._session = self._session_factory()
         try:
+            self.level +=1
             yield Connection(self._session)
             await self._session.commit()
         except Exception:
@@ -81,7 +84,8 @@ class UnitOfWork:
                 await self._session.rollback()
             raise
         finally:
-            if self._session is not None:
+            self.level -= 1
+            if self.level ==0 and self._session is not None:
                 await self._session.close()
                 self._session = None
                 self._users = None

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Response
 from fastapi.params import Query
 
 import src.application.criteria as criteria_service
@@ -9,6 +9,8 @@ from src.application.workspaces import (
     create_join_rule,
     create_workspace,
     delete_join_rule,
+    get_student_grades,
+    get_student_grades_csv,
     get_workspace,
     get_workspace_join_rules,
     get_workspace_members,
@@ -36,6 +38,7 @@ from src.dto.workspaces.join_rule import (
     WorkspaceJoinRuleRequestUpdateDTO,
     WorkspaceJoinRuleResponseDTO,
 )
+from src.dto.workspaces.student_grades import StudentGradesDTO, StudentGradesFiltersDTO
 from src.interfaces.api.dependencies import get_current_user
 
 
@@ -176,3 +179,32 @@ async def get_workspace_criteria_endpoint(
         search=search,
     )
     return await criteria_service.get_workspace_criteria(workspace_id, filters, user)
+
+
+@router.get("/{workspace_id}/grades", response_model=list[StudentGradesDTO])
+async def get_student_grades_endpoint(
+    workspace_id: int,
+    task_ids: list[int] | None = Query(default=None),
+    user_ids: list[int] | None = Query(default=None),
+    user: ShortUserDTO = Depends(get_current_user),
+) -> list[StudentGradesDTO]:
+    filters = StudentGradesFiltersDTO(
+        task_ids=task_ids,
+        user_ids=user_ids,
+    )
+    return await get_student_grades(workspace_id, filters, user.id)
+
+
+@router.get("/{workspace_id}/grades/csv")
+async def get_student_grades_csv_endpoint(
+    workspace_id: int,
+    task_ids: list[int] | None = Query(default=None),
+    user_ids: list[int] | None = Query(default=None),
+    user: ShortUserDTO = Depends(get_current_user),
+) -> Response:
+    filters = StudentGradesFiltersDTO(
+        task_ids=task_ids,
+        user_ids=user_ids,
+    )
+    csv_content = await get_student_grades_csv(workspace_id, filters, user.id)
+    return Response(content=csv_content, media_type="text/csv")
