@@ -43,7 +43,7 @@ class SQLAlchemySolutionsDAO(SolutionsDAO):
         return SolutionResponseDTO.model_validate(row)
 
     async def update(self, solution_id: int, data: SolutionUpdateDTO) -> SolutionResponseDTO:
-        update_values = {k: v for k, v in data.model_dump(by_alias=True).items() if v is not None}
+        update_values = data.model_dump(by_alias=True, exclude_unset=True)
         if not update_values:
             return await self.get_by_id(solution_id)
 
@@ -79,3 +79,23 @@ class SQLAlchemySolutionsDAO(SolutionsDAO):
             solution_criteria_checks_table.c.solution_id == solution_id
         )
         await self.session.execute(query)
+
+    async def get_best_grades(self, task_ids: list[int], user_ids: list[int]) -> dict[tuple[int, int], int]:
+        if not task_ids:
+            return {}
+
+        query = (
+            sa.select(
+                solutions_table.c.created_by,
+                solutions_table.c.task_id,
+                sa.func.max(solutions_table.c.human_grade).label("best_grade"),
+            )
+            .where(
+                solutions_table.c.task_id.in_(task_ids),
+                solutions_table.c.created_by.in_(user_ids),
+            )
+            .group_by(solutions_table.c.created_by, solutions_table.c.task_id)
+        )
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+        return {(row.created_by, row.task_id): row.best_grade for row in rows}

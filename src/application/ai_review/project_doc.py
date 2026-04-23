@@ -3,9 +3,7 @@ from dependency_injector.wiring import Provide, inject
 from src.application.ai_review.task_graph import PipelineStepEnum
 from src.application.solutions.utils import get_workspace_id
 from src.application.transactions.utils import charge_for_llm_call
-from src.constants.ai_review import SolutionStatusEnum
 from src.di.container import Container
-from src.dto.solutions.solutions import SolutionUpdateDTO
 from src.dto.transactions.metadata import LLMCallTransactionMetadataDTO
 from src.infrastructure.ai.llm.interface import LLMInterface
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface

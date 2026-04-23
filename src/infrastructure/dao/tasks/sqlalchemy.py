@@ -54,6 +54,9 @@ class SQLAlchemyTasksDAO(TasksDAO):
         if filters.workspace_id is not None:
             query = query.where(tasks_table.c.workspace_id == filters.workspace_id)
 
+        if filters.ids is not None:
+            query = query.where(tasks_table.c.id.in_(filters.ids))
+
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [TaskResponseDTO.model_validate(row) for row in rows]

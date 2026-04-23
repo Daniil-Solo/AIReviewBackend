@@ -33,3 +33,7 @@ class SolutionsDAO(ABC):
     @abstractmethod
     async def delete_by_solution_id(self, solution_id: int) -> None:
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_best_grades(self, task_ids: list[int], user_ids: list[int]) -> dict[tuple[int, int], int]:
+        raise NotImplementedError

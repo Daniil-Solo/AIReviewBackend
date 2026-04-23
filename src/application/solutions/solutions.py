@@ -127,13 +127,13 @@ async def cancel(
 ) -> None:
     async with uow.connection() as conn, conn.transaction():
         solution = await uow.solutions.get_by_id(solution_id)
+        await check_solution_permissions(uow, user.id, solution.id)
 
         if solution.status != SolutionStatusEnum.AI_REVIEW:
             raise ApplicationError(
                 message="Отмена проверки решения возможна только во время AI-проверки", code="solution_status_invalid"
             )
 
-        await check_solution_permissions(uow, user.id, solution.id)
         await uow.pipeline_tasks.delete_many_not_completed(solution_id)
         await uow.solutions.update(solution_id, SolutionUpdateDTO(status=SolutionStatusEnum.CANCELLED))
 

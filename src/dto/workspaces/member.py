@@ -23,6 +23,7 @@ class WorkspaceMemberUpdateDTO(BaseDTO):
 class WorkspaceMemberFiltersDTO(BaseDTO):
     workspace_id: int = Field(description="Идентификатор пространства")
     roles: list[WorkspaceMemberRoleEnum] | None = Field(default=None, description="Роли в пространстве")
+    ids: list[int] | None = Field(default=None, description="Фильтр по ID участников")
 
 
 class TransferOwnershipDTO(BaseDTO):
