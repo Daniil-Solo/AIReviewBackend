@@ -149,17 +149,19 @@ async def test__success__with_tasks_and_grades(uow, get_grades, get_grades_csv):
     with open("txt.tx", "a+") as f:
         f.write(str(grades) + "\n")
 
-    owner_grades = next(g for g in grades if g.user_id == owner.id)
+    owner_grades = next(g for g in grades if g.user.id == owner.id)
     assert len(owner_grades.tasks) == 2
 
-    student_grades = next(g for g in grades if g.user_id == student.id)
+    student_grades = next(g for g in grades if g.user.id == student.id)
     assert len(student_grades.tasks) == 2
 
     task_1_grades = next(t for t in student_grades.tasks if t.task_id == task_1.id)
     assert task_1_grades.grade == solution_1.human_grade
+    assert task_1_grades.best_solution_id == solution_1.id
 
     task_2_grades = next(t for t in student_grades.tasks if t.task_id == task_2.id)
     assert task_2_grades.grade == solution_3.human_grade
+    assert task_2_grades.best_solution_id == solution_3.id
 
 
 async def test__success__filter(uow, get_grades):
@@ -190,7 +192,7 @@ async def test__success__csv_empty_workspace(uow, get_grades_csv):
     workspace = await create_workspace(uow, owner.id)
 
     csv_content = await get_grades_csv(workspace.id, token)
-    assert csv_content == "fullname,email\n"
+    assert csv_content == "fullname\n"
 
 
 async def test__failed__csv_unauthorized(request_grades_csv):
@@ -211,6 +213,6 @@ async def test__success__student_without_solutions(uow, get_grades):
     grades = await get_grades(workspace.id, token)
     assert len(grades) == 2
 
-    student_grades = next(g for g in grades if g.user_id == student.id)
+    student_grades = next(g for g in grades if g.user.id == student.id)
     assert len(student_grades.tasks) == 1
     assert student_grades.tasks[0].grade is None

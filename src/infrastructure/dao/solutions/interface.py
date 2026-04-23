@@ -35,5 +35,5 @@ class SolutionsDAO(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_best_grades(self, task_ids: list[int], user_ids: list[int]) -> dict[tuple[int, int], int]:
+    async def get_best_grades(self, task_ids: list[int], user_ids: list[int]) -> dict[tuple[int, int], tuple[int, int]]:
         raise NotImplementedError

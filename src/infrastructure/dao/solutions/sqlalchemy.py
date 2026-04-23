@@ -80,22 +80,41 @@ class SQLAlchemySolutionsDAO(SolutionsDAO):
         )
         await self.session.execute(query)
 
-    async def get_best_grades(self, task_ids: list[int], user_ids: list[int]) -> dict[tuple[int, int], int]:
+    async def get_best_grades(self, task_ids: list[int], user_ids: list[int]) -> dict[tuple[int, int], tuple[int, int]]:
         if not task_ids:
             return {}
 
-        query = (
+        subquery = (
             sa.select(
                 solutions_table.c.created_by,
                 solutions_table.c.task_id,
-                sa.func.max(solutions_table.c.human_grade).label("best_grade"),
+                solutions_table.c.human_grade,
+                solutions_table.c.id,
+                sa.func.row_number()
+                .over(
+                    partition_by=[solutions_table.c.created_by, solutions_table.c.task_id],
+                    order_by=[
+                        solutions_table.c.human_grade.desc(),
+                        solutions_table.c.id.desc(),
+                    ]
+                )
+                .label("rn")
             )
             .where(
                 solutions_table.c.task_id.in_(task_ids),
                 solutions_table.c.created_by.in_(user_ids),
+                solutions_table.c.human_grade.is_not(None),
             )
-            .group_by(solutions_table.c.created_by, solutions_table.c.task_id)
+            .subquery()
         )
+
+        query = sa.select(
+            subquery.c.created_by,
+            subquery.c.task_id,
+            subquery.c.human_grade.label("best_grade"),
+            subquery.c.id.label("best_solution_id"),
+        ).where(subquery.c.rn == 1)
+
         result = await self.session.execute(query)
         rows = result.fetchall()
-        return {(row.created_by, row.task_id): row.best_grade for row in rows}
+        return {(row.created_by, row.task_id): (row.best_grade, row.best_solution_id) for row in rows}

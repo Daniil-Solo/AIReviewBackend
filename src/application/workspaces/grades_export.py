@@ -42,14 +42,13 @@ async def get_student_grades(
 
         return [
                 StudentGradesDTO(
-                    user_id=student.id,
-                    user_fullname=student.fullname,
-                    user_email=student.email,
+                    user=student.as_short(),
                     tasks=[
                         TaskGradeDTO(
                             task_id=task.id,
                             task_name=task.name,
-                            grade=best_grades.get((student.id, task.id)),
+                            grade=best_grades.get((student.id, task.id))[0] if (student.id, task.id) in best_grades else None,
+                            best_solution_id=best_grades.get((student.id, task.id))[1] if (student.id, task.id) in best_grades else None,
                         )
                         for task in tasks
                     ],
@@ -68,16 +67,16 @@ async def get_student_grades_csv(
     student_grades = await get_student_grades(workspace_id, filters, user_id, uow=uow)
 
     if not student_grades:
-        return "fullname,email\n"
+        return "fullname\n"
 
-    headers = ["fullname", "email"] + [task.name for task in student_grades[0].tasks]
+    headers = ["fullname"] + [task.task_name for task in student_grades[0].tasks]
 
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(headers)
 
     for sg in student_grades:
-        row = [sg.fullname, sg.email]
+        row = [sg.user.fullname]
         for task in sg.tasks:
             row.append(str(task.grade) if task.grade is not None else "")
         writer.writerow(row)
