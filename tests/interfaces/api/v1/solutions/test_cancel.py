@@ -1,6 +1,8 @@
 from fastapi import status
 from httpx import AsyncClient, Response
 import pytest_asyncio
+
+from src.dto.solutions.solutions import SolutionUpdateDTO
 from tests.helpers.workspaces import create_workspace_with_task
 from tests.helpers.solutions import create_github_solution
 from tests.helpers.users import create_users
@@ -28,7 +30,7 @@ async def test__success__cancel_own_solution(uow, request_cancel_solution):
     solution = await create_github_solution(uow, task.id, user.id)
 
     response = await request_cancel_solution(solution_id=solution.id, token=token)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.text
 
 
 async def test__failed__cancel_other_solution(uow, request_cancel_solution):
@@ -41,7 +43,7 @@ async def test__failed__cancel_other_solution(uow, request_cancel_solution):
     other_token = create_access_token(other_user.as_short())
 
     response = await request_cancel_solution(solution_id=solution.id, token=other_token)
-    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.status_code == status.HTTP_403_FORBIDDEN, response.text
 
 
 async def test__failed__cancel_not_found(uow, request_cancel_solution):
@@ -49,4 +51,4 @@ async def test__failed__cancel_not_found(uow, request_cancel_solution):
     token = create_access_token(user.as_short())
 
     response = await request_cancel_solution(solution_id=99999, token=token)
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.text

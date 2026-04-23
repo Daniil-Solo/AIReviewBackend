@@ -13,4 +13,6 @@ class SolutionGitHubFactory(factory.Factory):
 
     task_id: int
     format = SolutionFormatEnum.GITHUB
-    link = GITHUB_REPO_LINK
+    github_repo_link = GITHUB_REPO_LINK
+    github_repo_branch = "main"
+    artifact_path = "artifacts/test/solution.zip"

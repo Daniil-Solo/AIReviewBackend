@@ -31,17 +31,17 @@ def update_criterion(request_update_criterion):
 
 
 async def test__success(uow, update_criterion):
-    user = (await create_users(uow))[0]
+    user = (await create_users(uow, is_admin=True))[0]
     token = create_access_token(user.as_short())
 
     criterion = (await create_criteria(uow, user.id, description="Original description"))[0]
 
-    data = CriterionUpdateDTO(description="Updated description", tags=["new_tag"], is_public=False)
+    data = CriterionUpdateDTO(description="Updated description", tags=["new_tag"])
     result = await update_criterion(criterion.id, data, token)
 
     assert result.description == "Updated description"
     assert "new_tag" in result.tags
-    assert not result.is_public
+    assert result.is_public
 
 
 async def test__failed__not_creator(uow, request_update_criterion):

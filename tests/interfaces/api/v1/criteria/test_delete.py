@@ -19,22 +19,22 @@ def request_delete_criterion(client: AsyncClient):
 
 
 async def test__success(uow, request_delete_criterion):
-    user = (await create_users(uow))[0]
+    user = (await create_users(uow, is_admin=True))[0]
     token = create_access_token(user.as_short())
 
-    criterion = (await create_criteria(uow, user.id, description="To be deleted"))[0]
+    criterion = (await create_criteria(uow, user.id))[0]
 
     response = await request_delete_criterion(criterion.id, token)
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["message"] == "Критерий удалён"
 
 
-async def test__failed__not_creator(uow, request_delete_criterion):
+async def test__failed__not_admin(uow, request_delete_criterion):
     user = (await create_users(uow))[0]
     other_user = (await create_users(uow))[0]
     other_token = create_access_token(other_user.as_short())
 
-    criterion = (await create_criteria(uow, user.id, description="Not your criterion"))[0]
+    criterion = (await create_criteria(uow, user.id))[0]
 
     response = await request_delete_criterion(criterion.id, other_token)
     assert response.status_code == status.HTTP_403_FORBIDDEN
