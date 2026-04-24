@@ -1,5 +1,12 @@
 ## Гайд для разработчика
 
+### Поднятие стенда
+
+```bash
+docker network create autoreviewer-network
+docker compose up -d
+```
+
 ### Установка зависимостей
 
 Требуется установленный пакетный менеджер uv

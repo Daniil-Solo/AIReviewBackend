@@ -3,6 +3,9 @@ experiments
 examples
 docs
 docker-compose.yml
+prod.docker-compose.yml
+Dockerfile
+prod.Dockerfile
 __pycache__
 .venv
 venv

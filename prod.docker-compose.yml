@@ -1,6 +1,8 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: prod.Dockerfile
     env_file:
       - .env
     ports:
@@ -11,16 +13,16 @@ services:
       s3:
         condition: service_healthy
       redis:
-         condition: service_healthy
-    volumes:
-      - .:/app
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - autoreviewer
-    command: uv run uvicorn src.interfaces.api.app:app --host 0.0.0.0 --port 8000 --reload
+    command: uv run uvicorn src.interfaces.api.app:app --host 0.0.0.0 --port 8000
 
   review_worker-1:
-    build: .
+    build:
+      context: .
+      dockerfile: prod.Dockerfile
     env_file:
       - .env
     depends_on:
@@ -30,15 +32,15 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    volumes:
-      - .:/app
     restart: unless-stopped
     networks:
       - autoreviewer
     command: uv run python -m src.interfaces.cli.worker
 
   review_worker-2:
-    build: .
+    build:
+      context: .
+      dockerfile: prod.Dockerfile
     env_file:
       - .env
     depends_on:
@@ -48,12 +50,26 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    volumes:
-      - .:/app
     restart: unless-stopped
     networks:
       - autoreviewer
     command: uv run python -m src.interfaces.cli.worker
+
+  migrations:
+    build:
+      context: .
+      dockerfile: prod.Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: no
+    networks:
+      - autoreviewer
+    profiles:
+      - migrations
+    command: ["uv", "run", "alembic", "upgrade", "head"]
 
   db:
     image: postgres:16
