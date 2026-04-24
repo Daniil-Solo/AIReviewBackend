@@ -4,7 +4,7 @@ WORKDIR /build
 
 RUN pip install uv==0.9.20
 
-COPY pyproject.toml .
+COPY pyproject.toml  uv.lock ./
 
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 
