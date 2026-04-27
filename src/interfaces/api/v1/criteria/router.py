@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, File, Form, Query, UploadFile
 
 import src.application.criteria as criteria_service
 from src.dto.common import SuccessOperationDTO
@@ -13,6 +13,16 @@ from src.interfaces.api.dependencies import get_current_user
 
 
 router = APIRouter(prefix="/criteria", tags=["criteria"])
+
+
+@router.post("/import", response_model=list[CriterionResponseDTO])
+async def import_criteria_endpoint(
+    file: UploadFile = File(..., media_type="application/json"),
+    workspace_id: int | None = Form(default=None),
+    task_id: int | None = Form(default=None),
+    user: ShortUserDTO = Depends(get_current_user),
+) -> list[CriterionResponseDTO]:
+    return await criteria_service.import_criteria(file, workspace_id, task_id, user)
 
 
 @router.post("", response_model=CriterionResponseDTO)

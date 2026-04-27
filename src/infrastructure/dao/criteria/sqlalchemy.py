@@ -113,3 +113,13 @@ class SQLAlchemyCriteriaDAO(CriteriaDAO):
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [row.tag for row in rows]
+
+    async def create_batch(self, data: list[CriterionCreateDTO], created_by: int) -> list[CriterionResponseDTO]:
+        if not data:
+            return []
+
+        values = [{**d.model_dump(by_alias=True), "created_by": created_by} for d in data]
+        query = sa.insert(criteria_table).values(values).returning(criteria_table)
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+        return [CriterionResponseDTO.model_validate(row) for row in rows]

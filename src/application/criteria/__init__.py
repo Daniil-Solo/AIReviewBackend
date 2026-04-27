@@ -5,6 +5,7 @@ from src.application.criteria.criteria import (
     get_list,
     get_one,
     get_workspace_criteria,
+    import_criteria,
     update,
 )
 
@@ -17,4 +18,5 @@ __all__ = [
     "update",
     "delete",
     "get_available_tags",
+    "import_criteria",
 ]

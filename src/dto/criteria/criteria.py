@@ -29,9 +29,9 @@ class CriterionUpdateDTO(CriterionCreateDTO):
 class CriterionResponseDTO(BaseDTO):
     id: int = Field(description="Идентификатор критерия")
     description: str = Field(description="Описание критерия")
+    prompt: str = Field(description="Промпт для AI-проверки критерия")
     tags: list[str] = Field(description="Теги критерия")
     stage: CriterionStageEnum | None = Field(description="Стадия проверки критерия")
-    prompt: str = Field(description="Промпт для AI-проверки критерия")
     workspace_id: int | None = Field(description="ID workspace для workspace-level критерия")
     task_id: int | None = Field(description="ID задачи для task-level критерия")
     created_by: int = Field(description="ID пользователя-автора критерия")

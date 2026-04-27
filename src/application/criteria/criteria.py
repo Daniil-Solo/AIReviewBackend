@@ -1,7 +1,12 @@
+import json
+
 from dependency_injector.wiring import Provide, inject
+from fastapi import UploadFile
+from openai._models import TypeAdapter
+from pydantic import ValidationError
 
 from src.application.criteria.utils import check_criterion_level_permissions
-from src.application.exceptions import ForbiddenError
+from src.application.exceptions import ForbiddenError, ApplicationError
 from src.application.workspaces.common import check_member_role
 from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.di.container import Container
@@ -119,30 +124,7 @@ async def delete(
 ) -> None:
     async with uow.connection() as conn, conn.transaction():
         criterion = await uow.criteria.get_by_id(criterion_id)
-
-        is_global = criterion.workspace_id is None and criterion.task_id is None
-
-        if is_global:
-            if not user.is_admin:
-                raise ForbiddenError(
-                    message="Удаление глобального критерия доступно только администраторам",
-                    code="criterion_access_denied",
-                )
-        elif criterion.workspace_id is not None:
-            await check_member_role(
-                uow,
-                user.id,
-                criterion.workspace_id,
-                allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER},
-            )
-        elif criterion.task_id is not None:
-            task = await uow.tasks.get_by_id(criterion.task_id)
-            await check_member_role(
-                uow,
-                user.id,
-                task.workspace_id,
-                allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER},
-            )
+        await check_criterion_level_permissions(uow, user, criterion.workspace_id, criterion.task_id)
 
         await uow.criteria.delete(criterion_id)
 
@@ -154,3 +136,37 @@ async def get_available_tags(
 ) -> list[str]:
     async with uow.connection():
         return await uow.criteria.get_available_tags()
+
+
+@inject
+async def import_criteria(
+    file: UploadFile,
+    workspace_id: int | None,
+    task_id: int | None,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> list[CriterionResponseDTO]:
+    content = await file.read()
+    try:
+        criteria_list = TypeAdapter(list[CriterionCreateDTO]).validate_json(content.decode("utf-8"))
+    except ValidationError:
+        raise ApplicationError(message="Некорректный формат файла", code="invalid_file_format")
+
+    async with uow.connection() as conn, conn.transaction():
+        await check_criterion_level_permissions(uow, user, workspace_id, task_id)
+
+        for criterion_data in criteria_list:
+            criterion_data.workspace_id = workspace_id
+            criterion_data.task_id = task_id
+        created_criteria = await uow.criteria.create_batch(criteria_list, created_by=user.id)
+
+        if task_id is not None:
+            for criterion in created_criteria:
+                task_criteria_data = TaskCriteriaCreateDTO(
+                    task_id=task_id,
+                    criterion_id=criterion.id,
+                    weight=1.0,
+                )
+                await uow.task_criteria.create(task_criteria_data)
+
+        return created_criteria

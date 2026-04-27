@@ -38,3 +38,7 @@ class CriteriaDAO(ABC):
     @abstractmethod
     async def get_available_tags(self) -> list[str]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def create_batch(self, data: list[CriterionCreateDTO], created_by: int) -> list[CriterionResponseDTO]:
+        raise NotImplementedError
