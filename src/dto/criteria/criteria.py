@@ -10,6 +10,7 @@ class CriterionCreateDTO(BaseDTO):
     description: str = Field(min_length=1, max_length=1000, description="Описание критерия")
     tags: list[str] = Field(default_factory=list, description="Теги критерия")
     stage: CriterionStageEnum | None = Field(default=None, description="Стадия проверки критерия")
+    prompt: str = Field(description="Промпт для AI-проверки критерия")
     workspace_id: int | None = Field(default=None, description="ID workspace для workspace-level критерия")
     task_id: int | None = Field(default=None, description="ID задачи для task-level критерия")
 
@@ -30,6 +31,7 @@ class CriterionResponseDTO(BaseDTO):
     description: str = Field(description="Описание критерия")
     tags: list[str] = Field(description="Теги критерия")
     stage: CriterionStageEnum | None = Field(description="Стадия проверки критерия")
+    prompt: str = Field(description="Промпт для AI-проверки критерия")
     workspace_id: int | None = Field(description="ID workspace для workspace-level критерия")
     task_id: int | None = Field(description="ID задачи для task-level критерия")
     created_by: int = Field(description="ID пользователя-автора критерия")

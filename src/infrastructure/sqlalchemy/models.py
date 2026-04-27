@@ -77,6 +77,7 @@ criteria_table = sa.Table(
     sa.Column("description", sa.Text, nullable=False),
     sa.Column("tags", sa.ARRAY(sa.String), nullable=False, server_default="{}"),
     sa.Column("stage", sa.Enum(CriterionStageEnum, name="criterion_stage"), nullable=True),
+    sa.Column("prompt", sa.Text, nullable=False, server_default=""),
     sa.Column(
         "workspace_id",
         sa.Integer,

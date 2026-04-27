@@ -49,11 +49,10 @@ async def grade_by_project_doc(
             if is_checking_stage or is_empty_stage or need_checking_from_other_stage:
                 criterion_for_review = CriterionWithCommentsDTO(
                     id=task_criterion.id,
-                    description=criterion.description,
+                    prompt=criterion.prompt,
                     comments=[check.comment for check in criterion_checks],
                 )
                 criteria.append(criterion_for_review)
-    logger.error("criteria", criteria=criteria)
     if not criteria:
         await artifact_storage.save_artifact(
             solution_id, PipelineStepEnum.GRADE_BY_PROJECT_DOC, "Нет подходящих критериев"
@@ -128,11 +127,10 @@ async def grade_by_codebase(
             if is_checking_stage or need_checking_from_other_stage:
                 criterion_for_review = CriterionWithCommentsDTO(
                     id=task_criterion.id,
-                    description=criterion.description,
+                    prompt=criterion.prompt,
                     comments=[check.comment for check in criterion_checks],
                 )
                 criteria.append(criterion_for_review)
-    logger.error("criteria", criteria=criteria)
     if not criteria:
         await artifact_storage.save_artifact(
             solution_id, PipelineStepEnum.GRADE_BY_CODEBASE, "Нет подходящих критериев"
