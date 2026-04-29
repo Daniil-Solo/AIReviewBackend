@@ -23,7 +23,7 @@ async def lifespan(_application: FastAPI) -> AsyncGenerator[None, None]:
 
 
 def create_app() -> FastAPI:
-    application = FastAPI(title="AI Review API", lifespan=lifespan, swagger_ui_parameters=dict(docExpansion="none"))
+    application = FastAPI(title="AI Review API", lifespan=lifespan, swagger_ui_parameters={"docExpansion": "none"})
 
     application.add_middleware(RequestLoggingMiddleware)
     application.add_middleware(

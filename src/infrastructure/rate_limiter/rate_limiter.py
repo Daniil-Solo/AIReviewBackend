@@ -4,7 +4,7 @@ from src.application.exceptions import RateLimitError
 
 
 class RateLimiter:
-    def __init__(self, redis: Redis, prefix: str, ttl: int, max_count: int):
+    def __init__(self, redis: Redis, prefix: str, ttl: int, max_count: int) -> None:
         self._redis = redis
         self._prefix = prefix
         self._ttl = ttl

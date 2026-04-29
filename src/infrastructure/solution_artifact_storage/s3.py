@@ -1,7 +1,7 @@
 from aiobotocore.config import AioConfig
 import aiobotocore.session
 
-from src.infrastructure.storage.artifact import SolutionArtifactStorage
+from src.infrastructure.solution_artifact_storage.interface import SolutionArtifactStorage
 
 
 class S3SolutionArtifactStorage(SolutionArtifactStorage):

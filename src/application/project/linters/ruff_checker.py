@@ -5,7 +5,7 @@ from pprint import pprint
 
 def run_ruff_on_project(project_path: Path) -> dict:
     """
-    Запускает ruff на проекте с любыми зависимостями.
+    Запускает ruff на проекте из любых зависимостей.
     Никакие библиотеки проекта не устанавливаются.
     """
     try:

@@ -9,7 +9,7 @@ logger = get_logger()
 
 
 class MailerooEmailSender(EmailSenderInterface):
-    def __init__(self, token: str):
+    def __init__(self, token: str) -> None:
         self._client = AsyncClient(
             base_url="https://smtp.maileroo.com",
             headers={"Authorization": f"Bearer {token}"},

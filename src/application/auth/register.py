@@ -45,8 +45,8 @@ async def start_registration(
 
     code = generate_code()
     hashed_password = hash_password(data.password)
-    data = CodeInfoDTO(email=data.email, hashed_password=hashed_password, code=code, fullname=data.fullname)
-    await registration_flow.create(data)
+    create_data = CodeInfoDTO(email=data.email, hashed_password=hashed_password, code=code, fullname=data.fullname)
+    await registration_flow.create(create_data)
 
     subject, plain, html = email_templater.render(
         template="register_confirm", code=code, platform_name=settings.PLATFORM_NAME
@@ -54,9 +54,9 @@ async def start_registration(
     message = EmailMessageDTO(to=[data.email], subject=subject, html=html, plain=plain)
     try:
         await email_sender.send(message)
-    except Exception:
+    except Exception as ex:
         logger.exception("failed_to_send_email", email=data.email, type="start_registration")
-        raise ApplicationError(message="Не удалось отправить письмо", code="email_send_failed")
+        raise ApplicationError(message="Не удалось отправить письмо", code="email_send_failed") from ex
 
     return SuccessOperationDTO(message="Письмо с кодом успешно отправлено")
 

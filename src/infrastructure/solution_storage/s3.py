@@ -5,7 +5,7 @@ import uuid
 from aiobotocore.config import AioConfig
 import aiobotocore.session
 
-from src.infrastructure.storage.interface import SolutionStorage
+from src.infrastructure.solution_storage.interface import SolutionStorage
 
 
 class S3SolutionStorage(SolutionStorage):

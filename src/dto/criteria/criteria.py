@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 
 from pydantic import Field, computed_field, field_validator
 
@@ -16,7 +17,7 @@ class CriterionCreateDTO(BaseDTO):
 
     @field_validator("tags", mode="before")
     @classmethod
-    def normalize_tags(cls, v):
+    def normalize_tags(cls, v: Any) -> list[str]:
         if isinstance(v, list):
             return [tag.lower() for tag in v]
         return v
@@ -47,10 +48,11 @@ class CriterionFiltersDTO(BaseDTO):
     tags: list[str] | None = Field(default=None, description="Теги")
     workspace_id: int | None = Field(default=None, description="ID workspace для workspace-level критерия")
     task_id: int | None = Field(default=None, description="ID задачи для task-level критерия")
+    ids: list[int] | None = Field(default=None, description="ID критериев")
 
     @field_validator("tags", mode="before")
     @classmethod
-    def normalize_tags(cls, v):
+    def normalize_tags(cls, v: Any) -> list[str]:
         if isinstance(v, list):
             return [tag.lower() for tag in v]
         return v

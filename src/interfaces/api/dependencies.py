@@ -16,10 +16,10 @@ async def get_current_user(
     token = credentials.credentials
     try:
         payload = decode_token(token)
-    except ExpiredSignatureError:
-        raise InvalidCredentialsError(message="Токен устарел", code="token_expired")
-    except PyJWTError:
-        raise InvalidCredentialsError(message="Токен невалидный", code="token_invalid")
+    except ExpiredSignatureError as ex:
+        raise InvalidCredentialsError(message="Токен устарел", code="token_expired") from ex
+    except PyJWTError as ex:
+        raise InvalidCredentialsError(message="Токен невалидный", code="token_invalid") from ex
     user_id: str | None = payload.get("sub")
     if user_id is None:
         raise InvalidCredentialsError(message="Токен невалидный", code="token_invalid")

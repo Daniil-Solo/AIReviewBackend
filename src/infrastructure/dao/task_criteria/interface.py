@@ -27,3 +27,7 @@ class TaskCriteriaDAO(ABC):
     @abstractmethod
     async def get_by_task_id(self, task_id: int) -> list[TaskCriteriaResponseDTO]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_ids(self, ids: list[int]) -> list[TaskCriteriaResponseDTO]:
+        raise NotImplementedError

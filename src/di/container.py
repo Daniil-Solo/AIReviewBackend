@@ -6,12 +6,14 @@ from src.infrastructure.ai.llm.openai_like import OpenAILikeLLM
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface
 from src.infrastructure.ai.prompt_builder.jinja2 import Jinja2PromptBuilder
 from src.infrastructure.dao.criteria.sqlalchemy import SQLAlchemyCriteriaDAO
+from src.infrastructure.dao.custom_models.sqlalchemy import SQLAlchemyCustomModelsDAO
 from src.infrastructure.dao.pipeline_tasks.sqlalchemy import SQLAlchemyPipelineTasksDAO
 from src.infrastructure.dao.registrations.interface import RegistrationsFlow
 from src.infrastructure.dao.registrations.redis import RedisRegistrationsFlow
 from src.infrastructure.dao.solution_criteria_checks.sqlalchemy import SQLAlchemySolutionCriteriaChecksDAO
 from src.infrastructure.dao.solutions.sqlalchemy import SQLAlchemySolutionsDAO
 from src.infrastructure.dao.task_criteria.sqlalchemy import SQLAlchemyTaskCriteriaDAO
+from src.infrastructure.dao.task_steps_models.sqlalchemy import SQLAlchemyTaskStepsModelsDAO
 from src.infrastructure.dao.tasks.sqlalchemy import SQLAlchemyTasksDAO
 from src.infrastructure.dao.transactions.sqlalchemy import SQLAlchemyTransactionsDAO
 from src.infrastructure.dao.users.sqlalchemy import SQLAlchemyUsersDAO
@@ -22,15 +24,17 @@ from src.infrastructure.email_sender.interface import EmailSenderInterface
 from src.infrastructure.email_sender.maileroo import MailerooEmailSender
 from src.infrastructure.email_templater.interface import EmailTemplaterInterface
 from src.infrastructure.email_templater.jinja2 import Jinja2EmailTemplater
+from src.infrastructure.encryptor.fernet import FernetEncryptor
+from src.infrastructure.encryptor.interface import BaseEncryptor
 from src.infrastructure.logs_sender.init_logs_sender import init_logs_sender
 from src.infrastructure.rate_limiter.rate_limiter import RateLimiter
 from src.infrastructure.redis.client import init_redis_client
+from src.infrastructure.solution_artifact_storage.interface import SolutionArtifactStorage
+from src.infrastructure.solution_artifact_storage.s3 import S3SolutionArtifactStorage
+from src.infrastructure.solution_storage.interface import SolutionStorage
+from src.infrastructure.solution_storage.s3 import S3SolutionStorage
 from src.infrastructure.sqlalchemy.engine import create_engine, create_session_factory
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
-from src.infrastructure.storage.artifact import SolutionArtifactStorage
-from src.infrastructure.storage.interface import SolutionStorage
-from src.infrastructure.storage.s3 import S3SolutionStorage
-from src.infrastructure.storage.s3_artifact import S3SolutionArtifactStorage
 from src.settings import ROOT_DIR, settings
 
 
@@ -55,6 +59,8 @@ class Container(containers.DeclarativeContainer):
     solution_criteria_checks_dao = providers.Factory(lambda: SQLAlchemySolutionCriteriaChecksDAO)
     pipeline_tasks_dao = providers.Factory(lambda: SQLAlchemyPipelineTasksDAO)
     transactions_dao = providers.Factory(lambda: SQLAlchemyTransactionsDAO)
+    custom_models_dao = providers.Factory(lambda: SQLAlchemyCustomModelsDAO)
+    task_steps_models_dao = providers.Factory(lambda: SQLAlchemyTaskStepsModelsDAO)
 
     redis_client = providers.Resource[Redis](init_redis_client)
     registrations_flow = providers.Factory[RegistrationsFlow](
@@ -86,7 +92,11 @@ class Container(containers.DeclarativeContainer):
         solution_criteria_checks_dao_factory=solution_criteria_checks_dao,
         pipeline_tasks_dao_factory=pipeline_tasks_dao,
         transactions_dao_factory=transactions_dao,
+        custom_models_dao_factory=custom_models_dao,
+        task_steps_models_dao_factory=task_steps_models_dao,
     )
+
+    encryptor = providers.Singleton[BaseEncryptor](FernetEncryptor, encryption_key=settings.security.ENCRYPTION_KEY)
 
     solution_storage = providers.Factory[SolutionStorage](
         S3SolutionStorage,
@@ -141,6 +151,7 @@ async def init_container() -> Container:
             "src.application.tasks",
             "src.application.solutions",
             "src.application.transactions",
+            "src.application.custom_models",
         ]
     )
     await container.init_resources()  # type: ignore[misc]

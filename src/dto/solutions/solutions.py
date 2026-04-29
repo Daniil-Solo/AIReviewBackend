@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 
 from pydantic import Field, field_validator
 
@@ -44,7 +45,7 @@ class SolutionResponseDTO(BaseDTO):
 
     @field_validator("steps", mode="before")
     @classmethod
-    def convert_empty_dict_to_list(cls, v):
+    def convert_empty_dict_to_list(cls, v: Any) -> list[PipelineStepEnum]:
         if v == {}:
             return []
         return v
@@ -67,7 +68,7 @@ class SolutionShortResponseDTO(BaseDTO):
 
     @field_validator("steps", mode="before")
     @classmethod
-    def convert_empty_dict_to_list(cls, v):
+    def convert_empty_dict_to_list(cls, v: Any) -> list[PipelineStepEnum]:
         if v == {}:
             return []
         return v

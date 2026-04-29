@@ -1,3 +1,7 @@
+from src.application.workspaces.grades_export import (
+    get_student_grades,
+    get_student_grades_csv,
+)
 from src.application.workspaces.join_rules import (
     check_slug_available,
     create_join_rule,
@@ -9,10 +13,6 @@ from src.application.workspaces.members import (
     join_to_workspace,
     leave_workspace,
     update_member,
-)
-from src.application.workspaces.grades_export import (
-    get_student_grades,
-    get_student_grades_csv,
 )
 from src.application.workspaces.workspaces import (
     archive_workspace,

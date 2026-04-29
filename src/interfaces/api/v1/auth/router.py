@@ -5,7 +5,6 @@ from src.application.auth.register import (
     confirm_registration,
     start_registration,
 )
-from src.dto.auth import TokenDTO
 from src.dto.auth.auth import TokenDTO, UserLoginDTO
 from src.dto.auth.register import (
     EmailConfirmationRequestDTO,

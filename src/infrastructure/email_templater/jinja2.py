@@ -7,7 +7,7 @@ from src.infrastructure.email_templater.interface import EmailTemplaterInterface
 
 
 class Jinja2EmailTemplater(EmailTemplaterInterface):
-    def __init__(self, templates_dir_path: Path):
+    def __init__(self, templates_dir_path: Path) -> None:
         self.env = Environment(loader=FileSystemLoader(templates_dir_path), undefined=StrictUndefined)
 
     def render(self, template: str, **kwargs: Any) -> tuple[str, str, str]:

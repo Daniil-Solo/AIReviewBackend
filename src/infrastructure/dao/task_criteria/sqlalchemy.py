@@ -53,3 +53,9 @@ class SQLAlchemyTaskCriteriaDAO(TaskCriteriaDAO):
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [TaskCriteriaResponseDTO.model_validate(row) for row in rows]
+
+    async def get_by_ids(self, ids: list[int]) -> list[TaskCriteriaResponseDTO]:
+        query = sa.select(task_criteria_table).where(task_criteria_table.c.id.in_(ids))
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+        return [TaskCriteriaResponseDTO.model_validate(row) for row in rows]

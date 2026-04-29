@@ -1,12 +1,10 @@
-import json
-
 from dependency_injector.wiring import Provide, inject
 from fastapi import UploadFile
 from openai._models import TypeAdapter
 from pydantic import ValidationError
 
 from src.application.criteria.utils import check_criterion_level_permissions
-from src.application.exceptions import ForbiddenError, ApplicationError
+from src.application.exceptions import ApplicationError
 from src.application.workspaces.common import check_member_role
 from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.di.container import Container
@@ -64,7 +62,7 @@ async def get_one(
 @inject
 async def get_list(
     filters: CriterionFiltersDTO,
-    user: ShortUserDTO,
+    _: ShortUserDTO,
     uow: UnitOfWork = Provide[Container.uow],
 ) -> list[CriterionResponseDTO]:
     async with uow.connection():
@@ -131,7 +129,7 @@ async def delete(
 
 @inject
 async def get_available_tags(
-    user: ShortUserDTO,
+    _: ShortUserDTO,
     uow: UnitOfWork = Provide[Container.uow],
 ) -> list[str]:
     async with uow.connection():
@@ -149,8 +147,8 @@ async def import_criteria(
     content = await file.read()
     try:
         criteria_list = TypeAdapter(list[CriterionCreateDTO]).validate_json(content.decode("utf-8"))
-    except ValidationError:
-        raise ApplicationError(message="Некорректный формат файла", code="invalid_file_format")
+    except ValidationError as ex:
+        raise ApplicationError(message=f"Некорректный формат файла\n{ex}", code="invalid_file_format") from ex
 
     async with uow.connection() as conn, conn.transaction():
         await check_criterion_level_permissions(uow, user, workspace_id, task_id)

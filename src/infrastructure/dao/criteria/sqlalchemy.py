@@ -42,6 +42,8 @@ class SQLAlchemyCriteriaDAO(CriteriaDAO):
     async def get_list(self, filters: CriterionFiltersDTO) -> list[CriterionResponseDTO]:
         query = sa.select(criteria_table)
 
+        if filters.ids is not None:
+            query = query.where(criteria_table.c.id.in_(filters.ids))
         if filters.tags is not None:
             tag_conditions = [criteria_table.c.tags.any(tag) for tag in filters.tags]
             query = query.where(sa.or_(*tag_conditions))

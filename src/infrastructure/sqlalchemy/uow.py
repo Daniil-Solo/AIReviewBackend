@@ -4,10 +4,12 @@ from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.dao.criteria.interface import CriteriaDAO
+from src.infrastructure.dao.custom_models.interface import CustomModelsDAO
 from src.infrastructure.dao.pipeline_tasks.interface import PipelineTasksDAO
 from src.infrastructure.dao.solution_criteria_checks.interface import SolutionCriteriaChecksDAO
 from src.infrastructure.dao.solutions.interface import SolutionsDAO
 from src.infrastructure.dao.task_criteria.interface import TaskCriteriaDAO
+from src.infrastructure.dao.task_steps_models.interface import TaskStepsModelsDAO
 from src.infrastructure.dao.tasks.interface import TasksDAO
 from src.infrastructure.dao.transactions.interface import TransactionsDAO
 from src.infrastructure.dao.users.interface import UsersDAO
@@ -17,7 +19,7 @@ from src.infrastructure.dao.workspaces.interface import WorkspacesDAO
 
 
 class Connection:
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
     @asynccontextmanager
@@ -41,6 +43,8 @@ class UnitOfWork:
         solution_criteria_checks_dao_factory: Callable[[AsyncSession], SolutionCriteriaChecksDAO],
         pipeline_tasks_dao_factory: Callable[[AsyncSession], PipelineTasksDAO],
         transactions_dao_factory: Callable[[AsyncSession], TransactionsDAO],
+        custom_models_dao_factory: Callable[[AsyncSession], CustomModelsDAO],
+        task_steps_models_dao_factory: Callable[[AsyncSession], TaskStepsModelsDAO],
     ) -> None:
         self._session_factory = session_factory
         self._session: AsyncSession | None = None
@@ -56,6 +60,8 @@ class UnitOfWork:
         self._solution_criteria_checks_dao_factory = solution_criteria_checks_dao_factory
         self._pipeline_tasks_dao_factory = pipeline_tasks_dao_factory
         self._transactions_dao_factory = transactions_dao_factory
+        self._custom_models_dao_factory = custom_models_dao_factory
+        self._task_steps_models_dao_factory = task_steps_models_dao_factory
         # dao
         self._users: UsersDAO | None = None
         self._workspaces: WorkspacesDAO | None = None
@@ -68,6 +74,8 @@ class UnitOfWork:
         self._solution_criteria_checks: SolutionCriteriaChecksDAO | None = None
         self._pipeline_tasks: PipelineTasksDAO | None = None
         self._transactions: TransactionsDAO | None = None
+        self._custom_models: CustomModelsDAO | None = None
+        self._task_steps_models: TaskStepsModelsDAO | None = None
         # system
         self.level = 0
 
@@ -76,7 +84,7 @@ class UnitOfWork:
         if self._session is None:
             self._session = self._session_factory()
         try:
-            self.level +=1
+            self.level += 1
             yield Connection(self._session)
             await self._session.commit()
         except Exception:
@@ -85,7 +93,7 @@ class UnitOfWork:
             raise
         finally:
             self.level -= 1
-            if self.level ==0 and self._session is not None:
+            if self.level == 0 and self._session is not None:
                 await self._session.close()
                 self._session = None
                 self._users = None
@@ -99,6 +107,8 @@ class UnitOfWork:
                 self._solution_criteria_checks = None
                 self._pipeline_tasks = None
                 self._transactions = None
+                self._custom_models = None
+                self._task_steps_models = None
 
     @property
     def session(self) -> AsyncSession:
@@ -109,65 +119,77 @@ class UnitOfWork:
     @property
     def users(self) -> UsersDAO:
         if self._users is None:
-            self._users = self._users_dao_factory(self._session)  # type: ignore[assignment]
+            self._users = self._users_dao_factory(self._session)  # type: ignore[arg-type]
         return self._users
 
     @property
     def workspaces(self) -> WorkspacesDAO:
         if self._workspaces is None:
-            self._workspaces = self._workspaces_dao_factory(self._session)  # type: ignore[assignment]
+            self._workspaces = self._workspaces_dao_factory(self._session)  # type: ignore[arg-type]
         return self._workspaces
 
     @property
     def workspace_members(self) -> WorkspaceMembersDAO:
         if self._workspace_members is None:
-            self._workspace_members = self._workspace_members_dao_factory(self._session)  # type: ignore[assignment]
+            self._workspace_members = self._workspace_members_dao_factory(self._session)  # type: ignore[arg-type]
         return self._workspace_members
 
     @property
     def workspace_join_rules(self) -> WorkspaceJoinRulesDAO:
         if self._workspace_join_rules is None:
-            self._workspace_join_rules = self._workspace_join_rules_dao_factory(self._session)  # type: ignore[assignment]
+            self._workspace_join_rules = self._workspace_join_rules_dao_factory(self._session)  # type: ignore[arg-type]
         return self._workspace_join_rules
 
     @property
     def criteria(self) -> CriteriaDAO:
         if self._criteria is None:
-            self._criteria = self._criteria_dao_factory(self._session)  # type: ignore[assignment]
+            self._criteria = self._criteria_dao_factory(self._session)  # type: ignore[arg-type]
         return self._criteria
 
     @property
     def tasks(self) -> TasksDAO:
         if self._tasks is None:
-            self._tasks = self._tasks_dao_factory(self._session)  # type: ignore[assignment]
+            self._tasks = self._tasks_dao_factory(self._session)  # type: ignore[arg-type]
         return self._tasks
 
     @property
     def task_criteria(self) -> TaskCriteriaDAO:
         if self._task_criteria is None:
-            self._task_criteria = self._task_criteria_dao_factory(self._session)  # type: ignore[assignment]
+            self._task_criteria = self._task_criteria_dao_factory(self._session)  # type: ignore[arg-type]
         return self._task_criteria
 
     @property
     def solutions(self) -> SolutionsDAO:
         if self._solutions is None:
-            self._solutions = self._solutions_dao_factory(self._session)  # type: ignore[assignment]
+            self._solutions = self._solutions_dao_factory(self._session)  # type: ignore[arg-type]
         return self._solutions
 
     @property
     def solution_criteria_checks(self) -> SolutionCriteriaChecksDAO:
         if self._solution_criteria_checks is None:
-            self._solution_criteria_checks = self._solution_criteria_checks_dao_factory(self._session)  # type: ignore[assignment]
+            self._solution_criteria_checks = self._solution_criteria_checks_dao_factory(self._session)  # type: ignore[arg-type]
         return self._solution_criteria_checks
 
     @property
     def pipeline_tasks(self) -> PipelineTasksDAO:
         if self._pipeline_tasks is None:
-            self._pipeline_tasks = self._pipeline_tasks_dao_factory(self._session)  # type: ignore[assignment]
+            self._pipeline_tasks = self._pipeline_tasks_dao_factory(self._session)  # type: ignore[arg-type]
         return self._pipeline_tasks
 
     @property
     def transactions(self) -> TransactionsDAO:
         if self._transactions is None:
-            self._transactions = self._transactions_dao_factory(self._session)  # type: ignore[assignment]
+            self._transactions = self._transactions_dao_factory(self._session)  # type: ignore[arg-type]
         return self._transactions
+
+    @property
+    def custom_models(self) -> CustomModelsDAO:
+        if self._custom_models is None:
+            self._custom_models = self._custom_models_dao_factory(self._session)  # type: ignore[arg-type]
+        return self._custom_models
+
+    @property
+    def task_steps_models(self) -> TaskStepsModelsDAO:
+        if self._task_steps_models is None:
+            self._task_steps_models = self._task_steps_models_dao_factory(self._session)  # type: ignore[arg-type]
+        return self._task_steps_models

@@ -25,9 +25,9 @@ from src.dto.solutions.solutions import (
 )
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces.member import WorkspaceMemberFiltersDTO
+from src.infrastructure.solution_artifact_storage.interface import SolutionArtifactStorage
+from src.infrastructure.solution_storage.interface import SolutionStorage
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
-from src.infrastructure.storage.artifact import SolutionArtifactStorage
-from src.infrastructure.storage.interface import SolutionStorage
 
 
 async def get_repo_zip(github_repo_link: str, github_repo_branch: str) -> IO[Any]:

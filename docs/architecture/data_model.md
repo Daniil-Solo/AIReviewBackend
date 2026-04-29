@@ -24,7 +24,8 @@ erDiagram
         integer id PK
         integer workspace_id FK
         integer user_id FK
-        workspace_member_role_enum  role
+        workspace_member_role_enum role
+        datetime created_at
     }
 
     workspace_member_role_enum {
@@ -37,7 +38,7 @@ erDiagram
         integer id PK
         integer workspace_id FK
         string slug
-        string password
+        string hashed_password
         integer used_count
         bool is_active
         workspace_member_role_enum role
@@ -54,14 +55,25 @@ erDiagram
         datetime created_at
         bool use_exam
     }
+
+    task_steps_models {
+        integer id PK
+        integer task_id FK, U
+        jsonb steps
+        datetime created_at
+        datetime updated_at
+    }
     
     criteria {
         integer id PK
         string description
         array tags
         nullable_criterion_stage_enum stage
-        bool is_public
-        integer created_by
+        string prompt
+        integer workspace_id FK
+        integer task_id FK
+        integer created_by FK
+        datetime created_at
     }
     
     criterion_stage_enum {
@@ -81,11 +93,13 @@ erDiagram
         integer id PK
         integer task_id FK
         solution_format_enum format
-        string link
+        string github_repo_link
+        string github_repo_branch
+        string artifact_path
         solution_status_enum status
         jsonb steps
         nullable_integer human_grade
-        nullable_string human_comment
+        nullable_string human_feedback
         nullable_string ai_feedback
         integer created_by FK
         datetime created_at
@@ -125,40 +139,37 @@ erDiagram
         string NOT_APPLICABLE
     }
 
-    solution_artifacts {
-        integer solution_id PK, FK
-        %% Raw data
-        string project_tree
-        string project_content
-        %% Project-doc
-        string project_doc
-        %% Exam questions
-        jsonb questions
-        %% code, text
-    }
-    
-    exams {
-        integer solution_id PK, FK
-        datetime started_at
-        datetime ended_at
-        datetime expired_at
-        %% code, text
-        jsonb answers
+    pipeline_tasks {
+        integer id PK
+        integer solution_id FK
+        string step
+        string status
+        nullable_string error_text
+        nullable_float duration
+        datetime last_checked_at
+        datetime ran_at
+        datetime created_at
     }
     
     transactions {
         integer id PK
         integer user_id FK
         float amount
-        transaction_type_enum type
+        string type
         jsonb metadata
+        datetime created_at
     }
 
-    transaction_type_enum {
-        string WELCOME_BONUS
-        string REVIEW
-        string ADMIN_TOP_UP
-        string DEPOSIT
+    custom_models {
+        integer id PK
+        integer workspace_id FK
+        integer created_by FK
+        string name
+        string base_url
+        string encrypted_api_key
+        string model
+        bool is_active
+        datetime created_at
     }
 
     users ||--|{ workspace_members   : "is a part of"
@@ -168,6 +179,10 @@ erDiagram
     workspace_join_rules   ||..|| workspace_member_role_enum : has
     
     workspaces ||--|{ tasks : contains
+    workspaces ||--|{ custom_models : contains
+    workspaces ||--|{ criteria : has
+    tasks ||--|| task_steps_models : "configured in"
+    tasks ||--|{ criteria : has
     users ||--|{ tasks : creates
     users ||--|{ criteria : creates
     
@@ -175,19 +190,18 @@ erDiagram
     criteria ||--|{ task_criteria : "included in"
     criteria  ||..|| criterion_stage_enum : has
     
+    task_criteria ||..|{ solution_criteria_checks : "verified by"
     solution_criteria_checks ||..|| criterion_check_status_enum : has
     solution_criteria_checks  ||..|| criterion_stage_enum : has
     solutions ||..|{ solution_criteria_checks : has
-    task_criteria ||..|{ solution_criteria_checks : has
     
     users ||--|{ solutions : creates
 
     tasks ||--|{ solutions : "solved in"
     solutions ||..|| solution_format_enum : has
     solutions ||..|| solution_status_enum : has
-    solutions ||--|| solution_artifacts: "extra described in"
-    solutions ||--|| exams: "extra estimated in"
+    solutions ||--|{ pipeline_tasks : "processed by"
     
     users ||..|{ transactions : has
-    transactions ||..|| transaction_type_enum : has
+    users ||--|{ custom_models : creates
 ```

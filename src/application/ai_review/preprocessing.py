@@ -10,9 +10,9 @@ from src.application.ai_review.task_graph import PipelineStepEnum
 from src.constants.preprocessing import ALLOWED_EXTENSIONS, IGNORED_DIRECTORIES
 from src.di.container import Container
 from src.infrastructure.logging import get_logger
+from src.infrastructure.solution_artifact_storage.interface import SolutionArtifactStorage
+from src.infrastructure.solution_storage.interface import SolutionStorage
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
-from src.infrastructure.storage.artifact import SolutionArtifactStorage
-from src.infrastructure.storage.interface import SolutionStorage
 
 
 logger = get_logger()
@@ -36,12 +36,8 @@ def include_code_only(p: Path) -> bool:
 
 def get_project_root_path(temp_dir: str) -> Path:
     temp_dir_path = Path(temp_dir)
-    children = [p for p in temp_dir_path.iterdir()]
-    if len(children) == 1 and children[0].is_dir():
-        project_root_path = children[0]
-    else:
-        project_root_path = temp_dir_path
-    return project_root_path
+    children = list(temp_dir_path.iterdir())
+    return children[0] if len(children) == 1 and children[0].is_dir() else temp_dir_path
 
 
 @inject

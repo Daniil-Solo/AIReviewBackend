@@ -10,6 +10,7 @@ from src.settings.database import DatabaseSettings
 from src.settings.emails import EmailSettings
 from src.settings.logging import LoggingSettings
 from src.settings.redis import RedisSettings
+from src.settings.security import SecuritySettings
 from src.settings.storage import StorageSettings
 
 
@@ -20,16 +21,17 @@ class Settings(BaseSettings):
     APP: str = Field(default="app", description="Сервис")
     PLATFORM_NAME: str = Field(default="AI Review", description="Название платформы")
 
-    db: DatabaseSettings = DatabaseSettings()
-    auth: AuthSettings = AuthSettings()
-    ai: AISettings = AISettings()
-    logging: LoggingSettings = LoggingSettings()
-    storage: StorageSettings = StorageSettings()
-    email: EmailSettings = EmailSettings()
-    redis: RedisSettings = RedisSettings()
+    db: DatabaseSettings = DatabaseSettings()  # type: ignore[call-arg]
+    auth: AuthSettings = AuthSettings()  # type: ignore[call-arg]
+    ai: AISettings = AISettings()  # type: ignore[call-arg]
+    logging: LoggingSettings = LoggingSettings()  # type: ignore[call-arg]
+    storage: StorageSettings = StorageSettings()  # type: ignore[call-arg]
+    email: EmailSettings = EmailSettings()  # type: ignore[call-arg]
+    redis: RedisSettings = RedisSettings()  # type: ignore[call-arg]
+    security: SecuritySettings = SecuritySettings()  # type: ignore[call-arg]
 
 
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg]
 setup_logging(
     level=settings.logging.LEVEL,
     log_format=settings.logging.FORMAT,
