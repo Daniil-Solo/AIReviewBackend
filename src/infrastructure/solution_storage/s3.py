@@ -62,5 +62,4 @@ class S3SolutionStorage(SolutionStorage):
         ) as client:
             response = await client.get_object(Bucket=self._bucket, Key=key)
             async with response["Body"] as stream:
-                data = await stream.read()
-            return data
+                return await stream.read()

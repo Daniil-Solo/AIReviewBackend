@@ -54,8 +54,7 @@ class S3SolutionArtifactStorage(SolutionArtifactStorage):
         ) as client:
             response = await client.get_object(Bucket=self._bucket, Key=full_key)
             async with response["Body"] as stream:
-                data = await stream.read()
-                return data.decode("utf-8")
+                return (await stream.read()).decode("utf-8")
 
     async def delete_artifact(self, solution_id: int, key: str) -> None:
         full_key = self._make_key(solution_id, key)
