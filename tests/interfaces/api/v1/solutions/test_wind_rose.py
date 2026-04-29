@@ -1,6 +1,7 @@
 from fastapi import status
 from httpx import AsyncClient, Response
 import pytest_asyncio
+from pydantic import TypeAdapter
 
 from tests.helpers.workspaces import create_workspace_with_task
 from tests.helpers.solutions import create_github_solution, create_solution_criteria_check
@@ -28,7 +29,7 @@ def get_wind_rose(request_get_wind_rose):
     async def inner(solution_id: int, token: str) -> list[WindRosePointDTO]:
         response = await request_get_wind_rose(solution_id, token)
         assert response.status_code == status.HTTP_200_OK
-        return [WindRosePointDTO.model_validate_json(item) for item in response.json()]
+        return TypeAdapter(list[WindRosePointDTO]).validate_json(response.text)
 
     return inner
 
