@@ -180,10 +180,9 @@ async def check_slug_endpoint(
 @router.get("/{workspace_id}/criteria", response_model=list[CriterionResponseDTO])
 async def get_workspace_criteria_endpoint(
     workspace_id: int,
-user: Annotated[ShortUserDTO, Depends(get_current_user)],
-    tags: Annotated[list[str] | None, Query()] =None,
-    search: Annotated[str | None, Query()] =None,
-
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+    tags: Annotated[list[str] | None, Query()] = None,
+    search: Annotated[str | None, Query()] = None,
 ) -> list[CriterionResponseDTO]:
     filters = CriterionFiltersDTO(
         tags=tags,
@@ -195,10 +194,9 @@ user: Annotated[ShortUserDTO, Depends(get_current_user)],
 @router.get("/{workspace_id}/grades", response_model=list[StudentGradesDTO])
 async def get_student_grades_endpoint(
     workspace_id: int,
-user: Annotated[ShortUserDTO, Depends(get_current_user)],
-    task_ids: Annotated[list[int] | None, Query()] =None,
-    user_ids: Annotated[list[int] | None, Query()] =None,
-
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+    task_ids: Annotated[list[int] | None, Query()] = None,
+    user_ids: Annotated[list[int] | None, Query()] = None,
 ) -> list[StudentGradesDTO]:
     filters = StudentGradesFiltersDTO(
         task_ids=task_ids,
@@ -210,10 +208,9 @@ user: Annotated[ShortUserDTO, Depends(get_current_user)],
 @router.get("/{workspace_id}/grades/csv")
 async def get_student_grades_csv_endpoint(
     workspace_id: int,
-user: Annotated[ShortUserDTO, Depends(get_current_user)],
-    task_ids: Annotated[list[int] | None, Query()] =None,
-    user_ids: Annotated[list[int] | None, Query()] =None,
-
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+    task_ids: Annotated[list[int] | None, Query()] = None,
+    user_ids: Annotated[list[int] | None, Query()] = None,
 ) -> Response:
     filters = StudentGradesFiltersDTO(
         task_ids=task_ids,

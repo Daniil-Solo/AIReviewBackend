@@ -3,7 +3,8 @@ ALLOWED_EXTENSIONS = {
     # language
     ".py",
     ".jinja",
-    ".tpl",  # ".ipynb",
+    ".tpl",
+    ".ipynb",
     ".html",
     ".css",
     ".js",
@@ -24,5 +25,6 @@ ALLOWED_EXTENSIONS = {
     ".yaml",
     ".yml",  # ".json" -> структуру
     # data
-    # ".csv" -> first 4 lines
+    ".csv",
+    ".xlsx",
 }

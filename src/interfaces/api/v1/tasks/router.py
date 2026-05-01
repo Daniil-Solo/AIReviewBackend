@@ -132,10 +132,9 @@ async def get_list_by_task_endpoint(
 @router.get("/{task_id}/available_criteria", response_model=list[CriterionResponseDTO])
 async def get_available_criteria_endpoint(
     task_id: int,
-user: Annotated[ShortUserDTO, Depends(get_current_user)],
-    tags: Annotated[list[str] | None, Query()] =None,
-    search: Annotated[str | None, Query()] =None,
-
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+    tags: Annotated[list[str] | None, Query()] = None,
+    search: Annotated[str | None, Query()] = None,
 ) -> list[CriterionResponseDTO]:
     filters = CriterionFiltersDTO(
         tags=tags,

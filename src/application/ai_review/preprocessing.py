@@ -4,8 +4,9 @@ import tempfile
 import zipfile
 
 from dependency_injector.wiring import Provide, inject
-from treeproject import path_content, path_tree
 
+from src.application.ai_review.preprocessing_utils.project_content import path_content
+from src.application.ai_review.preprocessing_utils.project_tree import path_tree
 from src.application.ai_review.task_graph import PipelineStepEnum
 from src.constants.preprocessing import ALLOWED_EXTENSIONS, IGNORED_DIRECTORIES
 from src.di.container import Container
@@ -31,7 +32,8 @@ def include_without_ignored_directories(p: Path) -> bool:
 def include_code_only(p: Path) -> bool:
     if p.is_dir() and not is_ignored_dir(p):
         return True
-    return p.is_file() and f".{p.name.split('.')[-1]}" in ALLOWED_EXTENSIONS
+    ext = "." + p.name.rsplit(".", 1)[-1]
+    return ext in ALLOWED_EXTENSIONS
 
 
 def get_project_root_path(temp_dir: str) -> Path:

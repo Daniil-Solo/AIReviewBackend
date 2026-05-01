@@ -44,7 +44,9 @@ async def validate_custom_model(base_url: str, api_key: str, model: str) -> None
             raise ApplicationError(message="Не удалось получить ответ от LLM", code="llm_validation_failed")
     except Exception as e:
         logger.error("LLM validation failed", error=str(e))
-        raise ApplicationError(message=f"Не удалось подключиться к LLM API.\n Ошибка: {str(e)}", code="llm_validation_failed") from e
+        raise ApplicationError(
+            message=f"Не удалось подключиться к LLM API.\n Ошибка: {str(e)}", code="llm_validation_failed"
+        ) from e
 
 
 @inject

@@ -103,12 +103,11 @@ def parse_response(details: dict[str, Any], openapi: dict[str, Any]) -> str:
                 json_schema = content["application/json"].get("schema", {})
                 if "$ref" in json_schema:
                     return json_schema["$ref"].split("/")[-1]
-                elif "items" in json_schema:
+                if "items" in json_schema:
                     if "$ref" in json_schema["items"]:
                         item_name = json_schema["items"]["$ref"].split("/")[-1]
                         return f"{item_name}[]"
-                    else:
-                        return f"{resolve_type(json_schema['items'], openapi)}[]"
+                    return f"{resolve_type(json_schema['items'], openapi)}[]"
     return "any"
 
 

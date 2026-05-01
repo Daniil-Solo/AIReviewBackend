@@ -41,9 +41,9 @@ async def create_admin_top_up_transaction_endpoint(
 @router.get("", response_model=list[TransactionResponseDTO])
 async def get_transactions_endpoint(
     user: Annotated[ShortUserDTO, Depends(get_current_user)],
-    started_at: Annotated[datetime | None, Query()] =None,
-    ended_at: Annotated[datetime | None, Query()] =None,
-    types: Annotated[list[TransactionTypeEnum] | None, Query()] =None,
+    started_at: Annotated[datetime | None, Query()] = None,
+    ended_at: Annotated[datetime | None, Query()] = None,
+    types: Annotated[list[TransactionTypeEnum] | None, Query()] = None,
 ) -> list[TransactionResponseDTO]:
     filters = TransactionFilterDTO(started_at=started_at, ended_at=ended_at, types=types)
     return await get_transactions(user, filters)
