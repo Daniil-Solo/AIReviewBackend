@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from src.interfaces.api.v1.app.router import router as app_router
 from src.interfaces.api.v1.auth.router import router as auth_router
 from src.interfaces.api.v1.criteria.router import router as criteria_router
 from src.interfaces.api.v1.custom_models import custom_models_router
@@ -13,6 +14,7 @@ from src.interfaces.api.v1.workspaces.router import router as workspaces_router
 
 
 v1_router = APIRouter(prefix="/v1", tags=["v1"])
+v1_router.include_router(app_router)
 v1_router.include_router(auth_router)
 v1_router.include_router(criteria_router)
 v1_router.include_router(users_router)

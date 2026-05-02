@@ -1,6 +1,7 @@
 from dependency_injector import containers, providers
 from redis.asyncio import Redis
 
+from src.constants.emails import EmailSenderTypeEnum
 from src.infrastructure.ai.llm.interface import LLMInterface
 from src.infrastructure.ai.llm.openai_like import OpenAILikeLLM
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface
@@ -20,8 +21,10 @@ from src.infrastructure.dao.users.sqlalchemy import SQLAlchemyUsersDAO
 from src.infrastructure.dao.workspace_join_rules.sqlalchemy import SQLAlchemyWorkspaceJoinRulesDAO
 from src.infrastructure.dao.workspace_members.sqlalchemy import SQLAlchemyWorkspaceMembersDAO
 from src.infrastructure.dao.workspaces.sqlalchemy import SQLAlchemyWorkspacesDAO
+from src.infrastructure.email_sender.disabled import DisabledEmailSender
 from src.infrastructure.email_sender.interface import EmailSenderInterface
 from src.infrastructure.email_sender.maileroo import MailerooEmailSender
+from src.infrastructure.email_sender.smtp import SmtpEmailSender
 from src.infrastructure.email_templater.interface import EmailTemplaterInterface
 from src.infrastructure.email_templater.jinja2 import Jinja2EmailTemplater
 from src.infrastructure.encryptor.fernet import FernetEncryptor
@@ -36,6 +39,21 @@ from src.infrastructure.solution_storage.s3 import S3SolutionStorage
 from src.infrastructure.sqlalchemy.engine import create_engine, create_session_factory
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 from src.settings import ROOT_DIR, settings
+
+
+def _get_email_sender() -> EmailSenderInterface:  # type: ignore[misc]
+    email_type = settings.email.TYPE
+    if email_type == EmailSenderTypeEnum.MAILEROO:
+        return MailerooEmailSender(token=settings.email.MAILEROO_API_KEY)  # type: ignore[arg-type]
+    if email_type == EmailSenderTypeEnum.SMTP:
+        return SmtpEmailSender(
+            host=settings.email.SMTP_HOST,  # type: ignore[arg-type]
+            port=settings.email.SMTP_PORT,  # type: ignore[arg-type]
+            user=settings.email.SMTP_USER,  # type: ignore[arg-type]
+            password=settings.email.SMTP_PASSWORD,  # type: ignore[arg-type]
+            use_tls=settings.email.SMTP_USE_TLS,  # type: ignore[arg-type]
+        )
+    return DisabledEmailSender()
 
 
 class Container(containers.DeclarativeContainer):
@@ -118,10 +136,7 @@ class Container(containers.DeclarativeContainer):
 
     logs_sender = providers.Resource(init_logs_sender)
 
-    email_sender = providers.Factory[EmailSenderInterface](
-        MailerooEmailSender,
-        token=settings.email.MAILEROO_API_KEY,
-    )
+    email_sender = providers.Factory[EmailSenderInterface](_get_email_sender)
     email_templater = providers.Factory[EmailTemplaterInterface](
         Jinja2EmailTemplater, templates_dir_path=ROOT_DIR / "src" / "email_templates"
     )

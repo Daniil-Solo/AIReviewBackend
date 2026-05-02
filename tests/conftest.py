@@ -11,6 +11,7 @@ import pytest
 import pytest_asyncio
 from sqlalchemy import text
 
+from src.constants.emails import EmailSenderTypeEnum
 from src.di.container import init_container, shutdown_container
 from src.infrastructure.sqlalchemy.models import ALL_TABLES
 from src.interfaces.api.app import create_app
@@ -87,6 +88,7 @@ def uow(container):
 def init_settings():
     settings.logging.LOKI_ENABLED = False
     settings.redis.ENABLED = False
+    settings.email.TYPE = EmailSenderTypeEnum.DISABLE
 
 
 @pytest_asyncio.fixture(scope="session")

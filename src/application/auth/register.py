@@ -111,3 +111,34 @@ async def confirm_registration(
     await resend_code_rate_limiter.reset(data.email)
     access_token = create_access_token(user.as_short())
     return TokenDTO(access_token=access_token)
+
+
+@inject
+async def register_without_confirmation(
+    data: EmailRegistrationRequestDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> TokenDTO:
+    hashed_password = hash_password(data.password)
+    async with uow.connection():
+        try:
+            await uow.users.get_by_email(data.email)
+            raise ConflictError(message="Пользователь уже существует", code="user_exists")
+        except EntityNotFoundError:
+            pass
+
+        user = await uow.users.create(
+            email=data.email,
+            fullname=data.fullname,
+            hashed_password=hashed_password,
+            is_admin=False,
+            is_verified=False,
+        )
+        welcome_bonus = TransactionCreateDTO(
+            user_id=user.id,
+            amount=100.0,
+            type=TransactionTypeEnum.WELCOME_BONUS,
+            metadata={"source": "registration"},
+        )
+        await uow.transactions.create(welcome_bonus)
+    access_token = create_access_token(user.as_short())
+    return TokenDTO(access_token=access_token)
