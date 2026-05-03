@@ -18,3 +18,5 @@ class AuthSettings(BaseSettings):
     CODE_RESEND_PREFIX: str = Field(default="code_resend", description="Префикс ключа для учета переотправок кода")
     RESEND_TTL: int = Field(default=3600, description="Время жизни счётчика счетчика отправок кода для одного email")
     MAX_RESEND_COUNT: int = Field(default=3, description="Максимальное количество повторных отправок кода")
+
+    WELCOME_BONUS_AMOUNT: float = Field(default=0, description="Бонус за регистрацию")

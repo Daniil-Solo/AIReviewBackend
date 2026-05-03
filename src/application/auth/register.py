@@ -102,7 +102,7 @@ async def confirm_registration(
 
         welcome_bonus = TransactionCreateDTO(
             user_id=user.id,
-            amount=100.0,
+            amount=settings.auth.WELCOME_BONUS_AMOUNT,
             type=TransactionTypeEnum.WELCOME_BONUS,
             metadata={"source": "registration"},
         )
@@ -135,7 +135,7 @@ async def register_without_confirmation(
         )
         welcome_bonus = TransactionCreateDTO(
             user_id=user.id,
-            amount=100.0,
+            amount=settings.auth.WELCOME_BONUS_AMOUNT,
             type=TransactionTypeEnum.WELCOME_BONUS,
             metadata={"source": "registration"},
         )
