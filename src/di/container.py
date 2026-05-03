@@ -32,28 +32,59 @@ from src.infrastructure.encryptor.interface import BaseEncryptor
 from src.infrastructure.logs_sender.init_logs_sender import init_logs_sender
 from src.infrastructure.rate_limiter.rate_limiter import RateLimiter
 from src.infrastructure.redis.client import init_redis_client
+from src.infrastructure.solution_artifact_storage.file import FileSolutionArtifactStorage
 from src.infrastructure.solution_artifact_storage.interface import SolutionArtifactStorage
 from src.infrastructure.solution_artifact_storage.s3 import S3SolutionArtifactStorage
+from src.infrastructure.solution_storage.file import FileSolutionStorage
 from src.infrastructure.solution_storage.interface import SolutionStorage
 from src.infrastructure.solution_storage.s3 import S3SolutionStorage
 from src.infrastructure.sqlalchemy.engine import create_engine, create_session_factory
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 from src.settings import ROOT_DIR, settings
+from src.settings.storage import StorageTypeEnum
 
 
 def _get_email_sender() -> EmailSenderInterface:  # type: ignore[misc]
     email_type = settings.email.TYPE
     if email_type == EmailSenderTypeEnum.MAILEROO:
-        return MailerooEmailSender(token=settings.email.MAILEROO_API_KEY)  # type: ignore[arg-type]
-    if email_type == EmailSenderTypeEnum.SMTP:
+        return MailerooEmailSender(
+            token=settings.email.MAILEROO_API_KEY,  # type: ignore[arg-type]
+            from_email=settings.email.MAILEROO_FROM,  # type: ignore[arg-type]
+            from_email_name=settings.email.MAILEROO_FROM_DISPLAY_NAME,  # type: ignore[arg-type]
+        )
+    elif email_type == EmailSenderTypeEnum.SMTP:
         return SmtpEmailSender(
             host=settings.email.SMTP_HOST,  # type: ignore[arg-type]
             port=settings.email.SMTP_PORT,  # type: ignore[arg-type]
             user=settings.email.SMTP_USER,  # type: ignore[arg-type]
             password=settings.email.SMTP_PASSWORD,  # type: ignore[arg-type]
+            from_email=settings.email.SMTP_FROM_EMAIL,  # type: ignore[arg-type]
             use_tls=settings.email.SMTP_USE_TLS,  # type: ignore[arg-type]
         )
     return DisabledEmailSender()
+
+def _get_solution_storage() -> SolutionStorage:
+    if settings.storage.TYPE == StorageTypeEnum.S3:
+        return S3SolutionStorage(
+            endpoint=settings.storage.S3_ENDPOINT,
+            access_key=settings.storage.S3_ACCESS_KEY,
+            secret_key=settings.storage.S3_SECRET_KEY,
+            bucket=settings.storage.S3_SOLUTIONS_BUCKET,
+            use_ssl=settings.storage.S3_USE_SSL,
+        )
+    return FileSolutionStorage(base_path=settings.storage.FILE_BASE_PATH)
+
+def _get_solution_artifact_storage() -> SolutionArtifactStorage:
+    if settings.storage.TYPE == StorageTypeEnum.S3:
+        return S3SolutionArtifactStorage(
+            endpoint=settings.storage.S3_ENDPOINT,
+            access_key=settings.storage.S3_ACCESS_KEY,
+            secret_key=settings.storage.S3_SECRET_KEY,
+            bucket=settings.storage.S3_SOLUTION_ARTIFACTS_BUCKET,
+            use_ssl=settings.storage.S3_USE_SSL,
+        )
+    return FileSolutionArtifactStorage(base_path=settings.storage.FILE_BASE_PATH)
+
 
 
 class Container(containers.DeclarativeContainer):
@@ -116,23 +147,8 @@ class Container(containers.DeclarativeContainer):
 
     encryptor = providers.Singleton[BaseEncryptor](FernetEncryptor, encryption_key=settings.security.ENCRYPTION_KEY)
 
-    solution_storage = providers.Factory[SolutionStorage](
-        S3SolutionStorage,
-        endpoint=settings.storage.ENDPOINT,
-        access_key=settings.storage.ACCESS_KEY,
-        secret_key=settings.storage.SECRET_KEY,
-        bucket=settings.storage.SOLUTIONS_BUCKET,
-        use_ssl=settings.storage.USE_SSL,
-    )
-
-    solution_artifact_storage = providers.Factory[SolutionArtifactStorage](
-        S3SolutionArtifactStorage,
-        endpoint=settings.storage.ENDPOINT,
-        access_key=settings.storage.ACCESS_KEY,
-        secret_key=settings.storage.SECRET_KEY,
-        bucket=settings.storage.SOLUTION_ARTIFACTS_BUCKET,
-        use_ssl=settings.storage.USE_SSL,
-    )
+    solution_storage = providers.Factory[SolutionStorage](_get_solution_storage)
+    solution_artifact_storage = providers.Factory[SolutionArtifactStorage](_get_solution_artifact_storage)
 
     logs_sender = providers.Resource(init_logs_sender)
 

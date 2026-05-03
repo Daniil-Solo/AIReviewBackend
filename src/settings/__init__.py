@@ -17,7 +17,7 @@ from src.settings.storage import StorageSettings
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="allow")
 
-    ENV: str = Field(description="Окружение: dev или prod")
+    ENV: str = Field(description="Окружение")
     APP: str = Field(default="app", description="Сервис")
     PLATFORM_NAME: str = Field(default="AI Review", description="Название платформы")
 
