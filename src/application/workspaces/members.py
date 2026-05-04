@@ -129,3 +129,26 @@ async def change_workspace_owner(
             )
 
         return await uow.workspaces.get_by_id(workspace_id)
+
+
+@inject
+async def delete_member(
+    workspace_id: int,
+    member_id: int,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> None:
+    async with uow.connection():
+        await check_member_role(uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER})
+
+        target_member = await uow.workspace_members.get_by_id(member_id)
+        if target_member.workspace_id != workspace_id:
+            raise EntityNotFoundError(message="Участник не найден в пространстве")
+
+        if target_member.role == WorkspaceMemberRoleEnum.OWNER:
+            raise ApplicationError(message="Нельзя удалить владельца пространства", code="cannot_delete_owner")
+
+        if target_member.user_id == user.id:
+            raise ApplicationError(message="Нельзя удалить самого себя", code="cannot_delete_self")
+
+        await uow.workspace_members.delete(member_id)

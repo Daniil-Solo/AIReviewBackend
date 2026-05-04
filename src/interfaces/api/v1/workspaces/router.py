@@ -15,6 +15,7 @@ from src.application.workspaces import (
     create_join_rule,
     create_workspace,
     delete_join_rule,
+    delete_member,
     get_student_grades,
     get_student_grades_csv,
     get_workspace,
@@ -150,6 +151,16 @@ async def update_member_endpoint(
     user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> WorkspaceMemberResponseDTO:
     return await update_member(workspace_id, member_id, data, user)
+
+
+@router.delete("/{workspace_id}/members/{member_id}", response_model=SuccessOperationDTO)
+async def delete_member_endpoint(
+    workspace_id: int,
+    member_id: int,
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+) -> SuccessOperationDTO:
+    await delete_member(workspace_id, member_id, user)
+    return SuccessOperationDTO(message="Участник удалён из пространства")
 
 
 @router.post("/{workspace_id}/leave", response_model=SuccessOperationDTO)

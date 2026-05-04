@@ -10,6 +10,7 @@ from src.application.workspaces.join_rules import (
 )
 from src.application.workspaces.members import (
     change_workspace_owner,
+    delete_member,
     join_to_workspace,
     leave_workspace,
     update_member,
@@ -39,6 +40,7 @@ __all__ = (
     "delete_join_rule",
     "join_to_workspace",
     "update_member",
+    "delete_member",
     "leave_workspace",
     "change_workspace_owner",
     "get_workspace_tasks",
