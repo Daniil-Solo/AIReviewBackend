@@ -25,7 +25,6 @@ class SolutionUpdateDTO(BaseDTO):
     steps: list[PipelineStepEnum] | None = Field(default=None, description="Шаги проверки")
     human_grade: int | None = Field(default=None, description="Оценка преподавателя")
     human_feedback: str | None = Field(default=None, description="Отзыв преподавателя")
-    ai_feedback: str | None = Field(default=None, description="Отзыв от AI")
     label: str | None = Field(default=None, description="Метка решения")
 
 
@@ -83,8 +82,7 @@ class SolutionFiltersRequestDTO(BaseDTO):
 
 class SolutionFinalReviewDTO(BaseDTO):
     human_grade: int = Field(description="Оценка преподавателя", ge=0, le=100)
-    human_feedback: str = Field(description="Отзыв преподавателя")
-    ai_feedback: str | None = Field(default=None, description="Отзыв от AI")
+    human_feedback: str = Field(description="Обратная связь")
 
 
 class SolutionFiltersDTO(BaseDTO):

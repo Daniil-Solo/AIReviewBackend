@@ -15,6 +15,7 @@ class PipelineStepEnum(StrEnum):
     VALIDATE_PROJECT_DOC = "validate_project_doc"
     GRADE_BY_PROJECT_DOC = "grade_by_project_doc"
     GRADE_BY_CODEBASE = "grade_by_codebase"
+    GENERATE_FEEDBACK = "generate_feedback"
 
 
 # шаг пайплайна: список шагов, от которых он зависит
@@ -28,13 +29,18 @@ TASK_DEPENDENCIES: dict[PipelineStepEnum, list[PipelineStepEnum]] = {
     PipelineStepEnum.VALIDATE_PROJECT_DOC: ["NON_REACHABLE"],  # валидация проекта производится студентом, а не воркером
     PipelineStepEnum.GRADE_BY_PROJECT_DOC: [PipelineStepEnum.VALIDATE_PROJECT_DOC],
     PipelineStepEnum.GRADE_BY_CODEBASE: [PipelineStepEnum.GRADE_BY_PROJECT_DOC],
+    PipelineStepEnum.GENERATE_FEEDBACK: ["NON_REACHABLE"],  # генерация обратной связью вызывается преподавателем, а не воркером
 }
 
 
-ALL_STEPS: list[PipelineStepEnum] = [PipelineStepEnum(item) for item in list(PipelineStepEnum) if PipelineStepEnum(item) != PipelineStepEnum.VALIDATE_PROJECT_DOC]
+ALL_STEPS: list[PipelineStepEnum] = [
+    PipelineStepEnum(item) for item in list(PipelineStepEnum)
+    if PipelineStepEnum(item) not in (PipelineStepEnum.VALIDATE_PROJECT_DOC, PipelineStepEnum.GENERATE_FEEDBACK)
+]
 
 LLM_STEPS: list[PipelineStepEnum] = [
     PipelineStepEnum.CREATE_PROJECT_DOC,
     PipelineStepEnum.GRADE_BY_PROJECT_DOC,
     PipelineStepEnum.GRADE_BY_CODEBASE,
+    PipelineStepEnum.GENERATE_FEEDBACK,
 ]

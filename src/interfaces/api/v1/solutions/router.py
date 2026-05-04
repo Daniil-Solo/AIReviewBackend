@@ -4,10 +4,11 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 from fastapi.responses import StreamingResponse
 
 import src.application.ai_review.pipeline as pipeline_service
-import src.application.solutions.review_by_criteria as solution_criteria_checks_service
+import src.application.solutions.manual_review as solution_criteria_checks_service
 import src.application.solutions.score as score_service
 import src.application.solutions.solutions as solution_service
 import src.application.solutions.wind_rose as wind_rose_service
+import src.application.ai_review.feedback as feedback_service
 from src.constants.ai_pipeline import PipelineStepEnum
 from src.constants.ai_review import SolutionFormatEnum
 from src.dto.ai_review.pipeline import PipelineInfoDTO
@@ -162,3 +163,15 @@ async def approve_project_doc_endpoint(
     user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> SolutionShortResponseDTO:
     return await solution_service.approve_project_doc(solution_id, file, user)
+
+
+@router.post("/{solution_id}/ai-feedback")
+async def get_artefact_endpoint(
+    solution_id: int,
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+) -> StreamingResponse:
+    content = await feedback_service.generate_feedback(solution_id, user)
+    return StreamingResponse(
+        content=iter([content]),
+        media_type="text/plain; charset=utf-8",
+    )

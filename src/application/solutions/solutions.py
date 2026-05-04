@@ -233,7 +233,6 @@ async def final_review(
                 status=SolutionStatusEnum.REVIEWED,
                 human_grade=data.human_grade,
                 human_feedback=data.human_feedback,
-                ai_feedback=data.ai_feedback,
             ),
         )
 
