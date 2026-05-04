@@ -11,6 +11,7 @@ from src.settings.emails import EmailSettings
 from src.settings.logging import LoggingSettings
 from src.settings.redis import RedisSettings
 from src.settings.security import SecuritySettings
+from src.settings.solutions import SolutionSettings
 from src.settings.storage import StorageSettings
 
 
@@ -29,6 +30,7 @@ class Settings(BaseSettings):
     email: EmailSettings = EmailSettings()  # type: ignore[call-arg]
     redis: RedisSettings = RedisSettings()  # type: ignore[call-arg]
     security: SecuritySettings = SecuritySettings()  # type: ignore[call-arg]
+    solutions: SolutionSettings = SolutionSettings()  # type: ignore[call-arg]
 
 
 settings = Settings()  # type: ignore[call-arg]

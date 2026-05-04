@@ -139,7 +139,9 @@ async def delete_member(
     uow: UnitOfWork = Provide[Container.uow],
 ) -> None:
     async with uow.connection():
-        await check_member_role(uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER})
+        await check_member_role(
+            uow, user.id, workspace_id, allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
+        )
 
         target_member = await uow.workspace_members.get_by_id(member_id)
         if target_member.workspace_id != workspace_id:

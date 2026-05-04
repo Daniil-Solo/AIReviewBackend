@@ -4,7 +4,9 @@ from src.application.ai_review.task_graph import PipelineStepEnum
 from src.application.custom_models.utils import get_llm_for_step
 from src.application.solutions.utils import get_workspace_id
 from src.application.transactions.utils import charge_for_llm_call
+from src.constants.ai_review import SolutionStatusEnum
 from src.di.container import Container
+from src.dto.solutions.solutions import SolutionUpdateDTO
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface
 from src.infrastructure.logging import get_logger
 from src.infrastructure.solution_artifact_storage.interface import SolutionArtifactStorage
@@ -37,9 +39,13 @@ async def create_project_doc(
 
     metadata.input_tokens = answer.input_tokens
     metadata.output_tokens = answer.output_tokens
-    async with uow.connection():
+    async with uow.connection() as conn, conn.transaction():
         workspace_id = await get_workspace_id(uow, solution_id)
         await charge_for_llm_call(uow, workspace_id, metadata)
+        await uow.solutions.update(
+            solution_id,
+            SolutionUpdateDTO(status=SolutionStatusEnum.VALIDATION_WAITING),
+        )
 
 
 @inject

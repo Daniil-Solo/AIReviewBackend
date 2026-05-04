@@ -28,6 +28,7 @@ from src.dto.workspaces.member import WorkspaceMemberFiltersDTO
 from src.infrastructure.solution_artifact_storage.interface import SolutionArtifactStorage
 from src.infrastructure.solution_storage.interface import SolutionStorage
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
+from src.settings import settings
 
 
 async def get_repo_zip(github_repo_link: str, github_repo_branch: str) -> IO[Any]:
@@ -83,6 +84,13 @@ async def create(
     async with uow.connection() as conn, conn.transaction():
         task = await uow.tasks.get_by_id(data.task_id)
         await check_member_role(uow, user.id, task.workspace_id)
+
+        existing_solutions = await uow.solutions.get_list(SolutionFiltersDTO(task_id=data.task_id, created_by=user.id))
+        if len(existing_solutions) >= settings.solutions.MAX_UPLOADS_PER_TASK:
+            raise ApplicationError(
+                message=f"Превышен лимит загрузок решений ({settings.solutions.MAX_UPLOADS_PER_TASK}) для этой задачи",
+                code="solution_upload_limit_exceeded",
+            )
 
         workspace = await uow.workspaces.get_by_id(task.workspace_id)
         owner_member = (

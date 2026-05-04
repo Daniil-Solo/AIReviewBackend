@@ -30,10 +30,6 @@ def upgrade() -> None:
     op.execute("UPDATE solutions SET status = 'ERROR' WHERE status = 'WAITING_EXAM'")
     op.execute("UPDATE solutions SET status = 'ERROR' WHERE status = 'EXAMINATION'")
 
-    op.execute("ALTER TYPE solution_status DROP VALUE IF EXISTS 'AI_REVIEW'")
-    op.execute("ALTER TYPE solution_status DROP VALUE IF EXISTS 'WAITING_EXAM'")
-    op.execute("ALTER TYPE solution_status DROP VALUE IF EXISTS 'EXAMINATION'")
-
     op.add_column("solutions", sa.Column("label", sa.String(), server_default="", nullable=False))
     # ### end Alembic commands ###
 
@@ -47,7 +43,4 @@ def downgrade() -> None:
     op.execute("ALTER TYPE solution_status ADD VALUE 'WAITING_EXAM'")
     op.execute("ALTER TYPE solution_status ADD VALUE 'EXAMINATION'")
 
-    op.execute("ALTER TYPE solution_status DROP VALUE IF EXISTS 'PROJECT_GENERATION'")
-    op.execute("ALTER TYPE solution_status DROP VALUE IF EXISTS 'VALIDATION_WAITING'")
-    op.execute("ALTER TYPE solution_status DROP VALUE IF EXISTS 'CRITERIA_GRADING'")
     # ### end Alembic commands ###
