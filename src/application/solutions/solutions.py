@@ -86,9 +86,10 @@ async def create(
         await check_member_role(uow, user.id, task.workspace_id)
 
         existing_solutions = await uow.solutions.get_list(SolutionFiltersDTO(task_id=data.task_id, created_by=user.id))
-        if len(existing_solutions) >= settings.solutions.MAX_UPLOADS_PER_TASK:
+        not_canceled_solutions = [solution for solution in existing_solutions if solution.status != SolutionStatusEnum.CANCELLED]
+        if len(not_canceled_solutions) >= settings.solutions.MAX_UPLOADS_PER_TASK:
             raise ApplicationError(
-                message=f"Превышен лимит загрузок решений ({settings.solutions.MAX_UPLOADS_PER_TASK}) для этой задачи",
+                message=f"Превышен лимит активных решений ({settings.solutions.MAX_UPLOADS_PER_TASK}) для этой задачи",
                 code="solution_upload_limit_exceeded",
             )
 
@@ -260,7 +261,7 @@ async def approve_project_doc(
     uow: UnitOfWork = Provide[Container.uow],
     artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
 ) -> SolutionShortResponseDTO:
-    async with uow.connection() as conn, conn.transaction():
+    async with uow.connection():
         solution = await uow.solutions.get_by_id(solution_id)
         await check_solution_permissions(uow, user.id, solution.id, allow_author=True)
 
@@ -270,17 +271,17 @@ async def approve_project_doc(
                 code="solution_status_invalid",
             )
 
-        content = await file.read()
-        text_content = content.decode("utf-8")
+    content = await file.read()
+    text_content = content.decode("utf-8")
 
-        await artifact_storage.save_artifact(
-            solution_id,
-            PipelineStepEnum.VALIDATE_PROJECT_DOC,
-            text_content,
-        )
+    await artifact_storage.save_artifact(
+        solution_id,
+        PipelineStepEnum.VALIDATE_PROJECT_DOC,
+        text_content,
+    )
 
+    async with uow.connection():
         new_steps = [*solution.steps, PipelineStepEnum.VALIDATE_PROJECT_DOC]
-
         updated_solution = await uow.solutions.update(
             solution_id,
             SolutionUpdateDTO(
@@ -289,4 +290,4 @@ async def approve_project_doc(
             ),
         )
 
-        return SolutionShortResponseDTO.model_validate(updated_solution)
+    return SolutionShortResponseDTO.model_validate(updated_solution)

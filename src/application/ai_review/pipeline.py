@@ -18,8 +18,6 @@ from src.infrastructure.sqlalchemy.uow import UnitOfWork
 
 logger = get_logger()
 
-RESTART_ALLOWED_STATUSES = {SolutionStatusEnum.ERROR, SolutionStatusEnum.CANCELLED, SolutionStatusEnum.REVIEWED}
-
 
 @inject
 async def restart(
@@ -29,12 +27,6 @@ async def restart(
 ) -> None:
     async with uow.connection() as conn, conn.transaction():
         solution = await uow.solutions.get_by_id(solution_id)
-
-        if solution.status not in RESTART_ALLOWED_STATUSES:
-            raise ApplicationError(
-                message="Перезапуск проверки доступен только в случае ошибки, отмены проверки или после AI-проверки",
-                code="solution_status_invalid",
-            )
 
         task = await uow.tasks.get_by_id(solution.task_id)
         await check_member_role(
