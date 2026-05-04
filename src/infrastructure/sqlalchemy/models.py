@@ -155,6 +155,7 @@ solutions_table = sa.Table(
     sa.Column("human_grade", sa.Integer, nullable=True),
     sa.Column("human_feedback", sa.String, nullable=True),
     sa.Column("ai_feedback", sa.Text, nullable=True),
+    sa.Column("label", sa.String, nullable=False, server_default=""),
     sa.Column(
         "created_by", sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"), nullable=False
     ),

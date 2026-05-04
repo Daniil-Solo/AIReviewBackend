@@ -1,7 +1,7 @@
-import enum
+from enum import StrEnum
 
 
-class EmailSenderTypeEnum(str, enum.Enum):
+class EmailSenderTypeEnum(StrEnum):
     MAILEROO = "MAILEROO"
     SMTP = "SMTP"
     DISABLE = "DISABLE"

@@ -1,5 +1,6 @@
-from src.dto.common import BaseDTO
 from pydantic import Field
+
+from src.dto.common import BaseDTO
 
 
 class AppSettingsResponseDTO(BaseDTO):

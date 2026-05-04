@@ -17,6 +17,7 @@ from src.dto.solutions.solutions import (
     SolutionCreateRequestDTO,
     SolutionFiltersRequestDTO,
     SolutionFinalReviewDTO,
+    SolutionLabelUpdateDTO,
     SolutionShortResponseDTO,
 )
 from src.dto.solutions.wind_rose import WindRosePointDTO
@@ -133,3 +134,12 @@ async def final_review_endpoint(
     user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> SolutionShortResponseDTO:
     return await solution_service.final_review(solution_id, data, user)
+
+
+@router.patch("/{solution_id}/label", response_model=SolutionShortResponseDTO)
+async def update_label_endpoint(
+    solution_id: int,
+    data: SolutionLabelUpdateDTO,
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+) -> SolutionShortResponseDTO:
+    return await solution_service.update_label(solution_id, data.label, user)

@@ -41,22 +41,20 @@ FILE: {{ item.filename }}
 
 class BanditChecker:
     @staticmethod
-    def run(project_directory: Path, ignored_directories: list[str] | None = None) -> list[Issue]:
+    def run(
+        project_directory: Path, ignored_directories: list[str] | None = None
+    ) -> list[Issue]:
         bandit_config = config.BanditConfig()
         dirs_to_exclude = ignored_directories or IGNORED_DIRECTORIES
 
         b_mgr = manager.BanditManager(
-            bandit_config,
-            'file',
-            debug=False,
-            verbose=False,
-            quiet=True
+            bandit_config, "file", debug=False, verbose=False, quiet=True
         )
 
         b_mgr.discover_files(
             [str(project_directory)],
             recursive=True,
-            excluded_paths=",".join(dirs_to_exclude)
+            excluded_paths=",".join(dirs_to_exclude),
         )
 
         b_mgr.run_tests()
@@ -69,7 +67,12 @@ class BanditChecker:
         for issue in issues:
             key = issue.test_id, issue.text
             if key not in groups:
-                groups[key] = IssueGroup(test_id=issue.test_id, issue_text=issue.text, severity=issue.severity, examples=[])
+                groups[key] = IssueGroup(
+                    test_id=issue.test_id,
+                    issue_text=issue.text,
+                    severity=issue.severity,
+                    examples=[],
+                )
             item = ExampleItem(
                 filename=issue.fname,
                 code=issue.get_code(max_lines=1, tabbed=True).strip(),
@@ -80,6 +83,7 @@ class BanditChecker:
     @staticmethod
     def get_report(issue_groups: list[IssueGroup]) -> str:
         return tpl.render(issue_groups=issue_groups).strip()
+
 
 if __name__ == "__main__":
     checker = BanditChecker()

@@ -26,6 +26,7 @@ class SolutionUpdateDTO(BaseDTO):
     human_grade: int | None = Field(default=None, description="Оценка преподавателя")
     human_feedback: str | None = Field(default=None, description="Отзыв преподавателя")
     ai_feedback: str | None = Field(default=None, description="Отзыв от AI")
+    label: str | None = Field(default=None, description="Метка решения")
 
 
 class SolutionResponseDTO(BaseDTO):
@@ -40,6 +41,7 @@ class SolutionResponseDTO(BaseDTO):
     human_grade: int | None = Field(description="Оценка преподавателя")
     human_feedback: str | None = Field(description="Отзыв преподавателя")
     ai_feedback: str | None = Field(description="Отзыв от AI")
+    label: str = Field(default="", description="Метка решения")
     created_by: int = Field(description="ID создателя")
     created_at: datetime.datetime = Field(description="Дата создания")
 
@@ -62,6 +64,7 @@ class SolutionShortResponseDTO(BaseDTO):
     human_grade: int | None = Field(description="Оценка преподавателя")
     human_feedback: str | None = Field(description="Отзыв преподавателя")
     ai_feedback: str | None = Field(description="Отзыв от AI")
+    label: str = Field(default="", description="Метка решения")
     created_at: datetime.datetime = Field(description="Дата создания")
     created_by: int = Field(description="ID создателя")
     author: ShortUserDTO | None = Field(default=None, description="Информация об авторе решения")
@@ -87,3 +90,7 @@ class SolutionFinalReviewDTO(BaseDTO):
 class SolutionFiltersDTO(BaseDTO):
     created_by: int | None = Field(default=None, description="ID создателя для фильтрации")
     task_id: int | None = Field(default=None, description="ID задачи для фильтрации")
+
+
+class SolutionLabelUpdateDTO(BaseDTO):
+    label: str = Field(description="Метка решения", max_length=255)

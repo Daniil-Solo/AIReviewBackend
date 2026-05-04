@@ -1,5 +1,6 @@
-import aiosmtplib
 from email.message import EmailMessage
+
+import aiosmtplib
 
 from src.dto.emails.emails import EmailMessageDTO
 from src.infrastructure.email_sender.interface import EmailSenderInterface

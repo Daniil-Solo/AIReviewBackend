@@ -15,7 +15,9 @@ class EmailSettings(BaseSettings):
     )
 
     MAILEROO_FROM: str | None = Field(default=None, description="Электронная почта отправителя для рассылок")
-    MAILEROO_FROM_DISPLAY_NAME: str | None = Field(default=None, description="Отображаемое имя отправителя для рассылок")
+    MAILEROO_FROM_DISPLAY_NAME: str | None = Field(
+        default=None, description="Отображаемое имя отправителя для рассылок"
+    )
     MAILEROO_API_KEY: str | None = Field(default=None, description="API ключ для Maileroo")
 
     SMTP_HOST: str | None = Field(default=None, description="SMTP хост")

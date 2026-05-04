@@ -11,7 +11,6 @@ class LintIssue:
     filename: str
 
 
-
 def run_ruff(project_path: Path) -> list[LintIssue]:
     issues = []
 
@@ -43,7 +42,6 @@ def run_ruff(project_path: Path) -> list[LintIssue]:
         filename = item.get("filename", "")
         code = item.get("code", "")
         message = item.get("message", "")
-
 
         issue = LintIssue(
             code=code,

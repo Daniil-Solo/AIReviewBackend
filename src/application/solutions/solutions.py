@@ -91,7 +91,7 @@ async def create(
             )
         )[0]
         balance = await uow.transactions.get_balance_by_user_id(owner_member.user_id)
-        initial_status = SolutionStatusEnum.ERROR if balance < 0 else SolutionStatusEnum.AI_REVIEW
+        initial_status = SolutionStatusEnum.ERROR if balance < 0 else SolutionStatusEnum.PROJECT_GENERATION
 
         solution = await uow.solutions.create(
             SolutionCreateDTO(**data.model_dump(), artifact_path=artifact_path), user.id
@@ -129,7 +129,7 @@ async def cancel(
         solution = await uow.solutions.get_by_id(solution_id)
         await check_solution_permissions(uow, user.id, solution.id)
 
-        if solution.status != SolutionStatusEnum.AI_REVIEW:
+        if solution.status != SolutionStatusEnum.PROJECT_GENERATION:
             raise ApplicationError(
                 message="Отмена проверки решения возможна только во время AI-проверки", code="solution_status_invalid"
             )
@@ -223,4 +223,17 @@ async def final_review(
             ),
         )
 
+        return SolutionShortResponseDTO.model_validate(updated_solution)
+
+
+@inject
+async def update_label(
+    solution_id: int,
+    label: str,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> SolutionShortResponseDTO:
+    async with uow.connection():
+        await check_solution_permissions(uow, user.id, solution_id, allow_author=True)
+        updated_solution = await uow.solutions.update(solution_id, SolutionUpdateDTO(label=label))
         return SolutionShortResponseDTO.model_validate(updated_solution)

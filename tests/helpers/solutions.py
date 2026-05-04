@@ -18,7 +18,7 @@ async def create_github_solution(uow: UnitOfWork, task_id: int, user_id: int) ->
     async with uow.connection():
         data = SolutionGitHubFactory.build(task_id=task_id)
         solution = await uow.solutions.create(data, user_id)
-        return await uow.solutions.update(solution.id, SolutionUpdateDTO(status=SolutionStatusEnum.AI_REVIEW))
+        return await uow.solutions.update(solution.id, SolutionUpdateDTO(status=SolutionStatusEnum.PROJECT_GENERATION))
 
 
 async def create_solution_criteria_check(

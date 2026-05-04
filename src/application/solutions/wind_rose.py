@@ -7,7 +7,6 @@ from src.di.container import Container
 from src.dto.criteria import CriterionFiltersDTO
 from src.dto.solutions.wind_rose import WindRosePointDTO
 from src.dto.users.user import ShortUserDTO
-from src.infrastructure.logging import get_logger
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 
 
@@ -29,7 +28,9 @@ async def get_wind_rose(
         task_criterion_to_criterion = {tc.id: tc.criterion_id for tc in task_criteria}
 
         criterion_ids = list(task_criterion_to_criterion.values())
-        criteria = await uow.criteria.get_list(CriterionFiltersDTO(ids=criterion_ids, workspace_id=task.workspace_id, task_id=task.id))
+        criteria = await uow.criteria.get_list(
+            CriterionFiltersDTO(ids=criterion_ids, workspace_id=task.workspace_id, task_id=task.id)
+        )
         criteria_tags = {c.id: c.tags for c in criteria}
 
         tag_stats: dict[str, dict[str, int]] = defaultdict(lambda: {"passed": 0, "count": 0})

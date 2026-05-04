@@ -24,11 +24,7 @@ def _notebook_handler(path: Path) -> str:
 def _format_table(rows: list[list[str]]) -> str:
     if not rows:
         return ""
-    col_widths = [max(len(str(row[i])) for row in rows) for i in range(len(rows[0]))]
-    lines = []
-    for row in rows:
-        line = " | ".join(str(cell).ljust(col_widths[i]) for i, cell in enumerate(row))
-        lines.append(line)
+    lines = [" | ".join(row) for row in rows]
     return "\n".join(lines)
 
 
@@ -36,26 +32,40 @@ def _csv_handler(path: Path) -> str:
     with open(path, encoding="utf-8", newline="") as f:
         reader = csv.reader(f)
         rows = []
-        for _ in range(5):
+        for _ in range(3):
             row = next(reader, None)
             if row is None:
                 break
             rows.append(row)
     table = _format_table(rows)
-    return f"{table}\n\nПервые 5 строк"
+    return f"{table}\n\nПервые 3 строки"
 
 
 def _excel_handler(path: Path) -> str:
     wb = openpyxl.load_workbook(path, read_only=True)
     ws = wb.active
-    rows = [[str(cell.value or "") for cell in row][:5] for row in list(ws.iter_rows(max_row=5))]
+    rows = [[str(cell.value or "") for cell in row][:3] for row in list(ws.iter_rows(max_row=5))]
     wb.close()
     table = _format_table(rows)
-    return f"{table}\n\nПервые 5 строк"
+    return f"{table}\n\nПервые 3 строки"
 
+
+def create_text_preview_handler(limit: int) -> FileHandler:
+    def handler(path: Path) -> str:
+        content = path.read_text(encoding="utf-8")
+        preview = content[:limit]
+        return preview + ("..." if len(content) > limit else "")
+
+    return handler
+
+
+_text_preview_handler = create_text_preview_handler(100)
 
 DEFAULT_FILE_HANDLERS: dict[str, FileHandler] = {
     ".ipynb": _notebook_handler,
     ".csv": _csv_handler,
     ".xlsx": _excel_handler,
+    ".css": _text_preview_handler,
+    ".html": _text_preview_handler,
+    ".js": _text_preview_handler,
 }

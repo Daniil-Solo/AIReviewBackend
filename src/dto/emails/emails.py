@@ -1,7 +1,6 @@
 from pydantic import Field
 
 from src.dto.common import BaseDTO
-from src.settings import settings
 
 
 class EmailMessageDTO(BaseDTO):

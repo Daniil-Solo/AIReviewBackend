@@ -52,7 +52,7 @@ def _get_email_sender() -> EmailSenderInterface:  # type: ignore[misc]
             from_email=settings.email.MAILEROO_FROM,  # type: ignore[arg-type]
             from_email_name=settings.email.MAILEROO_FROM_DISPLAY_NAME,  # type: ignore[arg-type]
         )
-    elif email_type == EmailSenderTypeEnum.SMTP:
+    if email_type == EmailSenderTypeEnum.SMTP:
         return SmtpEmailSender(
             host=settings.email.SMTP_HOST,  # type: ignore[arg-type]
             port=settings.email.SMTP_PORT,  # type: ignore[arg-type]
@@ -62,6 +62,7 @@ def _get_email_sender() -> EmailSenderInterface:  # type: ignore[misc]
             use_tls=settings.email.SMTP_USE_TLS,  # type: ignore[arg-type]
         )
     return DisabledEmailSender()
+
 
 def _get_solution_storage() -> SolutionStorage:
     if settings.storage.TYPE == StorageTypeEnum.S3:
@@ -74,6 +75,7 @@ def _get_solution_storage() -> SolutionStorage:
         )
     return FileSolutionStorage(base_path=settings.storage.FILE_BASE_PATH)
 
+
 def _get_solution_artifact_storage() -> SolutionArtifactStorage:
     if settings.storage.TYPE == StorageTypeEnum.S3:
         return S3SolutionArtifactStorage(
@@ -84,7 +86,6 @@ def _get_solution_artifact_storage() -> SolutionArtifactStorage:
             use_ssl=settings.storage.S3_USE_SSL,
         )
     return FileSolutionArtifactStorage(base_path=settings.storage.FILE_BASE_PATH)
-
 
 
 class Container(containers.DeclarativeContainer):

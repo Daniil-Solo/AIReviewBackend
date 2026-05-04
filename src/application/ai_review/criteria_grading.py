@@ -26,7 +26,7 @@ async def grade_by_project_doc(
     prompt_builder: PromptBuilderInterface = Provide[Container.prompt_builder],
     artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
 ) -> None:
-    project_doc = await artifact_storage.get_artifact(solution_id, PipelineStepEnum.IMPROVE_DOC)
+    project_doc = await artifact_storage.get_artifact(solution_id, PipelineStepEnum.CREATE_PROJECT_DOC)
 
     criteria = []
     async with uow.connection():

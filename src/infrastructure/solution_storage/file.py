@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import IO, Any
-
 import uuid
 
 from src.infrastructure.solution_storage.interface import SolutionStorage

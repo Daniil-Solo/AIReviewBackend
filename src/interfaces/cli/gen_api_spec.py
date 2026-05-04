@@ -50,10 +50,7 @@ def resolve_type(schema: dict[str, Any], openapi: dict[str, Any]) -> str:
     }
 
     schema_type = schema.get("type")
-    if schema_type == "null" or schema_type is None:
-        result_type = "null"
-    else:
-        result_type = type_map.get(schema_type, "null")
+    result_type = "null" if schema_type == "null" or schema_type is None else type_map.get(schema_type, "null")
 
     if schema.get("type") == "array" and "items" in schema:
         item_type = resolve_type(schema["items"], openapi)
@@ -131,7 +128,6 @@ def parse_request_body(details: dict[str, Any], openapi: dict[str, Any]) -> str 
         if content_type in content:
             schema = content[content_type].get("schema", {})
             if "$ref" in schema:
-                ref_name = schema["$ref"].split("/")[-1]
                 resolved = resolve_ref(schema["$ref"], openapi)
                 if resolved and "properties" in resolved:
                     schema = resolved
@@ -178,7 +174,7 @@ def parse_schemas(openapi: dict[str, Any]) -> dict[str, list[str]]:
 
         properties = schema.get("properties", {})
         fields = []
-        for field_name, field_schema in properties.items():
+        for field_name, _ in properties.items():
             formatted = format_ts_field(field_name, schema, openapi)
             fields.append(formatted)
 
@@ -188,7 +184,7 @@ def parse_schemas(openapi: dict[str, Any]) -> dict[str, list[str]]:
     return result
 
 
-async def main():
+async def main() -> None:
     parser = argparse.ArgumentParser(description="Generate API spec from OpenAPI JSON")
     parser.add_argument("--url", default="http://localhost:8000/openapi.json", help="OpenAPI JSON URL")
     parser.add_argument("--output", default="api_spec.ts", help="Output file path")
@@ -226,8 +222,6 @@ async def main():
 
     with open(args.output, "w", encoding="utf-8") as f:
         f.write(output)
-
-    print(f"API spec saved to {args.output}")
 
 
 if __name__ == "__main__":

@@ -6,13 +6,13 @@ import time
 import traceback
 
 from src.application.ai_review.criteria_grading import grade_by_codebase, grade_by_project_doc
+from src.application.ai_review.preprocessing import prepare_project_content, prepare_project_tree
 from src.application.ai_review.project_doc import (
     create_project_doc,
     generate_critic,
     improve_doc,
     resolve_gaps,
 )
-from src.application.ai_review.preprocessing import prepare_project_tree, prepare_project_content
 from src.application.ai_review.task_graph import is_step_ready
 from src.constants.ai_pipeline import PipelineStepEnum, PipelineTaskStatusEnum
 from src.constants.ai_review import SolutionStatusEnum

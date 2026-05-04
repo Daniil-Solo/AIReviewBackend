@@ -1,11 +1,11 @@
-from enum import Enum
+from enum import StrEnum
 from typing import Self
 
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class StorageTypeEnum(str, Enum):
+class StorageTypeEnum(StrEnum):
     S3 = "S3"
     FILE = "FILE"
 

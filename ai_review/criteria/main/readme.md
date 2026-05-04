@@ -31,18 +31,4 @@
 
 ### Безопасность (security)
 
-
-
-Functional: Altering the software’s behavior or interactions.
-F.1	
-Interface: Modifying interactions between codebase parts.
-F.2	
-Logic: Changing the code’s logical operations or algorithms.
-F.3	
-Resource: Altering how variables or resources are managed.
-F.4	
-Check: Modifying checks for unhandled states/conditions.
-F.5	
-Support: Adjusting interactions with external support systems or libraries.
-F.6	
-Larger Defects: Fixing major, extensive functional issues or missing features.
+следование рест
