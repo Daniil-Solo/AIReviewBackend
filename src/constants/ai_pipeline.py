@@ -31,7 +31,7 @@ TASK_DEPENDENCIES: dict[PipelineStepEnum, list[PipelineStepEnum]] = {
 }
 
 
-ALL_STEPS: list[PipelineStepEnum] = [PipelineStepEnum(item) for item in list(PipelineStepEnum)]
+ALL_STEPS: list[PipelineStepEnum] = [PipelineStepEnum(item) for item in list(PipelineStepEnum) if PipelineStepEnum(item) != PipelineStepEnum.VALIDATE_PROJECT_DOC]
 
 LLM_STEPS: list[PipelineStepEnum] = [
     PipelineStepEnum.CREATE_PROJECT_DOC,

@@ -141,9 +141,10 @@ async def cancel(
             SolutionStatusEnum.PROJECT_GENERATION,
             SolutionStatusEnum.VALIDATION_WAITING,
             SolutionStatusEnum.CRITERIA_GRADING,
+            SolutionStatusEnum.HUMAN_REVIEW,
         ):
             raise ApplicationError(
-                message="Отмена проверки решения возможна только во время AI-проверки", code="solution_status_invalid"
+                message="Отмена проверки решения возможна только до вынесения решения", code="solution_status_invalid"
             )
 
         await uow.pipeline_tasks.delete_many_not_completed(solution_id)
