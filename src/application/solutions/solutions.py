@@ -129,7 +129,11 @@ async def cancel(
         solution = await uow.solutions.get_by_id(solution_id)
         await check_solution_permissions(uow, user.id, solution.id)
 
-        if solution.status != SolutionStatusEnum.PROJECT_GENERATION:
+        if solution.status not in (
+            SolutionStatusEnum.PROJECT_GENERATION,
+            SolutionStatusEnum.VALIDATION_WAITING,
+            SolutionStatusEnum.CRITERIA_GRADING,
+        ):
             raise ApplicationError(
                 message="Отмена проверки решения возможна только во время AI-проверки", code="solution_status_invalid"
             )
@@ -236,4 +240,44 @@ async def update_label(
     async with uow.connection():
         await check_solution_permissions(uow, user.id, solution_id, allow_author=True)
         updated_solution = await uow.solutions.update(solution_id, SolutionUpdateDTO(label=label))
+        return SolutionShortResponseDTO.model_validate(updated_solution)
+
+
+@inject
+async def approve_project_doc(
+    solution_id: int,
+    file: UploadFile,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+    artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
+) -> SolutionShortResponseDTO:
+    async with uow.connection() as conn, conn.transaction():
+        solution = await uow.solutions.get_by_id(solution_id)
+        await check_solution_permissions(uow, user.id, solution.id, allow_author=True)
+
+        if solution.status != SolutionStatusEnum.VALIDATION_WAITING:
+            raise ApplicationError(
+                message="Подтверждение ProjectDoc возможно только в статусе VALIDATION_WAITING",
+                code="solution_status_invalid",
+            )
+
+        content = await file.read()
+        text_content = content.decode("utf-8")
+
+        await artifact_storage.save_artifact(
+            solution_id,
+            PipelineStepEnum.VALIDATE_PROJECT_DOC,
+            text_content,
+        )
+
+        new_steps = [*solution.steps, PipelineStepEnum.VALIDATE_PROJECT_DOC]
+
+        updated_solution = await uow.solutions.update(
+            solution_id,
+            SolutionUpdateDTO(
+                status=SolutionStatusEnum.CRITERIA_GRADING,
+                steps=new_steps,
+            ),
+        )
+
         return SolutionShortResponseDTO.model_validate(updated_solution)

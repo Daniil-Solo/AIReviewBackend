@@ -25,6 +25,7 @@ TASK_DEPENDENCIES: dict[PipelineStepEnum, list[PipelineStepEnum]] = {
         PipelineStepEnum.PREPARE_PROJECT_TREE,
         PipelineStepEnum.PREPARE_PROJECT_CONTENT,
     ],
+    PipelineStepEnum.VALIDATE_PROJECT_DOC: ["NON_REACHABLE"],  # валидация проекта производится студентом, а не воркером
     PipelineStepEnum.GRADE_BY_PROJECT_DOC: [PipelineStepEnum.VALIDATE_PROJECT_DOC],
     PipelineStepEnum.GRADE_BY_CODEBASE: [PipelineStepEnum.GRADE_BY_PROJECT_DOC],
 }

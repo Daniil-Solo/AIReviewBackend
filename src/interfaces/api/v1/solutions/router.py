@@ -143,3 +143,12 @@ async def update_label_endpoint(
     user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> SolutionShortResponseDTO:
     return await solution_service.update_label(solution_id, data.label, user)
+
+
+@router.post("/{solution_id}/approval", response_model=SolutionShortResponseDTO)
+async def approve_project_doc_endpoint(
+    solution_id: int,
+    file: Annotated[UploadFile, File()],
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+) -> SolutionShortResponseDTO:
+    return await solution_service.approve_project_doc(solution_id, file, user)

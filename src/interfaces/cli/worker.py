@@ -9,9 +9,6 @@ from src.application.ai_review.criteria_grading import grade_by_codebase, grade_
 from src.application.ai_review.preprocessing import prepare_project_content, prepare_project_tree
 from src.application.ai_review.project_doc import (
     create_project_doc,
-    generate_critic,
-    improve_doc,
-    resolve_gaps,
 )
 from src.application.ai_review.task_graph import is_step_ready
 from src.constants.ai_pipeline import PipelineStepEnum, PipelineTaskStatusEnum
@@ -29,9 +26,6 @@ STEP_HANDLER_MAP: dict[PipelineStepEnum, Callable[[int], Awaitable[None]]] = {
     PipelineStepEnum.PREPARE_PROJECT_TREE: prepare_project_tree,
     PipelineStepEnum.PREPARE_PROJECT_CONTENT: prepare_project_content,
     PipelineStepEnum.CREATE_PROJECT_DOC: create_project_doc,
-    PipelineStepEnum.GENERATE_CRITIC: generate_critic,
-    PipelineStepEnum.RESOLVE_GAPS: resolve_gaps,
-    PipelineStepEnum.IMPROVE_DOC: improve_doc,
     PipelineStepEnum.GRADE_BY_PROJECT_DOC: grade_by_project_doc,
     PipelineStepEnum.GRADE_BY_CODEBASE: grade_by_codebase,
 }
