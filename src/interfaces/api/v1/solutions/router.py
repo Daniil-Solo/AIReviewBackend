@@ -5,6 +5,7 @@ from fastapi.responses import StreamingResponse
 
 import src.application.ai_review.pipeline as pipeline_service
 import src.application.solutions.review_by_criteria as solution_criteria_checks_service
+import src.application.solutions.score as score_service
 import src.application.solutions.solutions as solution_service
 import src.application.solutions.wind_rose as wind_rose_service
 from src.constants.ai_pipeline import PipelineStepEnum
@@ -20,6 +21,7 @@ from src.dto.solutions.solutions import (
     SolutionLabelUpdateDTO,
     SolutionShortResponseDTO,
 )
+from src.dto.solutions.score import SolutionScoreDTO
 from src.dto.solutions.wind_rose import WindRosePointDTO
 from src.dto.users.user import ShortUserDTO
 from src.interfaces.api.dependencies import get_current_user
@@ -125,6 +127,14 @@ async def get_wind_rose_endpoint(
     user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> list[WindRosePointDTO]:
     return await wind_rose_service.get_wind_rose(solution_id, user)
+
+
+@router.get("/{solution_id}/score", response_model=SolutionScoreDTO)
+async def get_score_endpoint(
+    solution_id: int,
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+) -> SolutionScoreDTO:
+    return await score_service.get_score(solution_id, user)
 
 
 @router.post("/{solution_id}/final-review", response_model=SolutionShortResponseDTO)
