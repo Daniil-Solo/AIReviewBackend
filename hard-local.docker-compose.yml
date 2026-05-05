@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
 
   api:
-    build: .
+    image: daniilsolo/ai-review-backend
     command: uv run uvicorn src.interfaces.api.app:app --host 0.0.0.0 --port 8000
     env_file:
       - .hard-local.env
@@ -26,7 +26,7 @@ services:
     restart: unless-stopped
 
   migrations:
-    build: .
+    image: daniilsolo/ai-review-backend
     command: uv run alembic upgrade head
     env_file:
       - .hard-local.env
@@ -40,7 +40,7 @@ services:
     restart: on-failure
 
   worker:
-    build: .
+    image: daniilsolo/ai-review-backend
     command: uv run python -m src.interfaces.cli.worker
     env_file:
       - .hard-local.env
