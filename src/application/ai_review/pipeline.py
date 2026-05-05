@@ -12,9 +12,10 @@ from src.dto.solutions.solutions import (
     SolutionUpdateDTO,
 )
 from src.dto.users.user import ShortUserDTO
+from src.dto.workspaces.member import WorkspaceMemberFiltersDTO
 from src.infrastructure.logging import get_logger
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
-
+from src.settings import settings
 
 logger = get_logger()
 
@@ -33,13 +34,23 @@ async def restart(
             uow, user.id, task.workspace_id, {WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER}
         )
 
+        workspace = await uow.workspaces.get_by_id(task.workspace_id)
+        owner_member = (
+            await uow.workspace_members.get_list(
+                WorkspaceMemberFiltersDTO(workspace_id=workspace.id, roles=[WorkspaceMemberRoleEnum.OWNER])
+            )
+        )[0]
+        balance = await uow.transactions.get_balance_by_user_id(owner_member.user_id)
+
         await uow.pipeline_tasks.delete_many(solution.id)
         await uow.solutions.delete_by_solution_id(solution.id)
+        initial_status = SolutionStatusEnum.PROJECT_GENERATION if not settings.solutions.CHECK_BALANCE_BEFORE_CREATING or balance > 0 else SolutionStatusEnum.ERROR
         await uow.solutions.update(
             solution.id,
-            SolutionUpdateDTO(status=SolutionStatusEnum.PROJECT_GENERATION, steps=[]),
+            SolutionUpdateDTO(status=initial_status, steps=[]),
         )
-        await uow.pipeline_tasks.create_many(solution_id, ALL_STEPS)
+        if not settings.solutions.CHECK_BALANCE_BEFORE_CREATING or balance > 0:
+            await uow.pipeline_tasks.create_many(solution.id, ALL_STEPS)
 
 
 @inject

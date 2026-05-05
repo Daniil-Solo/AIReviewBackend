@@ -100,16 +100,14 @@ async def create(
             )
         )[0]
         balance = await uow.transactions.get_balance_by_user_id(owner_member.user_id)
-        initial_status = SolutionStatusEnum.ERROR if balance < 0 else SolutionStatusEnum.PROJECT_GENERATION
 
-        solution = await uow.solutions.create(
-            SolutionCreateDTO(**data.model_dump(), artifact_path=artifact_path), user.id
-        )
-        solution = await uow.solutions.update(
+        initial_status = SolutionStatusEnum.PROJECT_GENERATION if not settings.solutions.CHECK_BALANCE_BEFORE_CREATING or balance > 0 else SolutionStatusEnum.ERROR
+        solution = await uow.solutions.create(SolutionCreateDTO(**data.model_dump(), artifact_path=artifact_path), user.id)
+        await uow.solutions.update(
             solution.id,
             SolutionUpdateDTO(status=initial_status, steps=[]),
         )
-        if balance > 0:
+        if not settings.solutions.CHECK_BALANCE_BEFORE_CREATING or balance > 0:
             await uow.pipeline_tasks.create_many(solution.id, ALL_STEPS)
     return SolutionShortResponseDTO.model_validate(solution)
 
