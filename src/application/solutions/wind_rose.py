@@ -47,7 +47,7 @@ async def get_wind_rose(
         return [
             WindRosePointDTO(
                 tag=tag,
-                value=stats["passed"] / stats["count"] * 100 if stats["count"] else 0.0,
+                value=int(stats["passed"] / stats["count"] * 100) if stats["count"] else 0.0,
                 count=stats["count"],
             )
             for tag, stats in tag_stats.items()

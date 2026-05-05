@@ -74,6 +74,7 @@ async def generate_feedback(
     async with uow.connection() as conn, conn.transaction():
         workspace_id = await get_workspace_id(uow, solution_id)
         await charge_for_llm_call(uow, workspace_id, metadata)
-        await uow.solutions.update(solution.id, SolutionUpdateDTO(steps=[*solution.steps, PipelineStepEnum.GENERATE_FEEDBACK]))
+        if PipelineStepEnum.GENERATE_FEEDBACK not in solution.steps:
+            await uow.solutions.update(solution.id, SolutionUpdateDTO(steps=[*solution.steps, PipelineStepEnum.GENERATE_FEEDBACK]))
 
     return feedback
