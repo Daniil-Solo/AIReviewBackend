@@ -55,7 +55,7 @@ async def test__success__with_tags(uow, get_wind_rose):
     assert len(wind_rose) == 2
 
     style_point = next(p for p in wind_rose if p.tag == "style")
-    assert style_point.value == 1.0
+    assert style_point.value == 100.0
     assert style_point.count == 1
 
     best_practice_point = next(p for p in wind_rose if p.tag == "best_practice")
