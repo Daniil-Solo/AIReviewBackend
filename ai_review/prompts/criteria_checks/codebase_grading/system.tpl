@@ -76,7 +76,7 @@
 {% for criterion in criteria %}
 --- Начало критерия {{ criterion.id }} ---
 Описание:
-{{criterion.description}}
+{{criterion.prompt}}
 Комментарии с предыдущих этапов:
 {% for comment in criterion.comments %}
 {{comment}}

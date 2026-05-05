@@ -1,7 +1,13 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, Response
 from fastapi.params import Query
 
 import src.application.criteria as criteria_service
+from src.application.custom_models import (
+    create_custom_model,
+    get_workspace_custom_models,
+)
 from src.application.workspaces import (
     archive_workspace,
     change_workspace_owner,
@@ -9,6 +15,7 @@ from src.application.workspaces import (
     create_join_rule,
     create_workspace,
     delete_join_rule,
+    delete_member,
     get_student_grades,
     get_student_grades_csv,
     get_workspace,
@@ -22,6 +29,10 @@ from src.application.workspaces import (
 )
 from src.dto.common import SuccessOperationDTO
 from src.dto.criteria.criteria import CriterionFiltersDTO, CriterionResponseDTO
+from src.dto.custom_models import (
+    CustomModelDTO,
+    CustomModelRequestCreateDTO,
+)
 from src.dto.tasks.tasks import TaskResponseDTO
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces import (
@@ -48,7 +59,7 @@ router = APIRouter(prefix="/workspaces", tags=["workspaces"])
 @router.post("", response_model=WorkspaceResponseDTO)
 async def create_workspace_endpoint(
     data: WorkspaceCreateDTO,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> WorkspaceResponseDTO:
     return await create_workspace(data, user)
 
@@ -57,7 +68,7 @@ async def create_workspace_endpoint(
 async def update_workspace_endpoint(
     workspace_id: int,
     data: WorkspaceUpdateDTO,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> WorkspaceResponseDTO:
     return await update_workspace(workspace_id, data, user)
 
@@ -65,7 +76,7 @@ async def update_workspace_endpoint(
 @router.delete("/{workspace_id}")
 async def archive_workspace_endpoint(
     workspace_id: int,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> SuccessOperationDTO:
     await archive_workspace(workspace_id, user)
     return SuccessOperationDTO(message="Пространство архивировано")
@@ -74,7 +85,7 @@ async def archive_workspace_endpoint(
 @router.get("/{workspace_id}", response_model=WorkspaceResponseDTO)
 async def get_workspace_endpoint(
     workspace_id: int,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> WorkspaceResponseDTO:
     return await get_workspace(workspace_id, user)
 
@@ -82,7 +93,7 @@ async def get_workspace_endpoint(
 @router.get("/{workspace_id}/tasks", response_model=list[TaskResponseDTO])
 async def get_workspace_tasks_endpoint(
     workspace_id: int,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> list[TaskResponseDTO]:
     return await get_workspace_tasks(workspace_id, user)
 
@@ -90,7 +101,7 @@ async def get_workspace_tasks_endpoint(
 @router.get("/{workspace_id}/members", response_model=list[WorkspaceMemberResponseDTO])
 async def get_workspace_members_endpoint(
     workspace_id: int,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> list[WorkspaceMemberResponseDTO]:
     return await get_workspace_members(workspace_id, user)
 
@@ -98,7 +109,7 @@ async def get_workspace_members_endpoint(
 @router.get("/{workspace_id}/join_rules", response_model=list[WorkspaceJoinRuleResponseDTO])
 async def get_workspace_join_rules_endpoint(
     workspace_id: int,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> list[WorkspaceJoinRuleResponseDTO]:
     return await get_workspace_join_rules(workspace_id, user)
 
@@ -107,7 +118,7 @@ async def get_workspace_join_rules_endpoint(
 async def create_join_rule_endpoint(
     workspace_id: int,
     data: WorkspaceJoinRuleRequestCreateDTO,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> WorkspaceJoinRuleResponseDTO:
     return await create_join_rule(workspace_id, data, user)
 
@@ -117,7 +128,7 @@ async def update_join_rule_endpoint(
     workspace_id: int,
     rule_id: int,
     data: WorkspaceJoinRuleRequestUpdateDTO,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> WorkspaceJoinRuleResponseDTO:
     return await update_join_rule(workspace_id, rule_id, data, user)
 
@@ -126,7 +137,7 @@ async def update_join_rule_endpoint(
 async def delete_join_rule_endpoint(
     workspace_id: int,
     rule_id: int,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> SuccessOperationDTO:
     await delete_join_rule(workspace_id, rule_id, user)
     return SuccessOperationDTO(message="Правило приглашения удалено")
@@ -137,15 +148,25 @@ async def update_member_endpoint(
     workspace_id: int,
     member_id: int,
     data: WorkspaceMemberUpdateDTO,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> WorkspaceMemberResponseDTO:
     return await update_member(workspace_id, member_id, data, user)
+
+
+@router.delete("/{workspace_id}/members/{member_id}", response_model=SuccessOperationDTO)
+async def delete_member_endpoint(
+    workspace_id: int,
+    member_id: int,
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+) -> SuccessOperationDTO:
+    await delete_member(workspace_id, member_id, user)
+    return SuccessOperationDTO(message="Участник удалён из пространства")
 
 
 @router.post("/{workspace_id}/leave", response_model=SuccessOperationDTO)
 async def leave_workspace_endpoint(
     workspace_id: int,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> SuccessOperationDTO:
     await leave_workspace(workspace_id, user)
     return SuccessOperationDTO(message="Пользователь покинул пространство")
@@ -155,14 +176,14 @@ async def leave_workspace_endpoint(
 async def transfer_ownership_endpoint(
     workspace_id: int,
     data: TransferOwnershipDTO,
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
 ) -> WorkspaceResponseDTO:
     return await change_workspace_owner(workspace_id, data, user)
 
 
 @router.get("/slugs/availability", response_model=SlugCheckResponseDTO)
 async def check_slug_endpoint(
-    slug: str = Query(),
+    slug: Annotated[str, Query()],
 ) -> SlugCheckResponseDTO:
     return await check_slug_available(slug)
 
@@ -170,9 +191,9 @@ async def check_slug_endpoint(
 @router.get("/{workspace_id}/criteria", response_model=list[CriterionResponseDTO])
 async def get_workspace_criteria_endpoint(
     workspace_id: int,
-    tags: list[str] | None = Query(default=None),
-    search: str | None = Query(default=None),
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+    tags: Annotated[list[str] | None, Query()] = None,
+    search: Annotated[str | None, Query()] = None,
 ) -> list[CriterionResponseDTO]:
     filters = CriterionFiltersDTO(
         tags=tags,
@@ -184,9 +205,9 @@ async def get_workspace_criteria_endpoint(
 @router.get("/{workspace_id}/grades", response_model=list[StudentGradesDTO])
 async def get_student_grades_endpoint(
     workspace_id: int,
-    task_ids: list[int] | None = Query(default=None),
-    user_ids: list[int] | None = Query(default=None),
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+    task_ids: Annotated[list[int] | None, Query()] = None,
+    user_ids: Annotated[list[int] | None, Query()] = None,
 ) -> list[StudentGradesDTO]:
     filters = StudentGradesFiltersDTO(
         task_ids=task_ids,
@@ -198,9 +219,9 @@ async def get_student_grades_endpoint(
 @router.get("/{workspace_id}/grades/csv")
 async def get_student_grades_csv_endpoint(
     workspace_id: int,
-    task_ids: list[int] | None = Query(default=None),
-    user_ids: list[int] | None = Query(default=None),
-    user: ShortUserDTO = Depends(get_current_user),
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+    task_ids: Annotated[list[int] | None, Query()] = None,
+    user_ids: Annotated[list[int] | None, Query()] = None,
 ) -> Response:
     filters = StudentGradesFiltersDTO(
         task_ids=task_ids,
@@ -208,3 +229,20 @@ async def get_student_grades_csv_endpoint(
     )
     csv_content = await get_student_grades_csv(workspace_id, filters, user.id)
     return Response(content=csv_content, media_type="text/csv")
+
+
+@router.post("/{workspace_id}/custom-models", response_model=CustomModelDTO)
+async def create_custom_model_endpoint(
+    workspace_id: int,
+    data: CustomModelRequestCreateDTO,
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+) -> CustomModelDTO:
+    return await create_custom_model(data, workspace_id, user)
+
+
+@router.get("/{workspace_id}/custom-models", response_model=list[CustomModelDTO])
+async def get_workspace_custom_models_endpoint(
+    workspace_id: int,
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],
+) -> list[CustomModelDTO]:
+    return await get_workspace_custom_models(workspace_id, user)

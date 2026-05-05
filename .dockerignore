@@ -11,3 +11,6 @@ __pycache__
 venv
 research
 scripts
+.env
+.example.env
+.hard-local.env

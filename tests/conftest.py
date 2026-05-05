@@ -1,6 +1,7 @@
 from collections.abc import AsyncGenerator
 import logging
 from typing import Any
+from unittest.mock import AsyncMock, patch
 
 from alembic import command
 from alembic.config import Config
@@ -10,6 +11,7 @@ import pytest
 import pytest_asyncio
 from sqlalchemy import text
 
+from src.constants.emails import EmailSenderTypeEnum
 from src.di.container import init_container, shutdown_container
 from src.infrastructure.sqlalchemy.models import ALL_TABLES
 from src.interfaces.api.app import create_app
@@ -27,9 +29,7 @@ async def test_database_name():
     try:
         conn = await asyncpg.connect(settings.db.sync_url)
 
-        exists = await conn.fetchval(
-            "SELECT 1 FROM pg_database WHERE datname = $1", test_db_name
-        )
+        exists = await conn.fetchval("SELECT 1 FROM pg_database WHERE datname = $1", test_db_name)
         if exists:
             await conn.execute(f"DROP DATABASE {test_db_name}")
 
@@ -88,6 +88,7 @@ def uow(container):
 def init_settings():
     settings.logging.LOKI_ENABLED = False
     settings.redis.ENABLED = False
+    settings.email.TYPE = EmailSenderTypeEnum.DISABLE
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -95,3 +96,10 @@ async def client() -> AsyncGenerator[AsyncClient, Any]:
     app = create_app()
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
+
+
+@pytest.fixture(autouse=True)
+def mock_validate_custom_model():
+    with patch("src.application.custom_models.custom_models.validate_custom_model", new_callable=AsyncMock) as mock:
+        mock.return_value = None
+        yield mock

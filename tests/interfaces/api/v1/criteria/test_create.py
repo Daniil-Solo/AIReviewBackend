@@ -38,6 +38,7 @@ async def test__success(uow, create_criterion):
     criterion = await create_criterion(data, token)
     assert criterion.description == data.description
     assert criterion.tags == data.tags
+    assert criterion.prompt == data.prompt
     assert criterion.created_by == user.id
 
 

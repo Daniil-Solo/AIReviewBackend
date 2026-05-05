@@ -10,5 +10,6 @@ class CriterionFactory(factory.Factory):
     description = factory.Faker("sentence", nb_words=10)
     tags = factory.LazyAttribute(lambda o: ["api"])
     stage = None
+    prompt = factory.Faker("paragraph")
     workspace_id: int | None = None
     task_id: int | None = None

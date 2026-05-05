@@ -2,6 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions import EntityNotFoundError
+from src.constants.ai_review import CriterionCheckStatusEnum
 from src.dto.solutions.solution_criteria_checks import (
     SolutionCriteriaCheckCreateDTO,
     SolutionCriteriaCheckFiltersDTO,
@@ -22,6 +23,34 @@ class SQLAlchemySolutionCriteriaChecksDAO(SolutionCriteriaChecksDAO):
         if filters.solution_id is not None:
             query = query.where(solution_criteria_checks_table.c.solution_id == filters.solution_id)
         query = query.order_by(solution_criteria_checks_table.c.created_at.asc())
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+        return [SolutionCriteriaCheckResponseDTO.model_validate(row) for row in rows]
+
+    async def get_latest_by_solution(self, solution_id: int) -> list[SolutionCriteriaCheckResponseDTO]:
+        subquery = (
+            sa.select(
+                solution_criteria_checks_table.c.task_criterion_id,
+                sa.func.max(solution_criteria_checks_table.c.created_at).label("max_created_at"),
+            )
+            .where(
+                solution_criteria_checks_table.c.solution_id == solution_id,
+                solution_criteria_checks_table.c.status == str(CriterionCheckStatusEnum.SUFFICIENT),
+            )
+            .group_by(solution_criteria_checks_table.c.task_criterion_id)
+            .subquery()
+        )
+        query = (
+            sa.select(solution_criteria_checks_table)
+            .join(
+                subquery,
+                sa.and_(
+                    solution_criteria_checks_table.c.task_criterion_id == subquery.c.task_criterion_id,
+                    solution_criteria_checks_table.c.created_at == subquery.c.max_created_at,
+                ),
+            )
+            .where(solution_criteria_checks_table.c.solution_id == solution_id)
+        )
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [SolutionCriteriaCheckResponseDTO.model_validate(row) for row in rows]

@@ -12,11 +12,10 @@ class PipelineStepEnum(StrEnum):
     PREPARE_PROJECT_TREE = "prepare_project_tree"
     PREPARE_PROJECT_CONTENT = "prepare_project_content"
     CREATE_PROJECT_DOC = "create_project_doc"
-    GENERATE_CRITIC = "critic"
-    RESOLVE_GAPS = "resolve_gaps"
-    IMPROVE_DOC = "improve_doc"
+    VALIDATE_PROJECT_DOC = "validate_project_doc"
     GRADE_BY_PROJECT_DOC = "grade_by_project_doc"
     GRADE_BY_CODEBASE = "grade_by_codebase"
+    GENERATE_FEEDBACK = "generate_feedback"
 
 
 # шаг пайплайна: список шагов, от которых он зависит
@@ -27,15 +26,21 @@ TASK_DEPENDENCIES: dict[PipelineStepEnum, list[PipelineStepEnum]] = {
         PipelineStepEnum.PREPARE_PROJECT_TREE,
         PipelineStepEnum.PREPARE_PROJECT_CONTENT,
     ],
-    PipelineStepEnum.GENERATE_CRITIC: [PipelineStepEnum.CREATE_PROJECT_DOC],
-    PipelineStepEnum.RESOLVE_GAPS: [PipelineStepEnum.GENERATE_CRITIC],
-    PipelineStepEnum.IMPROVE_DOC: [
-        PipelineStepEnum.CREATE_PROJECT_DOC,
-        PipelineStepEnum.RESOLVE_GAPS,
-    ],
-    PipelineStepEnum.GRADE_BY_PROJECT_DOC: [PipelineStepEnum.IMPROVE_DOC],
+    PipelineStepEnum.VALIDATE_PROJECT_DOC: ["NON_REACHABLE"],  # валидация проекта производится студентом, а не воркером
+    PipelineStepEnum.GRADE_BY_PROJECT_DOC: [PipelineStepEnum.VALIDATE_PROJECT_DOC],
     PipelineStepEnum.GRADE_BY_CODEBASE: [PipelineStepEnum.GRADE_BY_PROJECT_DOC],
+    PipelineStepEnum.GENERATE_FEEDBACK: ["NON_REACHABLE"],  # генерация обратной связью вызывается преподавателем, а не воркером
 }
 
 
-ALL_STEPS: list[PipelineStepEnum] = [PipelineStepEnum(item) for item in list(PipelineStepEnum)]
+ALL_STEPS: list[PipelineStepEnum] = [
+    PipelineStepEnum(item) for item in list(PipelineStepEnum)
+    if PipelineStepEnum(item) not in (PipelineStepEnum.VALIDATE_PROJECT_DOC, PipelineStepEnum.GENERATE_FEEDBACK)
+]
+
+LLM_STEPS: list[PipelineStepEnum] = [
+    PipelineStepEnum.CREATE_PROJECT_DOC,
+    PipelineStepEnum.GRADE_BY_PROJECT_DOC,
+    PipelineStepEnum.GRADE_BY_CODEBASE,
+    PipelineStepEnum.GENERATE_FEEDBACK,
+]

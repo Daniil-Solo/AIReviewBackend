@@ -25,9 +25,10 @@ from src.dto.solutions.solutions import (
 )
 from src.dto.users.user import ShortUserDTO
 from src.dto.workspaces.member import WorkspaceMemberFiltersDTO
+from src.infrastructure.solution_artifact_storage.interface import SolutionArtifactStorage
+from src.infrastructure.solution_storage.interface import SolutionStorage
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
-from src.infrastructure.storage.artifact import SolutionArtifactStorage
-from src.infrastructure.storage.interface import SolutionStorage
+from src.settings import settings
 
 
 async def get_repo_zip(github_repo_link: str, github_repo_branch: str) -> IO[Any]:
@@ -84,6 +85,14 @@ async def create(
         task = await uow.tasks.get_by_id(data.task_id)
         await check_member_role(uow, user.id, task.workspace_id)
 
+        existing_solutions = await uow.solutions.get_list(SolutionFiltersDTO(task_id=data.task_id, created_by=user.id))
+        not_canceled_solutions = [solution for solution in existing_solutions if solution.status != SolutionStatusEnum.CANCELLED]
+        if len(not_canceled_solutions) >= settings.solutions.MAX_UPLOADS_PER_TASK:
+            raise ApplicationError(
+                message=f"Превышен лимит активных решений ({settings.solutions.MAX_UPLOADS_PER_TASK}) для этой задачи",
+                code="solution_upload_limit_exceeded",
+            )
+
         workspace = await uow.workspaces.get_by_id(task.workspace_id)
         owner_member = (
             await uow.workspace_members.get_list(
@@ -91,7 +100,7 @@ async def create(
             )
         )[0]
         balance = await uow.transactions.get_balance_by_user_id(owner_member.user_id)
-        initial_status = SolutionStatusEnum.ERROR if balance < 0 else SolutionStatusEnum.AI_REVIEW
+        initial_status = SolutionStatusEnum.ERROR if balance < 0 else SolutionStatusEnum.PROJECT_GENERATION
 
         solution = await uow.solutions.create(
             SolutionCreateDTO(**data.model_dump(), artifact_path=artifact_path), user.id
@@ -129,9 +138,14 @@ async def cancel(
         solution = await uow.solutions.get_by_id(solution_id)
         await check_solution_permissions(uow, user.id, solution.id)
 
-        if solution.status != SolutionStatusEnum.AI_REVIEW:
+        if solution.status not in (
+            SolutionStatusEnum.PROJECT_GENERATION,
+            SolutionStatusEnum.VALIDATION_WAITING,
+            SolutionStatusEnum.CRITERIA_GRADING,
+            SolutionStatusEnum.HUMAN_REVIEW,
+        ):
             raise ApplicationError(
-                message="Отмена проверки решения возможна только во время AI-проверки", code="solution_status_invalid"
+                message="Отмена проверки решения возможна только до вынесения решения", code="solution_status_invalid"
             )
 
         await uow.pipeline_tasks.delete_many_not_completed(solution_id)
@@ -219,8 +233,60 @@ async def final_review(
                 status=SolutionStatusEnum.REVIEWED,
                 human_grade=data.human_grade,
                 human_feedback=data.human_feedback,
-                ai_feedback=data.ai_feedback,
             ),
         )
 
         return SolutionShortResponseDTO.model_validate(updated_solution)
+
+
+@inject
+async def update_label(
+    solution_id: int,
+    label: str,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+) -> SolutionShortResponseDTO:
+    async with uow.connection():
+        await check_solution_permissions(uow, user.id, solution_id, allow_author=True)
+        updated_solution = await uow.solutions.update(solution_id, SolutionUpdateDTO(label=label))
+        return SolutionShortResponseDTO.model_validate(updated_solution)
+
+
+@inject
+async def approve_project_doc(
+    solution_id: int,
+    file: UploadFile,
+    user: ShortUserDTO,
+    uow: UnitOfWork = Provide[Container.uow],
+    artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
+) -> SolutionShortResponseDTO:
+    async with uow.connection():
+        solution = await uow.solutions.get_by_id(solution_id)
+        await check_solution_permissions(uow, user.id, solution.id, allow_author=True)
+
+        if solution.status != SolutionStatusEnum.VALIDATION_WAITING:
+            raise ApplicationError(
+                message="Подтверждение ProjectDoc возможно только в статусе VALIDATION_WAITING",
+                code="solution_status_invalid",
+            )
+
+    content = await file.read()
+    text_content = content.decode("utf-8")
+
+    await artifact_storage.save_artifact(
+        solution_id,
+        PipelineStepEnum.VALIDATE_PROJECT_DOC,
+        text_content,
+    )
+
+    async with uow.connection():
+        new_steps = [*solution.steps, PipelineStepEnum.VALIDATE_PROJECT_DOC]
+        updated_solution = await uow.solutions.update(
+            solution_id,
+            SolutionUpdateDTO(
+                status=SolutionStatusEnum.CRITERIA_GRADING,
+                steps=new_steps,
+            ),
+        )
+
+    return SolutionShortResponseDTO.model_validate(updated_solution)

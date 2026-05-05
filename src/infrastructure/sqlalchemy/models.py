@@ -77,6 +77,7 @@ criteria_table = sa.Table(
     sa.Column("description", sa.Text, nullable=False),
     sa.Column("tags", sa.ARRAY(sa.String), nullable=False, server_default="{}"),
     sa.Column("stage", sa.Enum(CriterionStageEnum, name="criterion_stage"), nullable=True),
+    sa.Column("prompt", sa.Text, nullable=False, server_default=""),
     sa.Column(
         "workspace_id",
         sa.Integer,
@@ -154,6 +155,7 @@ solutions_table = sa.Table(
     sa.Column("human_grade", sa.Integer, nullable=True),
     sa.Column("human_feedback", sa.String, nullable=True),
     sa.Column("ai_feedback", sa.Text, nullable=True),
+    sa.Column("label", sa.String, nullable=False, server_default=""),
     sa.Column(
         "created_by", sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"), nullable=False
     ),
@@ -219,6 +221,43 @@ transactions_table = sa.Table(
     sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
 )
 
+custom_models_table = sa.Table(
+    "custom_models",
+    metadata,
+    sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
+    sa.Column(
+        "workspace_id",
+        sa.Integer,
+        sa.ForeignKey("workspaces.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+    ),
+    sa.Column(
+        "created_by",
+        sa.Integer,
+        sa.ForeignKey("users.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+    ),
+    sa.Column("name", sa.String(255), nullable=False),
+    sa.Column("base_url", sa.String(500), nullable=False),
+    sa.Column("encrypted_api_key", sa.Text, nullable=False),
+    sa.Column("model", sa.String(255), nullable=False),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+)
+
+task_steps_models_table = sa.Table(
+    "task_steps_models",
+    metadata,
+    sa.Column(
+        "task_id",
+        sa.Integer,
+        sa.ForeignKey("tasks.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+        primary_key=True,
+    ),
+    sa.Column("steps", sa.JSON, nullable=False, server_default="{}"),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+)
+
 ALL_TABLES = [
     users_table,
     workspaces_table,
@@ -231,4 +270,6 @@ ALL_TABLES = [
     solution_criteria_checks_table,
     pipeline_tasks_table,
     transactions_table,
+    custom_models_table,
+    task_steps_models_table,
 ]

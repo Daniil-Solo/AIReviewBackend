@@ -4,15 +4,16 @@ import tempfile
 import zipfile
 
 from dependency_injector.wiring import Provide, inject
-from treeproject import path_content, path_tree
 
+from src.application.ai_review.preprocessing_utils.project_content import path_content
+from src.application.ai_review.preprocessing_utils.project_tree import path_tree
 from src.application.ai_review.task_graph import PipelineStepEnum
 from src.constants.preprocessing import ALLOWED_EXTENSIONS, IGNORED_DIRECTORIES
 from src.di.container import Container
 from src.infrastructure.logging import get_logger
+from src.infrastructure.solution_artifact_storage.interface import SolutionArtifactStorage
+from src.infrastructure.solution_storage.interface import SolutionStorage
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
-from src.infrastructure.storage.artifact import SolutionArtifactStorage
-from src.infrastructure.storage.interface import SolutionStorage
 
 
 logger = get_logger()
@@ -31,17 +32,14 @@ def include_without_ignored_directories(p: Path) -> bool:
 def include_code_only(p: Path) -> bool:
     if p.is_dir() and not is_ignored_dir(p):
         return True
-    return p.is_file() and f".{p.name.split('.')[-1]}" in ALLOWED_EXTENSIONS
+    ext = "." + p.name.rsplit(".", 1)[-1]
+    return ext in ALLOWED_EXTENSIONS
 
 
 def get_project_root_path(temp_dir: str) -> Path:
     temp_dir_path = Path(temp_dir)
-    children = [p for p in temp_dir_path.iterdir()]
-    if len(children) == 1 and children[0].is_dir():
-        project_root_path = children[0]
-    else:
-        project_root_path = temp_dir_path
-    return project_root_path
+    children = list(temp_dir_path.iterdir())
+    return children[0] if len(children) == 1 and children[0].is_dir() else temp_dir_path
 
 
 @inject

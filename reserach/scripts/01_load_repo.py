@@ -44,11 +44,8 @@ def create_project_prompt(project_zip_file: bytes) -> str:
         with zipfile.ZipFile(io.BytesIO(project_zip_file)) as zf:
             zf.extractall(temp_dir)
             temp_dir_path = Path(temp_dir)
-            children = [p for p in temp_dir_path.iterdir()]
-            if len(children) == 1 and children[0].is_dir():
-                project_root_path = children[0]
-            else:
-                project_root_path = temp_dir_path
+            children = list(temp_dir_path.iterdir())
+            project_root_path = children[0] if len(children) == 1 and children[0].is_dir() else temp_dir_path
             project_tree = path_tree(project_root_path, include=include_without_ignored_directories)
             project_content = path_content(project_root_path, include=include_code_only, encoding="utf-8")
             return PROJECT_PROMPT_TEMPLATE.substitute(project_tree=project_tree, project_content=project_content)

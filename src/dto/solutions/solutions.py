@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 
 from pydantic import Field, field_validator
 
@@ -24,7 +25,7 @@ class SolutionUpdateDTO(BaseDTO):
     steps: list[PipelineStepEnum] | None = Field(default=None, description="Шаги проверки")
     human_grade: int | None = Field(default=None, description="Оценка преподавателя")
     human_feedback: str | None = Field(default=None, description="Отзыв преподавателя")
-    ai_feedback: str | None = Field(default=None, description="Отзыв от AI")
+    label: str | None = Field(default=None, description="Метка решения")
 
 
 class SolutionResponseDTO(BaseDTO):
@@ -39,12 +40,13 @@ class SolutionResponseDTO(BaseDTO):
     human_grade: int | None = Field(description="Оценка преподавателя")
     human_feedback: str | None = Field(description="Отзыв преподавателя")
     ai_feedback: str | None = Field(description="Отзыв от AI")
+    label: str = Field(default="", description="Метка решения")
     created_by: int = Field(description="ID создателя")
     created_at: datetime.datetime = Field(description="Дата создания")
 
     @field_validator("steps", mode="before")
     @classmethod
-    def convert_empty_dict_to_list(cls, v):
+    def convert_empty_dict_to_list(cls, v: Any) -> list[PipelineStepEnum]:
         if v == {}:
             return []
         return v
@@ -61,13 +63,14 @@ class SolutionShortResponseDTO(BaseDTO):
     human_grade: int | None = Field(description="Оценка преподавателя")
     human_feedback: str | None = Field(description="Отзыв преподавателя")
     ai_feedback: str | None = Field(description="Отзыв от AI")
+    label: str = Field(default="", description="Метка решения")
     created_at: datetime.datetime = Field(description="Дата создания")
     created_by: int = Field(description="ID создателя")
     author: ShortUserDTO | None = Field(default=None, description="Информация об авторе решения")
 
     @field_validator("steps", mode="before")
     @classmethod
-    def convert_empty_dict_to_list(cls, v):
+    def convert_empty_dict_to_list(cls, v: Any) -> list[PipelineStepEnum]:
         if v == {}:
             return []
         return v
@@ -79,10 +82,13 @@ class SolutionFiltersRequestDTO(BaseDTO):
 
 class SolutionFinalReviewDTO(BaseDTO):
     human_grade: int = Field(description="Оценка преподавателя", ge=0, le=100)
-    human_feedback: str = Field(description="Отзыв преподавателя")
-    ai_feedback: str | None = Field(default=None, description="Отзыв от AI")
+    human_feedback: str = Field(description="Обратная связь")
 
 
 class SolutionFiltersDTO(BaseDTO):
     created_by: int | None = Field(default=None, description="ID создателя для фильтрации")
     task_id: int | None = Field(default=None, description="ID задачи для фильтрации")
+
+
+class SolutionLabelUpdateDTO(BaseDTO):
+    label: str = Field(description="Метка решения", max_length=255)

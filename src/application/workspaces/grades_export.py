@@ -1,8 +1,6 @@
 import csv
 import io
-import logging
 
-import sqlalchemy as sa
 from dependency_injector.wiring import Provide, inject
 
 from src.application.workspaces.common import check_member_role
@@ -11,7 +9,6 @@ from src.di.container import Container
 from src.dto.tasks import TaskFiltersDTO
 from src.dto.workspaces.member import WorkspaceMemberFiltersDTO
 from src.dto.workspaces.student_grades import StudentGradesDTO, StudentGradesFiltersDTO, TaskGradeDTO
-from src.infrastructure.sqlalchemy.models import solutions_table, tasks_table, users_table, workspace_members_table
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
 
 
@@ -41,20 +38,24 @@ async def get_student_grades(
         best_grades = await uow.solutions.get_best_grades(task_ids, user_ids)
 
         return [
-                StudentGradesDTO(
-                    user=student.as_short(),
-                    tasks=[
-                        TaskGradeDTO(
-                            task_id=task.id,
-                            task_name=task.name,
-                            grade=best_grades.get((student.id, task.id))[0] if (student.id, task.id) in best_grades else None,
-                            best_solution_id=best_grades.get((student.id, task.id))[1] if (student.id, task.id) in best_grades else None,
-                        )
-                        for task in tasks
-                    ],
-                )
-                for student in students
-            ]
+            StudentGradesDTO(
+                user=student.as_short(),
+                tasks=[
+                    TaskGradeDTO(
+                        task_id=task.id,
+                        task_name=task.name,
+                        grade=best_grades.get((student.id, task.id))[0]
+                        if (student.id, task.id) in best_grades
+                        else None,
+                        best_solution_id=best_grades.get((student.id, task.id))[1]
+                        if (student.id, task.id) in best_grades
+                        else None,
+                    )
+                    for task in tasks
+                ],
+            )
+            for student in students
+        ]
 
 
 @inject

@@ -96,9 +96,9 @@ class SQLAlchemySolutionsDAO(SolutionsDAO):
                     order_by=[
                         solutions_table.c.human_grade.desc(),
                         solutions_table.c.id.desc(),
-                    ]
+                    ],
                 )
-                .label("rn")
+                .label("rn"),
             )
             .where(
                 solutions_table.c.task_id.in_(task_ids),

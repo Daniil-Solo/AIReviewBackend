@@ -82,7 +82,7 @@
 ## Критерии для оценивания
 {% for criterion in criteria %}
 --- Начало критерия {{ criterion.id }} ---
-{{criterion.description}}
+{{criterion.prompt}}
 --- Конец критерия {{ criterion.id }} ---
 {% endfor %}
 

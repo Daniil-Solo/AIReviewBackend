@@ -8,7 +8,7 @@ class CriterionWithCommentsDTO(BaseDTO):
     """Является инпутом для модели"""
 
     id: int = Field(description="Идентификатор критерия")
-    description: str = Field(description="Описание критерия")
+    prompt: str = Field(description="Описание критерия")
     comments: list[str] = Field(default_factory=list, description="Комментарии модели с предыдущих этапов проверки")
 
 

@@ -42,6 +42,8 @@ class SQLAlchemyCriteriaDAO(CriteriaDAO):
     async def get_list(self, filters: CriterionFiltersDTO) -> list[CriterionResponseDTO]:
         query = sa.select(criteria_table)
 
+        if filters.ids is not None:
+            query = query.where(criteria_table.c.id.in_(filters.ids))
         if filters.tags is not None:
             tag_conditions = [criteria_table.c.tags.any(tag) for tag in filters.tags]
             query = query.where(sa.or_(*tag_conditions))
@@ -113,3 +115,13 @@ class SQLAlchemyCriteriaDAO(CriteriaDAO):
         result = await self.session.execute(query)
         rows = result.fetchall()
         return [row.tag for row in rows]
+
+    async def create_batch(self, data: list[CriterionCreateDTO], created_by: int) -> list[CriterionResponseDTO]:
+        if not data:
+            return []
+
+        values = [{**d.model_dump(by_alias=True), "created_by": created_by} for d in data]
+        query = sa.insert(criteria_table).values(values).returning(criteria_table)
+        result = await self.session.execute(query)
+        rows = result.fetchall()
+        return [CriterionResponseDTO.model_validate(row) for row in rows]

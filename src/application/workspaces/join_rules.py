@@ -45,10 +45,10 @@ async def create_join_rule(
             )
 
         hashed_password = hash_password(data.password) if data.password else None
-        data = WorkspaceJoinRuleCreateDTO(
+        create_data = WorkspaceJoinRuleCreateDTO(
             **data.model_dump(), hashed_password=hashed_password, workspace_id=workspace_id
         )
-        join_rule = await uow.workspace_join_rules.create(data)
+        join_rule = await uow.workspace_join_rules.create(create_data)
         return join_rule.to_response()
 
 
@@ -72,8 +72,8 @@ async def update_join_rule(
             )
 
         hashed_password = hash_password(data.password) if data.password else None
-        data = WorkspaceJoinRuleUpdateDTO(**data.model_dump(), hashed_password=hashed_password)
-        join_rule = await uow.workspace_join_rules.update(rule_id, data)
+        update_data = WorkspaceJoinRuleUpdateDTO(**data.model_dump(), hashed_password=hashed_password)
+        join_rule = await uow.workspace_join_rules.update(rule_id, update_data)
         return join_rule.to_response()
 
 

@@ -4,6 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions import EntityNotFoundError
+from src.constants.workspaces import WorkspaceMemberRoleEnum
 from src.dto.workspaces.member import (
     WorkspaceMemberCreateDTO,
     WorkspaceMemberFiltersDTO,
@@ -42,6 +43,14 @@ class SQLAlchemyWorkspaceMembersDAO(WorkspaceMembersDAO):
 
         if filters.ids:
             query = query.where(workspace_members_table.c.user_id.in_(filters.ids))
+
+        query = query.order_by(
+            sa.case(
+                (workspace_members_table.c.role == WorkspaceMemberRoleEnum.OWNER, 1),
+                (workspace_members_table.c.role == WorkspaceMemberRoleEnum.TEACHER, 2),
+                (workspace_members_table.c.role == WorkspaceMemberRoleEnum.STUDENT, 3),
+            )
+        )
 
         result = await self.session.execute(query)
         rows = result.fetchall()

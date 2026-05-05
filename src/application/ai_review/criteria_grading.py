@@ -1,6 +1,7 @@
 from dependency_injector.wiring import Provide, inject
 from pydantic import TypeAdapter
 
+from src.application.custom_models.utils import get_llm_for_step
 from src.application.solutions.utils import get_workspace_id
 from src.application.transactions.utils import charge_for_llm_call
 from src.constants.ai_pipeline import PipelineStepEnum
@@ -9,12 +10,10 @@ from src.di.container import Container
 from src.dto.ai_review.criteria import CriterionCheckDTO, CriterionWithCommentsDTO
 from src.dto.solutions.solution_criteria_checks import SolutionCriteriaCheckCreateDTO, SolutionCriteriaCheckFiltersDTO
 from src.dto.solutions.solutions import SolutionUpdateDTO
-from src.dto.transactions.metadata import LLMCallTransactionMetadataDTO
-from src.infrastructure.ai.llm.interface import LLMInterface
 from src.infrastructure.ai.prompt_builder.interface import PromptBuilderInterface
 from src.infrastructure.logging import get_logger
+from src.infrastructure.solution_artifact_storage.interface import SolutionArtifactStorage
 from src.infrastructure.sqlalchemy.uow import UnitOfWork
-from src.infrastructure.storage.artifact import SolutionArtifactStorage
 
 
 logger = get_logger()
@@ -25,10 +24,9 @@ async def grade_by_project_doc(
     solution_id: int,
     uow: UnitOfWork = Provide[Container.uow],
     prompt_builder: PromptBuilderInterface = Provide[Container.prompt_builder],
-    default_model: LLMInterface = Provide[Container.default_model],
     artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
 ) -> None:
-    project_doc = await artifact_storage.get_artifact(solution_id, PipelineStepEnum.IMPROVE_DOC)
+    project_doc = await artifact_storage.get_artifact(solution_id, PipelineStepEnum.VALIDATE_PROJECT_DOC)
 
     criteria = []
     async with uow.connection():
@@ -49,11 +47,13 @@ async def grade_by_project_doc(
             if is_checking_stage or is_empty_stage or need_checking_from_other_stage:
                 criterion_for_review = CriterionWithCommentsDTO(
                     id=task_criterion.id,
-                    description=criterion.description,
+                    prompt=criterion.prompt,
                     comments=[check.comment for check in criterion_checks],
                 )
                 criteria.append(criterion_for_review)
-    logger.error("criteria", criteria=criteria)
+
+        model, metadata = await get_llm_for_step(uow, solution_id, PipelineStepEnum.GRADE_BY_PROJECT_DOC)
+
     if not criteria:
         await artifact_storage.save_artifact(
             solution_id, PipelineStepEnum.GRADE_BY_PROJECT_DOC, "Нет подходящих критериев"
@@ -67,16 +67,12 @@ async def grade_by_project_doc(
         prompt_path="criteria_checks/projectdoc_grading/user.tpl", project_doc=project_doc
     )
 
-    answer = await default_model.run(system_content, user_content)
+    answer = await model.run(system_content, user_content)
     grading_doc = answer.content
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.GRADE_BY_PROJECT_DOC, grading_doc)
 
-    metadata = LLMCallTransactionMetadataDTO(
-        solution_id=solution_id,
-        task=PipelineStepEnum.GRADE_BY_PROJECT_DOC,
-        input_tokens=answer.input_tokens,
-        output_tokens=answer.output_tokens,
-    )
+    metadata.input_tokens = answer.input_tokens
+    metadata.output_tokens = answer.output_tokens
     async with uow.connection():
         workspace_id = await get_workspace_id(uow, solution_id)
         await charge_for_llm_call(uow, workspace_id, metadata)
@@ -102,7 +98,6 @@ async def grade_by_codebase(
     solution_id: int,
     uow: UnitOfWork = Provide[Container.uow],
     prompt_builder: PromptBuilderInterface = Provide[Container.prompt_builder],
-    default_model: LLMInterface = Provide[Container.default_model],
     artifact_storage: SolutionArtifactStorage = Provide[Container.solution_artifact_storage],
 ) -> None:
     project_tree_doc = await artifact_storage.get_artifact(solution_id, PipelineStepEnum.PREPARE_PROJECT_TREE)
@@ -128,11 +123,12 @@ async def grade_by_codebase(
             if is_checking_stage or need_checking_from_other_stage:
                 criterion_for_review = CriterionWithCommentsDTO(
                     id=task_criterion.id,
-                    description=criterion.description,
+                    prompt=criterion.prompt,
                     comments=[check.comment for check in criterion_checks],
                 )
                 criteria.append(criterion_for_review)
-    logger.error("criteria", criteria=criteria)
+
+        model, metadata = await get_llm_for_step(uow, solution_id, PipelineStepEnum.GRADE_BY_CODEBASE)
     if not criteria:
         await artifact_storage.save_artifact(
             solution_id, PipelineStepEnum.GRADE_BY_CODEBASE, "Нет подходящих критериев"
@@ -146,16 +142,12 @@ async def grade_by_codebase(
         project_content=project_content_doc,
     )
 
-    answer = await default_model.run(system_content, user_content)
+    answer = await model.run(system_content, user_content)
     grading_doc = answer.content
     await artifact_storage.save_artifact(solution_id, PipelineStepEnum.GRADE_BY_CODEBASE, grading_doc)
 
-    metadata = LLMCallTransactionMetadataDTO(
-        solution_id=solution_id,
-        task=PipelineStepEnum.GRADE_BY_CODEBASE,
-        input_tokens=answer.input_tokens,
-        output_tokens=answer.output_tokens,
-    )
+    metadata.input_tokens = answer.input_tokens
+    metadata.output_tokens = answer.output_tokens
     async with uow.connection():
         workspace_id = await get_workspace_id(uow, solution_id)
         await charge_for_llm_call(uow, workspace_id, metadata)

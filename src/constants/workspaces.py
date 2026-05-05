@@ -1,7 +1,7 @@
-import enum
+from enum import StrEnum
 
 
-class WorkspaceMemberRoleEnum(str, enum.Enum):
+class WorkspaceMemberRoleEnum(StrEnum):
     OWNER = "OWNER"
     TEACHER = "TEACHER"
     STUDENT = "STUDENT"

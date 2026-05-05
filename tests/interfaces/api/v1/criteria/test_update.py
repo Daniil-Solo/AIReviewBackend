@@ -36,11 +36,12 @@ async def test__success(uow, update_criterion):
 
     criterion = (await create_criteria(uow, user.id, description="Original description"))[0]
 
-    data = CriterionUpdateDTO(description="Updated description", tags=["new_tag"])
+    data = CriterionUpdateDTO(description="Updated description", tags=["new_tag"], prompt="Updated prompt")
     result = await update_criterion(criterion.id, data, token)
 
     assert result.description == "Updated description"
     assert "new_tag" in result.tags
+    assert result.prompt == "Updated prompt"
     assert result.is_public
 
 
@@ -51,7 +52,7 @@ async def test__failed__not_creator(uow, request_update_criterion):
 
     criterion = (await create_criteria(uow, user.id, description="Original description"))[0]
 
-    data = CriterionUpdateDTO(description="Updated description")
+    data = CriterionUpdateDTO(description="Updated description", prompt="Updated prompt")
     response = await request_update_criterion(criterion.id, data, other_token)
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -62,14 +63,14 @@ async def test__failed__not_found(uow, request_update_criterion):
     user = (await create_users(uow))[0]
     token = create_access_token(user.as_short())
 
-    data = CriterionUpdateDTO(description="Updated description")
+    data = CriterionUpdateDTO(description="Updated description", prompt="Updated prompt")
     response = await request_update_criterion(9999, data, token)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 async def test__failed__unauthorized(request_update_criterion):
-    data = CriterionUpdateDTO(description="Updated description")
+    data = CriterionUpdateDTO(description="Updated description", prompt="Updated prompt")
 
     response = await request_update_criterion(1, data, token="invalid")
     assert response.status_code == status.HTTP_401_UNAUTHORIZED

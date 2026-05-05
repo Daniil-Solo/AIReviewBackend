@@ -1,16 +1,6 @@
 ## Вспомогательные скрипты
 
-### Подсчет символов и токенов директории проекта
+### Генерация api-спеки для фронтенда
 ```bash
-uv run python -m src.interfaces.cli.get_info src
-```
-
-### Сохранение контента файлов проекта
-```bash
-uv run python -m src.interfaces.cli.save_project_content src
-```
-
-### Сохранение дерева проекта
-```bash
-uv run python -m src.interfaces.cli.save_project_tree src
+uv run python -m src.interfaces.cli.gen_api_spec --output api_spec.txt
 ```

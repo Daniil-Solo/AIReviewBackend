@@ -18,5 +18,4 @@ async def check(uow: UnitOfWork = Provide[Container.uow]) -> dict[str, bool]:
     except Exception:
         logger.exception("Healthcheck failed", component="postgres")
         data["postgres"] = False
-    finally:
-        return data
+    return data

@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 
 from src.application.users.users import create_admin, create_user, get_all_users, get_user
@@ -10,7 +12,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("", response_model=list[UserResponseDTO])
 async def get_users(
-    user: ShortUserDTO = Depends(get_current_user),  # noqa: B008
+    user: Annotated[ShortUserDTO, Depends(get_current_user)],  # noqa: B008
 ) -> list[UserResponseDTO]:
     return await get_all_users(user)
 

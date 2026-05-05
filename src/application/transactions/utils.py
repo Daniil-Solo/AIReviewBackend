@@ -20,9 +20,12 @@ async def charge_for_llm_call(uow: UnitOfWork, workspace_id: int, metadata: LLMC
             WorkspaceMemberFiltersDTO(workspace_id=workspace.id, roles=[WorkspaceMemberRoleEnum.OWNER])
         )
     )[0]
-    input_cost = metadata.input_tokens * settings.ai.LLM_DEFAULT_MODEL_INPUT_TOKEN_PRICE / 1_000_000
-    output_cost = metadata.output_tokens * settings.ai.LLM_DEFAULT_MODEL_OUTPUT_TOKEN_PRICE / 1_000_000
-    total_cost = input_cost + output_cost
+
+    total_cost = 0.0
+    if metadata.model == "default":
+        input_cost = metadata.input_tokens * settings.ai.LLM_DEFAULT_MODEL_INPUT_TOKEN_PRICE / 1_000_000
+        output_cost = metadata.output_tokens * settings.ai.LLM_DEFAULT_MODEL_OUTPUT_TOKEN_PRICE / 1_000_000
+        total_cost = input_cost + output_cost
 
     data = TransactionCreateDTO(
         user_id=owner_member.user_id,

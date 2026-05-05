@@ -54,7 +54,6 @@ async def get(
             uow,
             user.id,
             task.workspace_id,
-            allowed_roles={WorkspaceMemberRoleEnum.OWNER, WorkspaceMemberRoleEnum.TEACHER},
         )
         return task
 
