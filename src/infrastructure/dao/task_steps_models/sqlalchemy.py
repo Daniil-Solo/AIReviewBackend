@@ -51,6 +51,6 @@ class SQLAlchemyTaskStepsModelsDAO(TaskStepsModelsDAO):
                     updated = True
             if updated:
                 update_query = (
-                    sa.update(task_steps_models_table).where(task_steps_models_table.c.id == row.id).values(steps=steps)
+                    sa.update(task_steps_models_table).where(task_steps_models_table.c.task_id == row.task_id).values(steps=steps)
                 )
                 await self.session.execute(update_query)
