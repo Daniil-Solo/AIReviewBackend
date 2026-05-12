@@ -24,7 +24,6 @@ def path_content(
     *,
     follow_symlinks: bool = False,
     include: Callable[[Path], bool] = lambda _: True,
-    skip_binary: bool = True,
     encoding: str = "utf-8",
     errors: str = "raise",
     file_handlers: dict[str, FileHandler] | None = None,
@@ -43,8 +42,6 @@ def path_content(
         return handlers.get(ext)
 
     def safe_add_file(p: Path) -> None:
-        if skip_binary and is_binary_file(p):
-            return
         try:
             handler = get_handler(p)
             content = handler(p) if handler is not None else p.read_text(encoding=encoding)

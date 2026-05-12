@@ -20,38 +20,39 @@ flowchart LR
                 grafana("<b>dashboard</b><br>Grafana :3000")
                 prom("<b>metrics</b><br>Prometheus")
             end
-        end
-        subgraph Volumes["Docker Volumes"]
-            pg_data[("postgres_data")]
-            minio_data[("minio_data")]
-            loki_data[("loki_data")]
-            prom_data[("prometheus_data")]
-            redis_data[("redis_data")]
+        
+            subgraph Volumes["Docker Volumes"]
+                pg_data[("postgres_data")]
+                minio_data[("minio_data")]
+                loki_data[("loki_data")]
+                prom_data[("prometheus_data")]
+                redis_data[("redis_data")]
+            end
         end
     end
 
-    subgraph External2["Внешние системы"]
-        llm("<b>LLM API</b><br>Zveno AI")
-    end
 
     %% Связи между контейнерами
     nginx --> api
-    api --> db
+    nginx --> minio
+    nginx --> grafana
+    
+
+    
     api --> redis
+    api --> db
     api --> minio
     
     worker1 --> db
-    worker1 --> redis
     worker1 --> minio
     
     grafana --> loki
     grafana --> prom
-    worker1 --> llm
+    
 
     %% Связи с внешним миром
     user -->|":80/:443"| nginx
-    admin -->|":3000"| grafana
-    admin -->|":9001"| minio
+    admin -->|":80/:443"| nginx
 
     %% Монтирование томов
     db -.-> pg_data
@@ -60,5 +61,31 @@ flowchart LR
     redis -.-> redis_data
     prom -.-> prom_data
     
-    prom --> api
+```
+
+### Hard Local
+
+```mermaid
+flowchart TD
+    web(web: nginx) --> api
+    api(api: fastapi) --> database[(database: postgresql)]
+    worker(worker: python) --> database
+```
+
+
+### Production
+
+```mermaid
+flowchart TD
+    web(web: nginx) --> api
+
+    api(api: fastapi) --> database[(database: postgresql)]
+    api --> minio[(file storage: minio)]
+    api --> redis[(cache: redis)]
+    
+    worker --> minio
+    worker(worker: python) --> database
+
+    grafana(grafana) --> loki(logs: loki)
+    grafana --> prometheus(metrics: prometheus)
 ```

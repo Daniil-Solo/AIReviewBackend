@@ -12,7 +12,7 @@
 - **Database**: PostgreSQL, SQLAlchemy Core, Alembic
 - **AI**: OpenAI API
 - **Linters**: Ruff, MyPy
-- **CLI**: Click, Rich
+- **CLI**: Click
 - **Testing**: Pytest
 
 ## Компоненты

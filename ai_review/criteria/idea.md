@@ -1,4 +1,0 @@
-Maintainability
-Testability
-Performance
-Scalability

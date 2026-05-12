@@ -1,5 +1,41 @@
 ## Архитектура проекта
 
+### Без технологий
+
+```mermaid
+flowchart LR
+    user("Пользователь")
+
+    subgraph System["Система"]
+        balancer("Балансировщик нагрузки")
+        api("API-сервер")
+        worker("Воркер")
+        db("Реляционная БД")
+        storage("Файловое хранилище")
+        cache("БД типа 'ключ-значение'")
+    end
+    subgraph External["Внешние системы"]
+        llm("LLM API")
+        github("GitHub API")
+    end
+
+    %% Коммуникации внутри
+    balancer --> api
+    
+    api --> db
+    api --> cache
+    worker --> db
+    worker --> storage
+
+    %% Коммуникации с внешними системами
+    worker --> llm
+    api --> github
+
+    %% Внешний доступ пользователя
+    user --> balancer
+```
+
+
 ### С4 - уровень компонентов
 
 ```mermaid
